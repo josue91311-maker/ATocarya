@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
-import { ServiceDate, SlotKey, SlotConfig } from '../types';
+import { ServiceDate, SlotKey } from '../types';
 import { 
   X, 
-  Calendar, 
   Clock, 
   Check, 
   Sliders, 
-  AlertCircle, 
-  Sparkles,
-  Music
+  AlertCircle
 } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 
@@ -18,6 +15,27 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
+
+const ALL_SLOTS_DEF: { key: SlotKey; label: string; category: string }[] = [
+  { key: 'voz_director', label: 'Voz Director', category: 'Voces' },
+  { key: 'voz_coro_1', label: 'Voz Coro 1', category: 'Voces' },
+  { key: 'voz_coro_2', label: 'Voz Coro 2', category: 'Voces' },
+  { key: 'voz_coro_3', label: 'Voz Coro 3', category: 'Voces' },
+  { key: 'voz_coro_4', label: 'Voz Coro 4', category: 'Voces' },
+  { key: 'piano_1', label: 'Piano 1', category: 'Teclados' },
+  { key: 'piano_2', label: 'Piano 2', category: 'Teclados' },
+  { key: 'guitarra_1', label: 'Guitarra Eléc. 1', category: 'Guitarras' },
+  { key: 'guitarra_2', label: 'Guitarra Eléc. 2', category: 'Guitarras' },
+  { key: 'guitarra_acustica', label: 'Guitarra Acústica', category: 'Guitarras' },
+  { key: 'bateria', label: 'Batería', category: 'Ritmo' },
+  { key: 'bajo', label: 'Bajo', category: 'Ritmo' },
+  { key: 'sonido', label: 'Sonido & Audio', category: 'Técnica' },
+];
+
+const SLOT_LABEL_MAP = ALL_SLOTS_DEF.reduce((acc, item) => {
+  acc[item.key] = item.label;
+  return acc;
+}, {} as Record<SlotKey, string>);
 
 export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClose }) => {
   const { updateServiceConfig } = useApp();
@@ -28,23 +46,28 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [registrationDeadline, setRegistrationDeadline] = useState('');
-  const [enabledSlots, setEnabledSlots] = useState<Record<SlotKey, boolean>>({} as any);
+  const [enabledSlots, setEnabledSlots] = useState<Record<SlotKey, boolean>>(() => {
+    const initial: Record<SlotKey, boolean> = {} as any;
+    ALL_SLOTS_DEF.forEach(s => { initial[s.key] = true; });
+    return initial;
+  });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
   // Initialize fields when modal opens with service
   useEffect(() => {
     if (service) {
-      setDate(service.date);
-      setTime(service.time);
+      setDate(service.date || '');
+      setTime(service.time || '09:30');
       setRehearsalTime(service.rehearsalTime || '08:30');
-      setTitle(service.title);
+      setTitle(service.title || '');
       setNotes(service.notes || '');
       setRegistrationDeadline(service.registrationDeadline || '');
 
       const initialEnabled: Record<SlotKey, boolean> = {} as any;
-      (Object.keys(service.slots) as SlotKey[]).forEach(k => {
-        initialEnabled[k] = service.slots[k].enabled !== false;
+      ALL_SLOTS_DEF.forEach(item => {
+        const slotInService = service.slots?.[item.key];
+        initialEnabled[item.key] = slotInService ? slotInService.enabled !== false : true;
       });
       setEnabledSlots(initialEnabled);
     }
@@ -62,9 +85,7 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
   // Presets
   const applyPresetAll = () => {
     const allOn: Record<SlotKey, boolean> = {} as any;
-    (Object.keys(service.slots) as SlotKey[]).forEach(k => {
-      allOn[k] = true;
-    });
+    ALL_SLOTS_DEF.forEach(s => { allOn[s.key] = true; });
     setEnabledSlots(allOn);
   };
 
@@ -151,22 +172,22 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-2xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
         
-        {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-200 bg-slate-50 flex items-center justify-between flex-shrink-0">
+        {/* Header - Planning Center Style */}
+        <div className="px-6 py-5 border-b border-slate-200 bg-slate-50/60 flex items-center justify-between flex-shrink-0">
           <div>
             <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
-              <h2 className="text-base font-bold text-slate-900">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+              <h2 className="text-base font-bold text-slate-900 font-display">
                 Editar Fecha & Configurar Instrumentos
               </h2>
             </div>
             <p className="text-xs text-slate-500 mt-0.5">
-              Configura dinámicamente qué instrumentos participarán en este culto.
+              Configura los datos del culto y qué puestos estarán habilitados.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -175,8 +196,8 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
         {/* Content Form */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-5 flex-1">
           {error && (
-            <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-rose-500 flex-shrink-0" />
               <span>{error}</span>
             </div>
           )}
@@ -199,7 +220,7 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                 required
                 value={date}
                 onChange={(e) => setDate(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600 cursor-pointer"
               />
             </div>
 
@@ -212,38 +233,39 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                 required
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600 cursor-pointer"
               />
             </div>
 
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">
-                Hora de Ensayo
+                Hora de Ensayo Previo
               </label>
               <input
                 type="time"
                 value={rehearsalTime}
                 onChange={(e) => setRehearsalTime(e.target.value)}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600"
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600 cursor-pointer"
               />
             </div>
           </div>
 
           <div>
             <label className="block text-xs font-bold text-slate-700 mb-1">
-              Título o Motivo del Servicio
+              Título o Motivo del Culto
             </label>
             <input
               type="text"
+              required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Ej. Servicio Dominical de Alabanza"
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600"
+              placeholder="Ej. Culto Dominical de Alabanza"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600"
             />
           </div>
 
           {/* FECHA LÍMITE DE EXPIRACIÓN */}
-          <div className="p-3 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-2">
+          <div className="p-3.5 bg-amber-50/70 border border-amber-200/80 rounded-2xl space-y-2">
             <div className="flex items-center justify-between">
               <label className="block text-xs font-bold text-amber-950 flex items-center gap-1.5">
                 <Clock className="w-3.5 h-3.5 text-amber-600" />
@@ -261,9 +283,9 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                 type="date"
                 value={registrationDeadline}
                 onChange={(e) => setRegistrationDeadline(e.target.value)}
-                className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-amber-500"
+                className="w-full px-3 py-2 bg-white border border-amber-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-none focus:border-amber-500 cursor-pointer"
               />
-              <div className="flex items-center gap-1">
+              <div className="flex items-center gap-1 flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => {
@@ -276,7 +298,7 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                       setRegistrationDeadline(`${y}-${m}-${dayStr}`);
                     }
                   }}
-                  className="px-2 py-1 bg-white hover:bg-amber-100/60 border border-amber-200 rounded-lg text-[10px] font-bold text-amber-900 whitespace-nowrap"
+                  className="px-2.5 py-1 bg-white hover:bg-amber-100/60 border border-amber-200 rounded-lg text-[10px] font-bold text-amber-900 whitespace-nowrap shadow-2xs"
                 >
                   1 día antes
                 </button>
@@ -285,14 +307,14 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                   onClick={() => {
                     if (date) setRegistrationDeadline(date);
                   }}
-                  className="px-2 py-1 bg-white hover:bg-amber-100/60 border border-amber-200 rounded-lg text-[10px] font-bold text-amber-900 whitespace-nowrap"
+                  className="px-2.5 py-1 bg-white hover:bg-amber-100/60 border border-amber-200 rounded-lg text-[10px] font-bold text-amber-900 whitespace-nowrap shadow-2xs"
                 >
                   Mismo día
                 </button>
                 <button
                   type="button"
                   onClick={() => setRegistrationDeadline('')}
-                  className="px-2 py-1 bg-white hover:bg-slate-100 border border-amber-200 rounded-lg text-[10px] text-slate-600 whitespace-nowrap"
+                  className="px-2.5 py-1 bg-white hover:bg-slate-100 border border-amber-200 rounded-lg text-[10px] text-slate-600 whitespace-nowrap shadow-2xs"
                 >
                   Limpiar
                 </button>
@@ -304,10 +326,10 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
           <div className="pt-2 border-t border-slate-100">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
               <div>
-                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-blue-600" />
+                <h3 className="text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5 font-display">
+                  <Sliders className="w-3.5 h-3.5 text-emerald-600" />
                   <span>Instrumentos Requeridos ese Día</span>
-                  <span className="ml-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                  <span className="ml-1 text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">
                     {activeCount} de 13 activos
                   </span>
                 </h3>
@@ -321,21 +343,21 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                 <button
                   type="button"
                   onClick={applyPresetAll}
-                  className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors"
+                  className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors"
                 >
                   Todos
                 </button>
                 <button
                   type="button"
                   onClick={applyPresetAcoustic}
-                  className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg text-[10px] font-bold transition-colors"
+                  className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-[10px] font-bold transition-colors"
                 >
                   Acústico
                 </button>
                 <button
                   type="button"
                   onClick={applyPresetBasic}
-                  className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors"
+                  className="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors"
                 >
                   Básico
                 </button>
@@ -352,7 +374,7 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                   
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                     {cat.keys.map((key) => {
-                      const slot = service.slots[key];
+                      const slotLabel = service.slots?.[key]?.label || SLOT_LABEL_MAP[key] || key;
                       const isEnabled = enabledSlots[key] !== false;
 
                       return (
@@ -362,19 +384,19 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
                           onClick={() => handleToggleSlot(key)}
                           className={`p-2 rounded-xl border text-left flex items-center justify-between gap-2 transition-all ${
                             isEnabled
-                              ? 'bg-white border-blue-300 text-slate-900 shadow-2xs'
+                              ? 'bg-white border-emerald-300 text-slate-900 shadow-2xs'
                               : 'bg-slate-100/70 border-slate-200 text-slate-400 opacity-60'
                           }`}
                         >
                           <div className="flex items-center gap-2 min-w-0">
-                            <InstrumentIcon instrument={key} className={`w-4 h-4 flex-shrink-0 ${isEnabled ? 'text-blue-600' : 'text-slate-400'}`} />
+                            <InstrumentIcon instrument={key} className={`w-4 h-4 flex-shrink-0 ${isEnabled ? 'text-emerald-600' : 'text-slate-400'}`} />
                             <span className="text-xs font-semibold truncate">
-                              {slot.label}
+                              {slotLabel}
                             </span>
                           </div>
 
                           <div className={`w-4 h-4 rounded-md flex items-center justify-center border text-white transition-colors ${
-                            isEnabled ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'
+                            isEnabled ? 'bg-emerald-600 border-emerald-600' : 'bg-white border-slate-300'
                           }`}>
                             {isEnabled && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -396,7 +418,7 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Ej. Canciones: 1. Tu Fidelidad, 2. Bueno es Alabar. Vestimenta: Formal."
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 resize-none font-medium"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 focus:bg-white focus:outline-none focus:border-emerald-600 resize-none font-medium"
             />
           </div>
 
@@ -410,9 +432,9 @@ export const AdminEditServiceModal: React.FC<Props> = ({ service, isOpen, onClos
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-500/20"
+              className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-sm shadow-emerald-600/20"
             >
-              Guardar Cambios del Culto
+              Guardar Cambios
             </button>
           </div>
         </form>

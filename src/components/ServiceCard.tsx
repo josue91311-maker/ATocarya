@@ -53,14 +53,19 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
         {/* Header: Planning Center Date Box + Title & Times + Status Pill */}
         <div className="flex items-start justify-between gap-3">
           <div className="flex items-center gap-3.5 min-w-0">
-            {/* Planning Center Date Box */}
-            <div className="w-13 h-13 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col items-center justify-center text-slate-800 flex-shrink-0 group-hover:border-emerald-300 group-hover:bg-emerald-50/30 transition-colors shadow-2xs">
-              <span className="text-[10px] uppercase font-bold text-emerald-700 leading-none tracking-wider">
+            {/* Ultra-Visible Calendar Sheet Badge */}
+            <div className="w-14 h-15 rounded-2xl border border-emerald-300 bg-white flex flex-col items-center overflow-hidden flex-shrink-0 shadow-sm group-hover:border-emerald-500 group-hover:shadow-md transition-all">
+              <div className="w-full bg-emerald-600 text-white text-[10px] uppercase font-black py-0.5 text-center tracking-wider leading-tight">
                 {monthName}
-              </span>
-              <span className="text-xl font-bold font-display leading-tight tabular-nums text-slate-900">
-                {dayNumber}
-              </span>
+              </div>
+              <div className="flex-1 flex flex-col items-center justify-center py-0.5">
+                <span className="text-2xl font-black font-display leading-none tabular-nums text-slate-900">
+                  {dayNumber}
+                </span>
+                <span className="text-[9px] uppercase font-bold text-slate-500 leading-none mt-0.5">
+                  {dayName.slice(0, 3)}
+                </span>
+              </div>
             </div>
 
             <div className="min-w-0">

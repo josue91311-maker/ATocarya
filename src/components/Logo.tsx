@@ -29,13 +29,24 @@ export const Logo: React.FC<LogoProps> = ({
 
   return (
     <div className={`flex items-center gap-2.5 ${className}`}>
-      {/* Planning Center Services style Icon with Emerald Gradient */}
-      <div className={`${iconSizes[size]} relative flex items-center justify-center rounded-xl bg-emerald-600 text-white shadow-sm flex-shrink-0`}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-          {/* Planning Center Services style Music Sheet & Play icon */}
-          <path d="M9 18V5l12-2v13" />
-          <circle cx="6" cy="18" r="3" />
-          <circle cx="18" cy="16" r="3" />
+      {/* Modern AtocarYa Emblem: Architectural 'A' + Soundwave */}
+      <div className={`${iconSizes[size]} relative flex items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-teal-700 text-white shadow-sm ring-1 ring-white/30 flex-shrink-0`}>
+        <svg viewBox="0 0 64 64" fill="none" className="w-5/6 h-5/6">
+          <path 
+            d="M17 48 L30.2 14.6 C31.0 12.6 33.0 12.6 33.8 14.6 L47 48" 
+            stroke="currentColor" 
+            strokeWidth="5.5" 
+            strokeLinecap="round" 
+            strokeLinejoin="round" 
+          />
+          <path 
+            d="M14 34 C19 34 21 28 26 28 C31 28 33 40 38 40 C43 40 45 34 50 34" 
+            stroke="currentColor" 
+            strokeWidth="4" 
+            strokeLinecap="round" 
+          />
+          <circle cx="38" cy="40" r="3.5" fill="#34d399" />
+          <circle cx="26" cy="28" r="2.5" fill="currentColor" />
         </svg>
       </div>
 

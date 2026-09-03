@@ -227,7 +227,7 @@ export const AdminEditMusicianModal: React.FC<Props> = ({ musician, isOpen, onCl
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm"
+              className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-lg transition-all shadow-sm shadow-emerald-600/20"
             >
               Guardar Cambios
             </button>

@@ -349,15 +349,15 @@ export const AdminScheduleTable: React.FC<Props> = ({
                           <button
                             onClick={() => setDuplicatingService(service)}
                             title="Duplicar esta fecha (cambiar fecha del evento y fecha límite)"
-                            className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors"
+                            className="p-1.5 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 rounded-lg transition-colors"
                           >
                             <Copy className="w-3.5 h-3.5" />
                           </button>
                           {onEditService && (
                             <button
                               onClick={() => onEditService(service)}
-                              title="Editar fecha y configurar instrumentos dinámicamente"
-                              className="p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors"
+                              title="Editar fecha y configurar instrumentos"
+                              className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
                             >
                               <Sliders className="w-3.5 h-3.5" />
                             </button>
@@ -365,7 +365,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
                           <button
                             onClick={() => onOpenService(service.id)}
                             title="Ver / Asignar músicos"
-                            className="p-1.5 text-slate-500 hover:text-blue-600 hover:bg-slate-100 rounded transition-colors"
+                            className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
