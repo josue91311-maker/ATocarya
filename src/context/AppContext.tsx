@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Musician, ServiceDate, CurrentUser, SlotKey, PrimaryInstrument } from '../types';
+import { Musician, ServiceDate, CurrentUser, SlotKey, SlotConfig, PrimaryInstrument } from '../types';
 import { INITIAL_MUSICIANS, generateInitialServices, createEmptySlots } from '../data/initialData';
 import { isServiceExpired } from '../utils/dateUtils';
 import { 
@@ -15,7 +15,8 @@ import {
   apiReleaseSlot, 
   apiAdminAssignSlot, 
   apiAdminClearSlot, 
-  apiToggleServiceOpen 
+  apiToggleServiceOpen,
+  apiSaveWholeService
 } from '../services/api';
 
 interface AppContextType {
@@ -47,6 +48,8 @@ interface AppContextType {
   // Admin service actions
   createService: (date: string, time: string, title: string, rehearsalTime?: string, notes?: string, enabledSlots?: Record<SlotKey, boolean>, registrationDeadline?: string) => { success: boolean; message?: string };
   generateSundays: (count?: number) => void;
+  duplicateService: (sourceServiceId: string, newDate: string, newRegistrationDeadline?: string, copyMusicians?: boolean) => { success: boolean; message?: string };
+  generateRecurringServices: (options: { weekday: number; count: number; time: string; rehearsalTime?: string; title?: string; startDate?: string }) => { success: boolean; count: number; message?: string };
   deleteService: (serviceId: string) => void;
   toggleServiceOpen: (serviceId: string) => void;
   updateServiceDetails: (serviceId: string, updates: Partial<Omit<ServiceDate, 'id' | 'slots'>>) => void;
@@ -514,6 +517,116 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
+  const duplicateService = (
+    sourceServiceId: string,
+    newDate: string,
+    newRegistrationDeadline?: string,
+    copyMusicians = false
+  ) => {
+    if (!newDate) {
+      return { success: false, message: 'Por favor ingresa la nueva fecha del evento.' };
+    }
+
+    const source = services.find(s => s.id === sourceServiceId);
+    if (!source) {
+      return { success: false, message: 'Servicio de origen no encontrado.' };
+    }
+
+    const exists = services.find(s => s.date === newDate && s.time === source.time);
+    if (exists) {
+      return { success: false, message: `Ya existe un servicio programado el ${newDate} a las ${source.time}.` };
+    }
+
+    const duplicatedSlots: Record<SlotKey, SlotConfig> = {} as any;
+    (Object.keys(source.slots) as SlotKey[]).forEach(k => {
+      const orig = source.slots[k];
+      duplicatedSlots[k] = {
+        ...orig,
+        musicianId: copyMusicians ? orig.musicianId : null,
+        musicianName: copyMusicians ? orig.musicianName : undefined,
+        assignedAt: copyMusicians && orig.musicianId ? new Date().toISOString() : undefined,
+      };
+    });
+
+    const newService: ServiceDate = {
+      id: `service_${newDate}_${Date.now()}`,
+      date: newDate,
+      time: source.time,
+      title: source.title,
+      rehearsalTime: source.rehearsalTime,
+      notes: source.notes,
+      isOpen: true,
+      registrationDeadline: newRegistrationDeadline?.trim() || undefined,
+      slots: duplicatedSlots,
+      createdAt: new Date().toISOString(),
+    };
+
+    setServices(prev => [...prev, newService].sort((a, b) => a.date.localeCompare(b.date)));
+    apiSaveWholeService(newService);
+
+    return { success: true };
+  };
+
+  const generateRecurringServices = (options: {
+    weekday: number;
+    count: number;
+    time: string;
+    rehearsalTime?: string;
+    title?: string;
+    startDate?: string;
+  }) => {
+    const existingDateTimes = new Set(services.map(s => `${s.date}_${s.time}`));
+    
+    const baseDate = options.startDate ? new Date(options.startDate + 'T12:00:00') : new Date();
+    const currentDay = baseDate.getDay(); // 0 (Dom) a 6 (Sáb)
+    let daysUntilTarget = (options.weekday - currentDay + 7) % 7;
+    if (daysUntilTarget === 0 && !options.startDate) {
+      // Si hoy es el mismo día y no se dio fecha fija, empezar en la siguiente semana
+      daysUntilTarget = 7;
+    }
+
+    const firstOccurrence = new Date(baseDate);
+    firstOccurrence.setDate(baseDate.getDate() + daysUntilTarget);
+
+    const newServicesList: ServiceDate[] = [];
+    for (let i = 0; i < options.count; i++) {
+      const occurrence = new Date(firstOccurrence);
+      occurrence.setDate(firstOccurrence.getDate() + i * 7);
+
+      const year = occurrence.getFullYear();
+      const month = String(occurrence.getMonth() + 1).padStart(2, '0');
+      const day = String(occurrence.getDate()).padStart(2, '0');
+      const dateStr = `${year}-${month}-${day}`;
+      const timeStr = options.time || '19:30';
+
+      const key = `${dateStr}_${timeStr}`;
+      if (!existingDateTimes.has(key)) {
+        existingDateTimes.add(key);
+
+        const newService: ServiceDate = {
+          id: `service_${dateStr}_${Date.now()}_${i}`,
+          date: dateStr,
+          time: timeStr,
+          rehearsalTime: options.rehearsalTime || '18:30',
+          title: options.title?.trim() || 'Culto de Alabanza',
+          notes: '',
+          isOpen: true,
+          slots: createEmptySlots(),
+          createdAt: new Date().toISOString(),
+        };
+
+        newServicesList.push(newService);
+        apiSaveWholeService(newService);
+      }
+    }
+
+    if (newServicesList.length > 0) {
+      setServices(prev => [...prev, ...newServicesList].sort((a, b) => a.date.localeCompare(b.date)));
+    }
+
+    return { success: true, count: newServicesList.length };
+  };
+
   const deleteService = (serviceId: string) => {
     setServices(prev => prev.filter(s => s.id !== serviceId));
     apiDeleteService(serviceId);
@@ -698,6 +811,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateMusicianPin,
         createService,
         generateSundays,
+        duplicateService,
+        generateRecurringServices,
         deleteService,
         toggleServiceOpen,
         updateServiceDetails,

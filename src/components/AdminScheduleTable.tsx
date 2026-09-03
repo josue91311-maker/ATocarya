@@ -13,10 +13,14 @@ import {
   Edit3,
   Layers,
   Camera,
-  Sliders
+  Sliders,
+  Copy,
+  Sparkles
 } from 'lucide-react';
 
 import { ConfirmModal, ConfirmDialogOptions } from './ConfirmModal';
+import { AdminDuplicateModal } from './AdminDuplicateModal';
+import { AdminQuickBatchModal } from './AdminQuickBatchModal';
 import { getMonthKey, getMonthLabel, isServicePast, isServiceExpired } from '../utils/dateUtils';
 
 interface Props {
@@ -35,6 +39,8 @@ export const AdminScheduleTable: React.FC<Props> = ({
   onEditService,
 }) => {
   const [confirmDialog, setConfirmDialog] = React.useState<ConfirmDialogOptions | null>(null);
+  const [duplicatingService, setDuplicatingService] = React.useState<ServiceDate | null>(null);
+  const [isQuickBatchOpen, setIsQuickBatchOpen] = React.useState<boolean>(false);
   const [selectedMonth, setSelectedMonth] = React.useState<string>('all');
   const [hidePast, setHidePast] = React.useState<boolean>(true);
 
@@ -118,16 +124,17 @@ export const AdminScheduleTable: React.FC<Props> = ({
           </button>
 
           <button
-            onClick={() => generateSundays(4)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition-colors shadow-sm"
+            onClick={() => setIsQuickBatchOpen(true)}
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100 text-indigo-700 border border-indigo-200 font-bold rounded-lg text-xs transition-all shadow-2xs"
+            title="Crear fechas para cualquier día de la semana (Lunes a Domingo), cantidad y hora"
           >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>+4 Semanas</span>
+            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <span>⚡ Creación Rápida</span>
           </button>
 
           <button
             onClick={onOpenShareModal}
-            className="flex items-center gap-1.5 px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-bold transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-bold transition-colors shadow-sm"
           >
             <Share2 className="w-3.5 h-3.5" />
             <span>WhatsApp</span>
@@ -135,7 +142,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
 
           <button
             onClick={handleExportJSON}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-medium transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
             <span>JSON</span>
@@ -187,12 +194,21 @@ export const AdminScheduleTable: React.FC<Props> = ({
           <p className="text-xs text-slate-500 mt-0.5 mb-4">
             {hidePast ? 'Las fechas pasadas están ocultas. Desmarca la casilla si deseas ver el historial.' : 'No se encontraron servicios para este mes.'}
           </p>
-          <button
-            onClick={() => generateSundays(4)}
-            className="px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow-sm"
-          >
-            Generar Próximas Fechas
-          </button>
+          <div className="flex items-center justify-center gap-2">
+            <button
+              onClick={onOpenCreateModal}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
+            >
+              Programar Culto Individual
+            </button>
+            <button
+              onClick={() => setIsQuickBatchOpen(true)}
+              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>⚡ Creador Rápido en Lote</span>
+            </button>
+          </div>
         </div>
       ) : (
         <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -325,6 +341,13 @@ export const AdminScheduleTable: React.FC<Props> = ({
                       {/* Actions */}
                       <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center justify-center gap-1">
+                          <button
+                            onClick={() => setDuplicatingService(service)}
+                            title="Duplicar esta fecha (cambiar fecha del evento y fecha límite)"
+                            className="p-1.5 text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 rounded transition-colors"
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                          </button>
                           {onEditService && (
                             <button
                               onClick={() => onEditService(service)}
@@ -375,6 +398,19 @@ export const AdminScheduleTable: React.FC<Props> = ({
 
       {/* Modern In-App Confirmation Dialog */}
       <ConfirmModal options={confirmDialog} />
+
+      {/* Modal para Duplicar Fecha */}
+      <AdminDuplicateModal 
+        service={duplicatingService} 
+        isOpen={!!duplicatingService} 
+        onClose={() => setDuplicatingService(null)} 
+      />
+
+      {/* Modal para Creación Rápida en Lote */}
+      <AdminQuickBatchModal 
+        isOpen={isQuickBatchOpen} 
+        onClose={() => setIsQuickBatchOpen(false)} 
+      />
     </div>
   );
 };
