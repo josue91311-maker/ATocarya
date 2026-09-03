@@ -55,9 +55,9 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
     year: 'numeric',
   });
 
-  const slotsList = (Object.values(service.slots) as SlotConfig[]).filter(s => s.enabled !== false);
+  const slotsList = (Object.values(service.slots || {}) as SlotConfig[]).filter(s => s && s.enabled !== false);
   const totalSlots = slotsList.length;
-  const occupiedCount = slotsList.filter(s => s.musicianId !== null).length;
+  const occupiedCount = slotsList.filter(s => Boolean(s.musicianId)).length;
 
   const myAssignedSlot = musicianUser
     ? slotsList.find(s => s.musicianId === musicianUser.id)
@@ -66,7 +66,7 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
   // Find quick recommended slot matching musician's instrument
   const recommendedSlot = musicianUser && !myAssignedSlot
     ? slotsList.find(s => 
-        s.musicianId === null &&
+        !s.musicianId &&
         (s.label.toLowerCase().includes(musicianUser.primaryInstrument.toLowerCase()) ||
          musicianUser.primaryInstrument.toLowerCase().includes(s.label.toLowerCase()) ||
          musicianUser.primaryInstrument.toLowerCase().includes(s.category.toLowerCase()))
@@ -288,13 +288,13 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700 pb-1 border-b border-slate-200">
                   <span>{cat}</span>
                   <span className="text-slate-500 font-normal">
-                    {catSlots.filter(s => s.musicianId !== null).length} de {catSlots.length} cubiertos
+                    {catSlots.filter(s => Boolean(s.musicianId)).length} de {catSlots.length} cubiertos
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   {catSlots.map((slot) => {
-                    const isOccupied = slot.musicianId !== null;
+                    const isOccupied = Boolean(slot.musicianId);
                     const isMe = musicianUser && slot.musicianId === musicianUser.id;
 
                     return (

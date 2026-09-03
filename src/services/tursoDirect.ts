@@ -98,23 +98,47 @@ export const tursoDeleteMusician = async (id: string): Promise<boolean> => {
 };
 
 // --- Servicios Directo en Turso SQLite ---
+import { createEmptySlots } from '../data/initialData';
+
+export const normalizeServiceSlots = (rawSlots: any): Record<SlotKey, SlotConfig> => {
+  const base = createEmptySlots();
+  if (!rawSlots || typeof rawSlots !== 'object') return base;
+  for (const key of Object.keys(base) as SlotKey[]) {
+    if (rawSlots[key]) {
+      base[key] = {
+        ...base[key],
+        ...rawSlots[key],
+        musicianId: rawSlots[key].musicianId || null,
+        enabled: rawSlots[key].enabled !== false,
+      };
+    }
+  }
+  return base;
+};
 
 export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
   try {
     const db = getTursoClient();
     const result = await db.execute('SELECT * FROM services ORDER BY date ASC');
-    return result.rows.map(r => ({
-      id: String(r.id),
-      date: String(r.date),
-      time: String(r.time),
-      title: String(r.title),
-      rehearsalTime: r.rehearsal_time ? String(r.rehearsal_time) : undefined,
-      notes: r.notes ? String(r.notes) : undefined,
-      isOpen: Boolean(r.is_open),
-      registrationDeadline: r.registration_deadline ? String(r.registration_deadline) : undefined,
-      slots: JSON.parse(String(r.slots)),
-      createdAt: String(r.created_at),
-    }));
+    return result.rows.map(r => {
+      let parsed = {};
+      try {
+        parsed = JSON.parse(String(r.slots || '{}'));
+      } catch (e) {}
+
+      return {
+        id: String(r.id),
+        date: String(r.date),
+        time: String(r.time),
+        title: String(r.title),
+        rehearsalTime: r.rehearsal_time ? String(r.rehearsal_time) : undefined,
+        notes: r.notes ? String(r.notes) : undefined,
+        isOpen: Boolean(r.is_open),
+        registrationDeadline: r.registration_deadline ? String(r.registration_deadline) : undefined,
+        slots: normalizeServiceSlots(parsed),
+        createdAt: String(r.created_at),
+      };
+    });
   } catch (err) {
     console.warn('Error al obtener cultos desde Turso:', err);
     return null;

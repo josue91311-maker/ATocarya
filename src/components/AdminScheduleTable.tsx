@@ -291,9 +291,9 @@ export const AdminScheduleTable: React.FC<Props> = ({
 
                       {/* Instrument Slots */}
                       {SLOT_COLUMNS.map((col) => {
-                        const slot = service.slots[col.key];
-                        const isEnabled = slot?.enabled !== false;
-                        const isOccupied = isEnabled && slot?.musicianId !== null;
+                        const slot = service.slots?.[col.key];
+                        const isEnabled = slot ? slot.enabled !== false : true;
+                        const isOccupied = isEnabled && Boolean(slot?.musicianId);
                         const firstName = slot?.musicianName?.split(' ')[0] || '';
 
                         if (!isEnabled) {
@@ -310,11 +310,11 @@ export const AdminScheduleTable: React.FC<Props> = ({
                           <td key={col.key} className="py-3 px-2 text-center whitespace-nowrap">
                             {isOccupied ? (
                               <div 
-                                title={slot?.musicianName || ''}
+                                title={slot?.musicianName || 'Músico Asignado'}
                                 className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200/90 text-emerald-900 font-semibold text-[11px] max-w-[95px] truncate shadow-2xs"
                               >
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                                <span className="truncate">{firstName}</span>
+                                <span className="truncate">{firstName || 'Asignado'}</span>
                               </div>
                             ) : (
                               <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md border border-dashed border-slate-300 text-slate-400 text-[10px] font-medium hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50/50 transition-colors">

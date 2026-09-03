@@ -271,13 +271,13 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
               const isPast = isServicePast(service.date);
               const isExpired = isServiceExpired(service);
 
-              const slotsList = (Object.values(service.slots) as SlotConfig[]).filter(s => s.enabled !== false);
-              const occupied = slotsList.filter(s => s.musicianId !== null).length;
+              const slotsList = (Object.values(service.slots || {}) as SlotConfig[]).filter(s => s && s.enabled !== false);
+              const occupied = slotsList.filter(s => Boolean(s.musicianId)).length;
               const total = slotsList.length;
 
               return (
                 <div 
-                  key={service.id}
+                  key={service.id} 
                   className={`bg-white border rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:shadow-md transition-all duration-150 ${
                     isPast ? 'border-slate-200/60 bg-slate-50/50 opacity-85' : 'border-slate-200'
                   }`}
@@ -287,7 +287,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
                     <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4 mb-4">
                       <div className="flex items-center gap-3.5">
                         <div className="w-13 h-13 rounded-2xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center font-bold flex-shrink-0 text-slate-800">
-                          <span className="text-[10px] uppercase font-bold text-blue-600 leading-none">
+                          <span className="text-[10px] uppercase font-bold text-emerald-700 leading-none">
                             {monthName.slice(0, 3)}
                           </span>
                           <span className="text-xl font-bold font-display leading-tight tabular-nums">
@@ -297,7 +297,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
 
                         <div>
                           <div className="flex items-center gap-2">
-                            <span className="text-xs font-bold text-blue-700 uppercase tracking-wide">
+                            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wide">
                               {dayName} · {service.date}
                             </span>
                             {isPast && (
@@ -337,9 +337,9 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
                     {/* Slots List for this Date */}
                     <div className="space-y-1.5 max-h-[340px] overflow-y-auto pr-1">
                       {slotOrder.map((key) => {
-                        const slot = service.slots[key];
+                        const slot = service.slots?.[key];
                         if (!slot || slot.enabled === false) return null;
-                        const isOccupied = slot.musicianId !== null;
+                        const isOccupied = Boolean(slot.musicianId);
 
                         return (
                           <div

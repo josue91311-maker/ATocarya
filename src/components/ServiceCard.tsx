@@ -22,9 +22,9 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
 
   const isExpired = isServiceExpired(service);
 
-  const slotsList = (Object.values(service.slots) as SlotConfig[]).filter(s => s.enabled !== false);
+  const slotsList = (Object.values(service.slots || {}) as SlotConfig[]).filter(s => s && s.enabled !== false);
   const totalSlots = slotsList.length;
-  const occupiedList = slotsList.filter(s => s.musicianId !== null);
+  const occupiedList = slotsList.filter(s => Boolean(s.musicianId));
   const occupiedCount = occupiedList.length;
   const availableCount = totalSlots - occupiedCount;
 
@@ -35,7 +35,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
   // Acceso rápido: slot que coincide con el instrumento del usuario
   const matchPrimarySlot = musicianUser && !myAssignedSlot
     ? slotsList.find(s => 
-        s.musicianId === null && 
+        !s.musicianId && 
         (s.label.toLowerCase().includes(musicianUser.primaryInstrument.toLowerCase()) || 
          musicianUser.primaryInstrument.toLowerCase().includes(s.label.toLowerCase()) ||
          musicianUser.primaryInstrument.toLowerCase().includes(s.category.toLowerCase()))
@@ -178,7 +178,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
       {/* Slots chips preview - Planning Center Clean Badges */}
       <div className="mt-3.5 flex flex-wrap gap-1.5">
         {slotsList.map(slot => {
-          const isFilled = slot.musicianId !== null;
+          const isFilled = Boolean(slot.musicianId);
           const isMe = musicianUser && slot.musicianId === musicianUser.id;
 
           return (

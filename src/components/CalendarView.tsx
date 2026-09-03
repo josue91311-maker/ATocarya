@@ -63,8 +63,8 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
   
   const totalVacancies = activeUpcomingServices.reduce((acc, s) => {
     if (isServiceExpired(s)) return acc;
-    const vacantInService = (Object.values(s.slots) as SlotConfig[])
-      .filter(slot => slot.enabled !== false && slot.musicianId === null).length;
+    const vacantInService = (Object.values(s.slots || {}) as SlotConfig[])
+      .filter(slot => slot && slot.enabled !== false && !slot.musicianId).length;
     return acc + vacantInService;
   }, 0);
 
@@ -78,26 +78,43 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
       const term = searchTerm.toLowerCase();
       const matchTitle = service.title.toLowerCase().includes(term);
       const matchDate = service.date.includes(term);
-      const matchMusician = Object.values(service.slots).some(
-        s => s.musicianName?.toLowerCase().includes(term) || s.label.toLowerCase().includes(term)
+      const matchMusician = Object.values(service.slots || {}).some(
+        s => s && (s.musicianName?.toLowerCase().includes(term) || s.label.toLowerCase().includes(term))
       );
       if (!matchTitle && !matchDate && !matchMusician) return false;
     }
 
     if (filterType === 'available') {
       const isExpired = isServiceExpired(service);
-      const hasAvailable = (Object.values(service.slots) as SlotConfig[])
-        .some(s => s.enabled !== false && s.musicianId === null);
+      const hasAvailable = (Object.values(service.slots || {}) as SlotConfig[])
+        .some(s => s && s.enabled !== false && !s.musicianId);
       if (!hasAvailable || isExpired) return false;
     }
 
     if (filterType === 'mine' && musicianUser) {
-      const isMine = Object.values(service.slots).some(s => s.musicianId === musicianUser.id);
+      const isMine = Object.values(service.slots || {}).some(s => s && s.musicianId === musicianUser.id);
       if (!isMine) return false;
     }
 
     return true;
   });
+
+  // Próximo culto más cercano y recomendación rápida de aplicación
+  const nextService = activeUpcomingServices.length > 0 ? activeUpcomingServices[0] : null;
+  const isNextExpired = nextService ? isServiceExpired(nextService) : true;
+  const myAssignedSlotInNext = (nextService && musicianUser)
+    ? (Object.values(nextService.slots || {}) as SlotConfig[]).find(s => s && s.musicianId === musicianUser.id)
+    : null;
+  const recommendedSlotInNext = (nextService && musicianUser && !myAssignedSlotInNext && !isNextExpired)
+    ? (Object.values(nextService.slots || {}) as SlotConfig[]).find(s =>
+        s &&
+        s.enabled !== false &&
+        !s.musicianId &&
+        (s.label.toLowerCase().includes(musicianUser.primaryInstrument.toLowerCase()) ||
+         musicianUser.primaryInstrument.toLowerCase().includes(s.label.toLowerCase()) ||
+         musicianUser.primaryInstrument.toLowerCase().includes(s.category.toLowerCase()))
+      )
+    : null;
 
   // Calendar Grid Calculation
   const firstDayOfWeek = new Date(calYear, calMonth, 1).getDay(); // 0 = Dom, 1 = Lun...
@@ -128,6 +145,84 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       
+      {/* ⚡ TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
+      {nextService && musicianUser && (
+        <div>
+          {myAssignedSlotInNext ? (
+            <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+              <div className="flex items-center gap-3.5">
+                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
+                  <Check className="w-6 h-6 stroke-[3]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-2xs">
+                      Confirmado
+                    </span>
+                    <span className="text-xs font-bold text-emerald-950">
+                      Próximo Culto: {nextService.date} ({nextService.time})
+                    </span>
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-emerald-950 mt-0.5 font-display">
+                    ¡{musicianUser.fullName}, estás confirmado en {myAssignedSlotInNext.label}!
+                  </h3>
+                </div>
+              </div>
+              <button
+                onClick={() => onSelectService(nextService)}
+                className="px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition-all shadow-2xs self-start sm:self-auto"
+              >
+                Ver servicio completo
+              </button>
+            </div>
+          ) : recommendedSlotInNext ? (
+            <div className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white rounded-3xl p-5 sm:p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div className="flex items-start sm:items-center gap-3.5">
+                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex flex-col items-center justify-center text-white flex-shrink-0 shadow-inner">
+                  <span className="text-[10px] uppercase font-bold tracking-wider leading-none">
+                    {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { month: 'short' })}
+                  </span>
+                  <span className="text-2xl font-black font-display leading-tight tabular-nums">
+                    {new Date(nextService.date + 'T00:00:00').getDate()}
+                  </span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-white text-emerald-900 shadow-2xs">
+                      ⚡ Recomendación para ti
+                    </span>
+                    <span className="text-xs font-bold text-emerald-100">
+                      Próxima Fecha: {nextService.date} ({nextService.time})
+                    </span>
+                  </div>
+                  <h3 className="text-base sm:text-lg font-bold font-display text-white mt-1">
+                    {musicianUser.fullName}, ¿tocas este {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long' })}?
+                  </h3>
+                  <p className="text-xs text-emerald-100/90 mt-0.5">
+                    Tu instrumento es <strong>{musicianUser.primaryInstrument}</strong> y el puesto <strong>{recommendedSlotInNext.label}</strong> está libre.
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 self-start md:self-auto flex-shrink-0">
+                <button
+                  onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
+                  className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 rounded-xl text-xs font-black flex items-center gap-2 shadow-sm transition-all hover:scale-105 active:scale-95"
+                >
+                  <Check className="w-4 h-4 stroke-[3] text-emerald-600" />
+                  <span>Anotarme en {recommendedSlotInNext.label} (1 Clic)</span>
+                </button>
+                <button
+                  onClick={() => onSelectService(nextService)}
+                  className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-xs font-bold transition-colors"
+                >
+                  Ver todos
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </div>
+      )}
+
       {/* 1. TOP METRICS STRIP (Planning Center Quick Glance) */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
         <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
@@ -400,9 +495,9 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
               // Days with Service
               const firstService = dayServices[0];
               const isExpired = isServiceExpired(firstService);
-              const isMyService = musicianUser && Object.values(firstService.slots).some(s => s.musicianId === musicianUser.id);
-              const slotsList = (Object.values(firstService.slots) as SlotConfig[]).filter(s => s.enabled !== false);
-              const vacantCount = slotsList.filter(s => s.musicianId === null).length;
+              const isMyService = musicianUser && Object.values(firstService.slots || {}).some(s => s && s.musicianId === musicianUser.id);
+              const slotsList = (Object.values(firstService.slots || {}) as SlotConfig[]).filter(s => s && s.enabled !== false);
+              const vacantCount = slotsList.filter(s => !s.musicianId).length;
 
               return (
                 <div 
@@ -483,9 +578,9 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
 
               const isExpired = isServiceExpired(service);
 
-              const slotsList = (Object.values(service.slots) as SlotConfig[]).filter(s => s.enabled !== false);
+              const slotsList = (Object.values(service.slots || {}) as SlotConfig[]).filter(s => s && s.enabled !== false);
               const totalSlots = slotsList.length;
-              const occupiedCount = slotsList.filter(s => s.musicianId !== null).length;
+              const occupiedCount = slotsList.filter(s => Boolean(s.musicianId)).length;
               const vacantCount = totalSlots - occupiedCount;
 
               const myAssignedSlot = musicianUser
@@ -557,14 +652,14 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                         className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] border ${
                           slot.musicianId === musicianUser?.id
                             ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold'
-                            : slot.musicianId !== null
+                            : Boolean(slot.musicianId)
                             ? 'bg-slate-50 text-slate-700 border-slate-200/70 font-medium'
                             : 'bg-white text-slate-400 border-slate-200 border-dashed'
                         }`}
                       >
                         <InstrumentIcon instrument={slot.key} className="w-3 h-3 text-slate-400" />
                         <span className="truncate max-w-[60px]">
-                          {slot.musicianId !== null ? slot.musicianName?.split(' ')[0] : slot.label.split(' ')[0]}
+                          {Boolean(slot.musicianId) ? slot.musicianName?.split(' ')[0] : slot.label.split(' ')[0]}
                         </span>
                       </span>
                     ))}
