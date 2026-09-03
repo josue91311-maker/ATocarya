@@ -124,11 +124,19 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
 export const tursoSaveService = async (service: ServiceDate): Promise<boolean> => {
   try {
     const db = getTursoClient();
+
+    // Si ya existe un servicio para esta misma fecha y hora, reutilizar su ID para evitar duplicados
+    const existing = await db.execute({
+      sql: 'SELECT id FROM services WHERE date = ? AND time = ?',
+      args: [service.date, service.time],
+    });
+    const targetId = existing.rows.length > 0 ? String(existing.rows[0].id) : service.id;
+
     await db.execute({
       sql: `INSERT OR REPLACE INTO services (id, date, time, title, rehearsal_time, notes, is_open, registration_deadline, slots, created_at)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
-        service.id,
+        targetId,
         service.date,
         service.time,
         service.title,
@@ -142,7 +150,7 @@ export const tursoSaveService = async (service: ServiceDate): Promise<boolean> =
     });
     return true;
   } catch (err) {
-    console.warn('Error al guardar culto en Turso:', err);
+    console.warn('Error al guardar servicio en Turso:', err);
     return false;
   }
 };

@@ -45,17 +45,8 @@ export const apiCreateMusician = async (musician: Partial<Musician>): Promise<Mu
     createdAt: musician.createdAt || new Date().toISOString(),
   };
 
-  // Guardar en Turso SQLite
+  // Guardar en Turso SQLite directamente
   await tursoCreateMusician(fullMusician);
-
-  // También notificar al endpoint /api si existe
-  try {
-    fetch(`${API_BASE}/musicians`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(fullMusician),
-    }).catch(() => {});
-  } catch {}
 
   return fullMusician;
 };
@@ -134,14 +125,6 @@ export const apiCreateService = async (serviceData: {
   };
 
   await tursoSaveService(newService);
-
-  try {
-    fetch(`${API_BASE}/services`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'create', ...serviceData }),
-    }).catch(() => {});
-  } catch {}
 
   return newService;
 };
