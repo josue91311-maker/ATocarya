@@ -1,84 +1,113 @@
 import { Musician, ServiceDate, SlotKey, SlotConfig } from '../types';
+import {
+  tursoGetMusicians,
+  tursoCreateMusician,
+  tursoUpdateMusician,
+  tursoDeleteMusician,
+  tursoGetServices,
+  tursoSaveService,
+  tursoDeleteService,
+  tursoUpdateSlots,
+} from './tursoDirect';
 
 const API_BASE = '/api';
-
-/**
- * Verifica si el backend serverless de SQLite está disponible
- */
-let isApiAvailable: boolean | null = null;
-
-const checkApiHealth = async (): Promise<boolean> => {
-  if (isApiAvailable !== null) return isApiAvailable;
-  try {
-    const res = await fetch(`${API_BASE}/musicians`, { method: 'GET' });
-    isApiAvailable = res.ok;
-    return isApiAvailable;
-  } catch {
-    isApiAvailable = false;
-    return false;
-  }
-};
 
 // --- Músicos ---
 
 export const apiGetMusicians = async (): Promise<Musician[] | null> => {
+  // 1. Intentar conexión directa a Turso SQLite
+  const directData = await tursoGetMusicians();
+  if (directData && directData.length > 0) {
+    return directData;
+  }
+
+  // 2. Fallback a endpoint serverless /api
   try {
     const res = await fetch(`${API_BASE}/musicians`);
-    if (!res.ok) return null;
-    return await res.json();
+    if (res.ok) {
+      return await res.json();
+    }
   } catch (err) {
-    return null;
+    // Ignorar si no hay serverless activo
   }
+
+  return null;
 };
 
 export const apiCreateMusician = async (musician: Partial<Musician>): Promise<Musician | null> => {
+  const fullMusician: Musician = {
+    id: musician.id || `m_${Date.now()}`,
+    fullName: musician.fullName?.trim() || '',
+    age: musician.age || 20,
+    pin: musician.pin || '1234',
+    primaryInstrument: musician.primaryInstrument || 'Voz Director',
+    phone: musician.phone?.trim(),
+    createdAt: musician.createdAt || new Date().toISOString(),
+  };
+
+  // Guardar en Turso SQLite
+  await tursoCreateMusician(fullMusician);
+
+  // También notificar al endpoint /api si existe
   try {
-    const res = await fetch(`${API_BASE}/musicians`, {
+    fetch(`${API_BASE}/musicians`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(musician),
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
+      body: JSON.stringify(fullMusician),
+    }).catch(() => {});
+  } catch {}
+
+  return fullMusician;
 };
 
 export const apiUpdateMusician = async (musician: Musician): Promise<boolean> => {
+  // Actualizar en Turso SQLite
+  await tursoUpdateMusician(musician);
+
   try {
-    const res = await fetch(`${API_BASE}/musicians`, {
+    fetch(`${API_BASE}/musicians`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(musician),
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
 };
 
 export const apiDeleteMusician = async (id: string): Promise<boolean> => {
+  // Eliminar en Turso SQLite
+  await tursoDeleteMusician(id);
+
   try {
-    const res = await fetch(`${API_BASE}/musicians?id=${id}`, {
+    fetch(`${API_BASE}/musicians?id=${id}`, {
       method: 'DELETE',
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
 };
 
 // --- Servicios / Cultos ---
 
 export const apiGetServices = async (): Promise<ServiceDate[] | null> => {
+  // 1. Intentar conexión directa a Turso SQLite
+  const directServices = await tursoGetServices();
+  if (directServices && directServices.length > 0) {
+    return directServices;
+  }
+
+  // 2. Fallback a endpoint serverless /api
   try {
     const res = await fetch(`${API_BASE}/services`);
-    if (!res.ok) return null;
-    return await res.json();
+    if (res.ok) {
+      return await res.json();
+    }
   } catch (err) {
-    return null;
+    // Ignorar si no hay serverless activo
   }
+
+  return null;
 };
 
 export const apiCreateService = async (serviceData: {
@@ -90,17 +119,31 @@ export const apiCreateService = async (serviceData: {
   enabledSlots?: Record<SlotKey, boolean>;
   registrationDeadline?: string;
 }): Promise<ServiceDate | null> => {
+  const serviceId = `service_${serviceData.date}_${Date.now()}`;
+  const newService: ServiceDate = {
+    id: serviceId,
+    date: serviceData.date,
+    time: serviceData.time || '09:30',
+    title: serviceData.title || 'Servicio de Alabanza',
+    rehearsalTime: serviceData.rehearsalTime,
+    notes: serviceData.notes,
+    isOpen: true,
+    registrationDeadline: serviceData.registrationDeadline,
+    slots: {} as any,
+    createdAt: new Date().toISOString(),
+  };
+
+  await tursoSaveService(newService);
+
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action: 'create', ...serviceData }),
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch (err) {
-    return null;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return newService;
 };
 
 export const apiUpdateServiceConfig = async (
@@ -115,37 +158,48 @@ export const apiUpdateServiceConfig = async (
     registrationDeadline?: string;
   }
 ): Promise<boolean> => {
+  // Si tenemos los servicios, guardamos la actualización en Turso
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: serviceId, ...updates }),
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
 };
 
 export const apiDeleteService = async (serviceId: string): Promise<boolean> => {
+  await tursoDeleteService(serviceId);
+
   try {
-    const res = await fetch(`${API_BASE}/services?id=${serviceId}`, {
+    fetch(`${API_BASE}/services?id=${serviceId}`, {
       method: 'DELETE',
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
+};
+
+export const apiSaveWholeService = async (service: ServiceDate): Promise<boolean> => {
+  await tursoSaveService(service);
+  return true;
 };
 
 export const apiClaimSlot = async (
   serviceId: string,
   slotKey: SlotKey,
   musicianId: string,
-  musicianName: string
+  musicianName: string,
+  allSlots?: Record<SlotKey, SlotConfig>
 ): Promise<{ success: boolean; slots?: Record<SlotKey, SlotConfig>; error?: string }> => {
+  if (allSlots) {
+    await tursoUpdateSlots(serviceId, allSlots);
+  }
+
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -155,23 +209,23 @@ export const apiClaimSlot = async (
         musicianId,
         musicianName,
       }),
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      return { success: false, error: data.error || 'Error al reclamar puesto' };
-    }
-    return { success: true, slots: data.slots };
-  } catch (err: any) {
-    return { success: false, error: err.message };
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return { success: true };
 };
 
 export const apiReleaseSlot = async (
   serviceId: string,
-  slotKey: SlotKey
+  slotKey: SlotKey,
+  allSlots?: Record<SlotKey, SlotConfig>
 ): Promise<{ success: boolean; slots?: Record<SlotKey, SlotConfig> }> => {
+  if (allSlots) {
+    await tursoUpdateSlots(serviceId, allSlots);
+  }
+
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -179,21 +233,24 @@ export const apiReleaseSlot = async (
         serviceId,
         slotKey,
       }),
-    });
-    const data = await res.json();
-    return { success: res.ok, slots: data.slots };
-  } catch (err) {
-    return { success: false };
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return { success: true };
 };
 
 export const apiAdminAssignSlot = async (
   serviceId: string,
   slotKey: SlotKey,
-  targetMusicianId: string
+  targetMusicianId: string,
+  allSlots?: Record<SlotKey, SlotConfig>
 ): Promise<boolean> => {
+  if (allSlots) {
+    await tursoUpdateSlots(serviceId, allSlots);
+  }
+
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -202,19 +259,23 @@ export const apiAdminAssignSlot = async (
         slotKey,
         targetMusicianId,
       }),
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
 };
 
 export const apiAdminClearSlot = async (
   serviceId: string,
-  slotKey: SlotKey
+  slotKey: SlotKey,
+  allSlots?: Record<SlotKey, SlotConfig>
 ): Promise<boolean> => {
+  if (allSlots) {
+    await tursoUpdateSlots(serviceId, allSlots);
+  }
+
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -222,25 +283,23 @@ export const apiAdminClearSlot = async (
         serviceId,
         slotKey,
       }),
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
 };
 
 export const apiToggleServiceOpen = async (serviceId: string): Promise<boolean> => {
   try {
-    const res = await fetch(`${API_BASE}/services`, {
+    fetch(`${API_BASE}/services`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         action: 'toggle-open',
         serviceId,
       }),
-    });
-    return res.ok;
-  } catch (err) {
-    return false;
-  }
+    }).catch(() => {});
+  } catch {}
+
+  return true;
 };

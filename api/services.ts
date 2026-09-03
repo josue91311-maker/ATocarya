@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getDb, initDb } from './db';
+import { getDb, initDb } from './db.js';
 
 const createEmptySlots = () => ({
   voz_director: { key: 'voz_director', label: 'Voz Director', category: 'Voces', musicianId: null },

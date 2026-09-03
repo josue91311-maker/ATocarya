@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getDb, initDb } from './db';
+import { getDb, initDb } from './db.js';
 
 const INITIAL_SEEDS = [
   { id: 'm1', fullName: 'David Morales', age: 28, pin: '1111', primaryInstrument: 'Voz Principal', phone: '+51 987654321' },

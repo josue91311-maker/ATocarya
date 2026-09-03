@@ -215,26 +215,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       };
     }
 
+    const updatedSlots = {
+      ...service.slots,
+      [slotKey]: {
+        ...service.slots[slotKey],
+        musicianId: musicianUser.id,
+        musicianName: musicianUser.fullName,
+        assignedAt: new Date().toISOString(),
+      },
+    };
+
     setServices(prev =>
       prev.map(s => {
         if (s.id !== serviceId) return s;
         return {
           ...s,
-          slots: {
-            ...s.slots,
-            [slotKey]: {
-              ...s.slots[slotKey],
-              musicianId: musicianUser.id,
-              musicianName: musicianUser.fullName,
-              assignedAt: new Date().toISOString(),
-            },
-          },
+          slots: updatedSlots,
         };
       })
     );
 
     // Sync persistente con SQLite en la nube (Turso)
-    apiClaimSlot(serviceId, slotKey, musicianUser.id, musicianUser.fullName);
+    apiClaimSlot(serviceId, slotKey, musicianUser.id, musicianUser.fullName, updatedSlots);
 
     return { success: true };
   };
@@ -250,26 +252,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, message: 'Solo puedes liberar puestos que te pertenecen.' };
     }
 
+    const updatedSlots = {
+      ...service.slots,
+      [slotKey]: {
+        ...service.slots[slotKey],
+        musicianId: null,
+        musicianName: undefined,
+        assignedAt: undefined,
+      },
+    };
+
     setServices(prev =>
       prev.map(s => {
         if (s.id !== serviceId) return s;
         return {
           ...s,
-          slots: {
-            ...s.slots,
-            [slotKey]: {
-              ...s.slots[slotKey],
-              musicianId: null,
-              musicianName: undefined,
-              assignedAt: undefined,
-            },
-          },
+          slots: updatedSlots,
         };
       })
     );
 
     // Sync persistente con SQLite en la nube (Turso)
-    apiReleaseSlot(serviceId, slotKey);
+    apiReleaseSlot(serviceId, slotKey, updatedSlots);
 
     return { success: true };
   };
@@ -608,33 +612,36 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           assignedAt: new Date().toISOString(),
         };
 
+        apiAdminAssignSlot(serviceId, slotKey, musicianId, updatedSlots);
+
         return { ...s, slots: updatedSlots };
       })
     );
-
-    apiAdminAssignSlot(serviceId, slotKey, musicianId);
   };
 
   const adminClearSlot = (serviceId: string, slotKey: SlotKey) => {
     setServices(prev =>
       prev.map(s => {
         if (s.id !== serviceId) return s;
+
+        const updatedSlots = {
+          ...s.slots,
+          [slotKey]: {
+            ...s.slots[slotKey],
+            musicianId: null,
+            musicianName: undefined,
+            assignedAt: undefined,
+          },
+        };
+
+        apiAdminClearSlot(serviceId, slotKey, updatedSlots);
+
         return {
           ...s,
-          slots: {
-            ...s.slots,
-            [slotKey]: {
-              ...s.slots[slotKey],
-              musicianId: null,
-              musicianName: undefined,
-              assignedAt: undefined,
-            },
-          },
+          slots: updatedSlots,
         };
       })
     );
-
-    apiAdminClearSlot(serviceId, slotKey);
   };
 
   const resetAllData = () => {

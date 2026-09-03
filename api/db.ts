@@ -1,10 +1,10 @@
-import { createClient, Client } from '@libsql/client';
+import { createClient, Client } from '@libsql/client/web';
 
 let client: Client | null = null;
 
 export const getDb = (): Client => {
   if (!client) {
-    const url = process.env.TURSO_DATABASE_URL || 'file:local.db';
+    const url = process.env.TURSO_DATABASE_URL || 'libsql://atocarya-db-jothejmaster.aws-us-west-2.turso.io';
     const authToken = process.env.TURSO_AUTH_TOKEN || undefined;
 
     client = createClient({
@@ -21,7 +21,6 @@ export const getDb = (): Client => {
 export const initDb = async () => {
   const db = getDb();
 
-  // 1. Tabla de músicos
   await db.execute(`
     CREATE TABLE IF NOT EXISTS musicians (
       id TEXT PRIMARY KEY,
@@ -34,7 +33,6 @@ export const initDb = async () => {
     )
   `);
 
-  // 2. Tabla de servicios / cultos
   await db.execute(`
     CREATE TABLE IF NOT EXISTS services (
       id TEXT PRIMARY KEY,
@@ -50,24 +48,10 @@ export const initDb = async () => {
     )
   `);
 
-  // 3. Tabla de configuración (ej. PIN admin)
   await db.execute(`
     CREATE TABLE IF NOT EXISTS settings (
       key TEXT PRIMARY KEY,
       value TEXT NOT NULL
     )
   `);
-
-  // Sembrar PIN de administrador por defecto si no existe
-  const adminPinRow = await db.execute({
-    sql: 'SELECT value FROM settings WHERE key = ?',
-    args: ['admin_pin'],
-  });
-
-  if (adminPinRow.rows.length === 0) {
-    await db.execute({
-      sql: 'INSERT INTO settings (key, value) VALUES (?, ?)',
-      args: ['admin_pin', '7777'],
-    });
-  }
 };
