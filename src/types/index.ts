@@ -1,0 +1,66 @@
+export type PrimaryInstrument = 
+  | 'Bajo'
+  | 'Guitarra Eléctrica'
+  | 'Guitarra Acústica'
+  | 'Batería'
+  | 'Voz Director'
+  | 'Voz Coro'
+  | 'Piano'
+  | 'Sonido';
+
+export type SlotKey = 
+  | 'piano_1'
+  | 'piano_2'
+  | 'guitarra_1'
+  | 'guitarra_2'
+  | 'guitarra_acustica'
+  | 'voz_director'
+  | 'voz_coro_1'
+  | 'voz_coro_2'
+  | 'voz_coro_3'
+  | 'voz_coro_4'
+  | 'bateria'
+  | 'bajo'
+  | 'sonido';
+
+export interface Musician {
+  id: string;
+  fullName: string;
+  age: number;
+  pin: string; // 4 digits
+  primaryInstrument: PrimaryInstrument;
+  phone?: string;
+  avatarUrl?: string;
+  createdAt: string;
+}
+
+export interface SlotConfig {
+  key: SlotKey;
+  label: string;
+  category: 'Teclados' | 'Guitarras' | 'Voces' | 'Ritmo' | 'Técnica';
+  icon: string;
+  musicianId: string | null; // Id of assigned musician or null
+  musicianName?: string;
+  assignedAt?: string;
+  enabled?: boolean; // Whether this instrument is active for this specific date
+}
+
+export interface ServiceDate {
+  id: string;
+  date: string; // YYYY-MM-DD
+  time: string; // e.g. "09:00"
+  title: string; // e.g. "Servicio Dominical Principal"
+  rehearsalTime?: string; // e.g. "08:15"
+  notes?: string; // e.g. "Canciones: Grande y Fuerte, Cuan Grande es Dios..."
+  isOpen: boolean; // Admin can toggle if registrations are open
+  registrationDeadline?: string; // YYYY-MM-DD - Fecha de expiración de inscripciones
+  slots: Record<SlotKey, SlotConfig>;
+  createdAt: string;
+}
+
+export interface AdminUser {
+  isAdmin: true;
+  name: string;
+}
+
+export type CurrentUser = (Musician & { isAdmin?: false }) | AdminUser | null;
