@@ -93,14 +93,16 @@ export const AdminScheduleTable: React.FC<Props> = ({
       {/* Top Header & Actions */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <Layers className="w-5 h-5 text-blue-600" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
+              <Layers className="w-4 h-4" />
+            </div>
             <h2 className="text-xl font-bold font-display text-slate-900">
-              Matriz de Cronograma & Asignaciones
+              Matriz de Planes & Asignaciones
             </h2>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            <strong className="text-slate-800 tabular-nums">{services.length}</strong> cultos programados · <strong className="text-slate-800 tabular-nums">{musicians.length}</strong> músicos registrados
+            <strong className="text-slate-800 tabular-nums">{services.length}</strong> cultos programados · <strong className="text-slate-800 tabular-nums">{musicians.length}</strong> músicos en el equipo
           </p>
         </div>
 
@@ -108,16 +110,16 @@ export const AdminScheduleTable: React.FC<Props> = ({
           {onGoToVisualBoard && (
             <button
               onClick={onGoToVisualBoard}
-              className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 font-bold rounded-lg text-xs transition-colors shadow-sm"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs transition-colors shadow-2xs"
             >
-              <Camera className="w-4 h-4 text-blue-600" />
-              <span>Ver como Foto / WhatsApp</span>
+              <Camera className="w-3.5 h-3.5 text-slate-500" />
+              <span>Ver como Foto</span>
             </button>
           )}
 
           <button
             onClick={onOpenCreateModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-xs transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm shadow-emerald-600/20"
           >
             <Plus className="w-4 h-4" />
             <span>Programar Culto</span>
@@ -125,18 +127,18 @@ export const AdminScheduleTable: React.FC<Props> = ({
 
           <button
             onClick={() => setIsQuickBatchOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-gradient-to-r from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100 text-indigo-700 border border-indigo-200 font-bold rounded-lg text-xs transition-all shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold rounded-lg text-xs transition-all shadow-2xs"
             title="Crear fechas para cualquier día de la semana (Lunes a Domingo), cantidad y hora"
           >
-            <Sparkles className="w-3.5 h-3.5 text-indigo-600" />
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
             <span>⚡ Creación Rápida</span>
           </button>
 
           <button
             onClick={onOpenShareModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-lg text-xs font-bold transition-colors shadow-sm"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition-colors shadow-2xs"
           >
-            <Share2 className="w-3.5 h-3.5" />
+            <Share2 className="w-3.5 h-3.5 text-emerald-600" />
             <span>WhatsApp</span>
           </button>
 
@@ -250,7 +252,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
                   return (
                     <tr 
                       key={service.id} 
-                      className={`hover:bg-blue-50/40 transition-colors cursor-pointer ${
+                      className={`hover:bg-emerald-50/25 transition-colors cursor-pointer ${
                         isPast ? 'bg-slate-50/60 opacity-80' : ''
                       }`}
                       onClick={() => onOpenService(service.id)}
@@ -258,7 +260,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
                       {/* Date */}
                       <td className="py-3 px-4 sticky left-0 bg-white z-10 border-r border-slate-200 whitespace-nowrap">
                         <div className="flex items-center gap-1.5">
-                          <p className="font-bold text-slate-900 capitalize">
+                          <p className="font-bold text-slate-900 capitalize font-display">
                             {dateStr}
                           </p>
                           {isPast && (
@@ -267,12 +269,12 @@ export const AdminScheduleTable: React.FC<Props> = ({
                             </span>
                           )}
                           {isExpired && !isPast && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-red-50 text-red-700 font-bold border border-red-200">
+                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-50 text-rose-700 font-bold border border-rose-200">
                               Expirado
                             </span>
                           )}
                         </div>
-                        <p className="text-[11px] text-slate-500 truncate max-w-[130px]">
+                        <p className="text-[11px] text-slate-500 truncate max-w-[140px] font-medium">
                           {service.title}
                         </p>
                         {service.registrationDeadline && (
@@ -283,7 +285,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
                       </td>
 
                       {/* Time */}
-                      <td className="py-3 px-3 text-center text-slate-600 whitespace-nowrap">
+                      <td className="py-3 px-3 text-center text-slate-700 font-bold text-xs whitespace-nowrap tabular-nums">
                         {service.time}
                       </td>
 
@@ -307,14 +309,17 @@ export const AdminScheduleTable: React.FC<Props> = ({
                         return (
                           <td key={col.key} className="py-3 px-2 text-center whitespace-nowrap">
                             {isOccupied ? (
-                              <span 
+                              <div 
                                 title={slot?.musicianName || ''}
-                                className="inline-block px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 max-w-[80px] truncate shadow-2xs"
+                                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200/90 text-emerald-900 font-semibold text-[11px] max-w-[95px] truncate shadow-2xs"
                               >
-                                {firstName}
-                              </span>
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
+                                <span className="truncate">{firstName}</span>
+                              </div>
                             ) : (
-                              <span className="text-slate-400 font-mono">Vacante</span>
+                              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md border border-dashed border-slate-300 text-slate-400 text-[10px] font-medium hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50/50 transition-colors">
+                                Vacante
+                              </span>
                             )}
                           </td>
                         );

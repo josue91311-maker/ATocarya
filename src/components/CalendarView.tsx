@@ -112,7 +112,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
             Mis Puestos
           </p>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-bold font-display text-emerald-600 tabular-nums">
+            <span className="text-2xl font-bold font-display text-emerald-700 tabular-nums">
               {myServicesCount}
             </span>
             <span className="text-xs text-slate-500">confirmados</span>
@@ -124,7 +124,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
             Vacantes Abiertas
           </p>
           <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-bold font-display text-blue-600 tabular-nums">
+            <span className="text-2xl font-bold font-display text-emerald-800 tabular-nums">
               {totalVacancies}
             </span>
             <span className="text-xs text-slate-500">cupos disponibles</span>
@@ -295,26 +295,26 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                 >
                   {/* Left: Date & Title */}
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center flex-shrink-0 text-slate-800">
-                      <span className="text-[10px] uppercase font-bold text-blue-600 leading-none">
+                    <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center flex-shrink-0 text-slate-800 shadow-2xs">
+                      <span className="text-[10px] uppercase font-bold text-emerald-700 leading-none">
                         {monthName}
                       </span>
-                      <span className="text-lg font-bold font-display leading-tight tabular-nums">
+                      <span className="text-lg font-bold font-display leading-tight tabular-nums text-slate-900">
                         {dayNum}
                       </span>
                     </div>
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-slate-900 truncate">
+                        <h4 className="text-sm font-bold text-slate-900 truncate font-display">
                           {service.title}
                         </h4>
                         {myAssignedSlot ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300">
                             <Check className="w-2.5 h-2.5 stroke-[3]" /> {myAssignedSlot.label}
                           </span>
                         ) : isExpired ? (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-50 text-red-700 border border-red-200">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                             Inscripciones cerradas
                           </span>
                         ) : vacantCount === 0 ? (
@@ -322,7 +322,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                             Completo
                           </span>
                         ) : (
-                          <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
                             {vacantCount} vacantes
                           </span>
                         )}

@@ -401,7 +401,7 @@ export const AdminCreateServiceModal: React.FC<Props> = ({ isOpen, onClose }) =>
                           </div>
 
                           <div className={`w-4 h-4 rounded-md flex items-center justify-center border text-white transition-colors ${
-                            isEnabled ? 'bg-blue-600 border-blue-600' : 'bg-white border-slate-300'
+                            isEnabled ? 'bg-emerald-600 border-emerald-600' : 'bg-white border-slate-300'
                           }`}>
                             {isEnabled && <Check className="w-3 h-3 stroke-[3]" />}
                           </div>
@@ -423,7 +423,7 @@ export const AdminCreateServiceModal: React.FC<Props> = ({ isOpen, onClose }) =>
               onChange={(e) => setNotes(e.target.value)}
               rows={2}
               placeholder="Ej. Canciones: 1. Grande y Fuerte | 2. Cuan Grande es Dios. Vestimenta: Formal."
-              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 resize-none font-medium"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 resize-none font-medium"
             />
           </div>
 
@@ -437,9 +437,9 @@ export const AdminCreateServiceModal: React.FC<Props> = ({ isOpen, onClose }) =>
             </button>
             <button
               type="submit"
-              className="px-5 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-colors shadow-sm shadow-blue-500/20"
+              className="px-5 py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-colors shadow-sm shadow-emerald-600/20"
             >
-              Crear Servicio & Habilitar Cupos
+              Programar Culto & Habilitar Cupos
             </button>
           </div>
         </form>

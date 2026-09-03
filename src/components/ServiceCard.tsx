@@ -45,35 +45,35 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
   return (
     <div
       onClick={() => onSelect(service)}
-      className={`bg-white hover:bg-slate-50/40 border rounded-2xl p-4 sm:p-5 cursor-pointer transition-all duration-150 flex flex-col justify-between shadow-2xs hover:shadow-xs group ${
-        isExpired ? 'border-slate-200/70 opacity-90' : 'border-slate-200/90 hover:border-blue-300'
+      className={`bg-white hover:bg-slate-50/50 border rounded-2xl p-4 sm:p-5 cursor-pointer transition-all duration-150 flex flex-col justify-between shadow-2xs hover:shadow-pc group ${
+        isExpired ? 'border-slate-200/70 opacity-90' : 'border-slate-200/90 hover:border-emerald-400'
       }`}
     >
       <div>
-        {/* Header: Date Box + Title & Times + Status Pill */}
+        {/* Header: Planning Center Date Box + Title & Times + Status Pill */}
         <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3 min-w-0">
-            {/* Calendar Box */}
-            <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center text-slate-800 flex-shrink-0 group-hover:border-blue-200 transition-colors">
-              <span className="text-[10px] uppercase font-bold text-blue-600 leading-none">
+          <div className="flex items-center gap-3.5 min-w-0">
+            {/* Planning Center Date Box */}
+            <div className="w-13 h-13 rounded-xl bg-slate-50 border border-slate-200/90 flex flex-col items-center justify-center text-slate-800 flex-shrink-0 group-hover:border-emerald-300 group-hover:bg-emerald-50/30 transition-colors shadow-2xs">
+              <span className="text-[10px] uppercase font-bold text-emerald-700 leading-none tracking-wider">
                 {monthName}
               </span>
-              <span className="text-lg font-bold font-display leading-tight tabular-nums">
+              <span className="text-xl font-bold font-display leading-tight tabular-nums text-slate-900">
                 {dayNumber}
               </span>
             </div>
 
             <div className="min-w-0">
-              <h3 className="font-bold text-sm sm:text-base text-slate-900 truncate">
+              <h3 className="font-bold text-sm sm:text-base text-slate-900 truncate font-display group-hover:text-emerald-950 transition-colors">
                 {service.title}
               </h3>
               <div className="flex items-center gap-2 mt-0.5 text-xs text-slate-500">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
+                <span className="flex items-center gap-1 font-bold text-slate-700 tabular-nums">
+                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
                   {service.time}
                 </span>
                 {service.rehearsalTime && (
-                  <span className="hidden sm:inline">· Ensayo: {service.rehearsalTime}</span>
+                  <span className="hidden sm:inline text-slate-400">· Ensayo: <strong className="text-slate-600">{service.rehearsalTime}</strong></span>
                 )}
                 <span className="capitalize text-slate-400 hidden sm:inline">· {dayName}</span>
                 {service.registrationDeadline && (
@@ -85,16 +85,17 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
             </div>
           </div>
 
-          {/* Badges */}
+          {/* Badges - Planning Center Style */}
           <div className="flex flex-col items-end gap-1 flex-shrink-0">
             {isExpired ? (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-50 text-rose-700 border border-rose-200">
                 <Lock className="w-3 h-3" />
                 Expirado
               </span>
             ) : myAssignedSlot ? (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                <Check className="w-3 h-3 text-emerald-600 stroke-[3]" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <Check className="w-3 h-3 text-emerald-700 stroke-[3]" />
                 {myAssignedSlot.label}
               </span>
             ) : availableCount === 0 ? (
@@ -102,13 +103,13 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
                 Completo
               </span>
             ) : (
-              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 tabular-nums">
+              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 tabular-nums">
                 {availableCount} vacantes
               </span>
             )}
 
             {!service.isOpen && !isExpired && (
-              <span className="text-[10px] text-red-600 uppercase tracking-wider font-bold">
+              <span className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
                 Cerrado
               </span>
             )}
@@ -120,35 +121,35 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
           <span>
             Equipo: <strong className="text-slate-800 tabular-nums">{occupiedCount} de {totalSlots}</strong> posiciones
           </span>
-          <span className="text-blue-600 font-semibold flex items-center gap-0.5 text-xs group-hover:translate-x-0.5 transition-transform">
+          <span className="text-emerald-700 font-bold flex items-center gap-0.5 text-xs group-hover:translate-x-0.5 transition-transform">
             Ver equipo <ChevronRight className="w-3.5 h-3.5" />
           </span>
         </div>
 
         <div className="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden mt-1.5">
           <div
-            className="h-full bg-blue-600 rounded-full transition-all duration-300"
+            className="h-full bg-emerald-600 rounded-full transition-all duration-300"
             style={{ width: `${(occupiedCount / totalSlots) * 100}%` }}
           />
         </div>
       </div>
 
-      {/* Acceso Rápido de 1-Clic para el músico (Solo si el servicio NO ha expirado) */}
+      {/* Acceso Rápido de 1-Clic para el músico (Planning Center Aceptar / Confirmar) */}
       {matchPrimarySlot && !myAssignedSlot && !isExpired && (
         <div 
-          className="mt-3.5 p-2.5 bg-blue-50/70 border border-blue-200/80 rounded-xl flex items-center justify-between gap-2"
+          className="mt-3.5 p-2.5 bg-emerald-50/70 border border-emerald-200/90 rounded-xl flex items-center justify-between gap-2"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-xs text-blue-900 font-bold flex items-center gap-1.5 truncate">
-            <Sparkles className="w-3.5 h-3.5 text-blue-600 flex-shrink-0" />
+          <span className="text-xs text-emerald-950 font-bold flex items-center gap-1.5 truncate">
+            <Sparkles className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
             <span className="truncate">¿Tocas este {dayName}?</span>
           </span>
           <button
             onClick={() => claimSlot(service.id, matchPrimarySlot.key)}
-            className="touch-target px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+            className="touch-target px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
           >
             <Check className="w-3.5 h-3.5 stroke-[3]" />
-            <span>Poner mi Check ({matchPrimarySlot.label.split(' ')[0]})</span>
+            <span>Aceptar ({matchPrimarySlot.label.split(' ')[0]})</span>
           </button>
         </div>
       )}
@@ -160,7 +161,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
           onClick={(e) => e.stopPropagation()}
         >
           <span className="text-xs text-slate-600 flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+            <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
             <span>Inscripciones expiradas</span>
           </span>
           <span className="text-[11px] font-bold text-slate-400">
@@ -169,7 +170,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
         </div>
       )}
 
-      {/* Slots chips preview */}
+      {/* Slots chips preview - Planning Center Clean Badges */}
       <div className="mt-3.5 flex flex-wrap gap-1.5">
         {slotsList.map(slot => {
           const isFilled = slot.musicianId !== null;
@@ -181,7 +182,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
               title={`${slot.label}: ${slot.musicianName || 'Vacante'}`}
               className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] border transition-colors ${
                 isMe
-                  ? 'bg-emerald-50 text-emerald-900 border-emerald-300 font-bold'
+                  ? 'bg-emerald-50 text-emerald-900 border-emerald-300 font-bold shadow-2xs'
                   : isFilled
                   ? 'bg-slate-50 text-slate-700 border-slate-200 font-medium'
                   : 'bg-white text-slate-400 border-slate-200 border-dashed'

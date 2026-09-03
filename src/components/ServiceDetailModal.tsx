@@ -123,48 +123,48 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
       <div className="relative w-full max-w-3xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
         
-        {/* Header */}
-        <div className="p-5 sm:p-6 border-b border-slate-200 bg-slate-50/80 flex-shrink-0">
+        {/* Header - Planning Center Plan Sheet Style */}
+        <div className="px-6 py-5 border-b border-slate-200/90 bg-slate-50/60">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
                   {service.title}
                 </span>
                 {isExpired ? (
-                  <span className="text-[11px] font-bold text-red-700 bg-red-50 border border-red-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
                     <Lock className="w-3 h-3" /> Inscripciones Expiradas
                   </span>
                 ) : service.isOpen ? (
-                  <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Fechas Abiertas
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Fechas Abiertas
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-slate-500 flex items-center gap-1">
+                  <span className="text-[11px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
                     <Lock className="w-3 h-3 text-slate-400" /> Inscripciones cerradas
                   </span>
                 )}
               </div>
 
-              <h2 className="text-lg sm:text-xl font-bold font-display text-slate-900 capitalize">
+              <h2 className="text-lg sm:text-2xl font-bold font-display text-slate-900 capitalize">
                 {dateFormatted}
               </h2>
 
               <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-600">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  Culto: <strong className="text-slate-800">{service.time}</strong>
+                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                  Culto: <strong className="text-slate-800 tabular-nums">{service.time}</strong>
                 </span>
                 {service.rehearsalTime && (
                   <span>
-                    · Ensayo: <strong className="text-slate-800">{service.rehearsalTime}</strong>
+                    · Ensayo: <strong className="text-slate-800 tabular-nums">{service.rehearsalTime}</strong>
                   </span>
                 )}
                 <span>
-                  · Cobertura: <strong className="text-slate-800 tabular-nums">{occupiedCount} de {totalSlots}</strong>
+                  · Cobertura: <strong className="text-slate-800 tabular-nums">{occupiedCount} de {totalSlots}</strong> posiciones
                 </span>
                 {service.registrationDeadline && (
-                  <span className="text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded">
+                  <span className="text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-medium">
                     Fecha límite: <strong>{service.registrationDeadline}</strong>
                   </span>
                 )}
@@ -173,33 +173,33 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
 
             <button
               onClick={onClose}
-              className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200 transition-colors"
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {service.notes && (
-            <div className="mt-3 p-2.5 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 flex items-start gap-2">
-              <FileText className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div className="mt-3 p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 flex items-start gap-2 shadow-2xs">
+              <FileText className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
               <span><strong>Notas / Repertorio:</strong> {service.notes}</span>
             </div>
           )}
         </div>
 
-        {/* ACCESO RÁPIDO RECOMENDADO PARA EL USUARIO MÚSICO */}
+        {/* ACCESO RÁPIDO RECOMENDADO PARA EL USUARIO MÚSICO (Planning Center Style) */}
         {musicianUser && isMusicianView && (
           <div className="mx-6 mt-4">
             {isExpired && !myAssignedSlot ? (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center gap-3 shadow-2xs">
-                <div className="w-9 h-9 rounded-xl bg-red-100 text-red-700 flex items-center justify-center font-bold flex-shrink-0">
+              <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 shadow-2xs">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold flex-shrink-0">
                   <Lock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-red-950">
+                  <h4 className="text-xs font-bold text-rose-950">
                     Inscripciones expiradas para este servicio
                   </h4>
-                  <p className="text-xs text-red-800 mt-0.5">
+                  <p className="text-xs text-rose-800 mt-0.5">
                     El plazo de postulación para esta fecha ha finalizado{service.registrationDeadline ? ` (límite: ${service.registrationDeadline})` : ''}. Ya no se admiten registros de puestos.
                   </p>
                 </div>
@@ -212,7 +212,7 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-emerald-950">
-                      ¡Estás anotado en esta fecha!
+                      ¡Estás confirmado en este servicio!
                     </h4>
                     <p className="text-xs text-emerald-800 mt-0.5">
                       Puesto asignado: <strong>{myAssignedSlot.label}</strong>
@@ -223,28 +223,28 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                 {!isExpired && (
                   <button
                     onClick={() => handleRelease(myAssignedSlot.key)}
-                    className="px-3 py-1.5 bg-white hover:bg-red-50 text-red-700 border border-red-200 rounded-xl text-xs font-bold transition-colors"
+                    className="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
                   >
                     Liberar mi puesto
                   </button>
                 )}
               </div>
             ) : recommendedSlot && service.isOpen && !isExpired ? (
-              <div className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
+              <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/20">
                     <Sparkles className="w-4 h-4" />
                   </div>
                   <div>
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.2 bg-blue-600 text-white rounded-md">
+                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-emerald-600 text-white rounded-md">
                         Acceso Rápido
                       </span>
-                      <h4 className="text-xs font-bold text-blue-950">
+                      <h4 className="text-xs font-bold text-emerald-950">
                         {musicianUser.fullName}, tu instrumento es {musicianUser.primaryInstrument}
                       </h4>
                     </div>
-                    <p className="text-xs text-blue-800 mt-0.5">
+                    <p className="text-xs text-emerald-800 mt-0.5">
                       El puesto <strong>{recommendedSlot.label}</strong> está libre para este {dayName}.
                     </p>
                   </div>
@@ -252,10 +252,10 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
 
                 <button
                   onClick={() => handleClaim(recommendedSlot.key)}
-                  className="w-full sm:w-auto px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm transition-all"
+                  className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <Check className="w-4 h-4 stroke-[3]" />
-                  <span>Poner mi Check en {recommendedSlot.label}</span>
+                  <span>Aceptar puesto ({recommendedSlot.label})</span>
                 </button>
               </div>
             ) : null}
@@ -317,7 +317,7 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                             : isOccupied
                             ? 'bg-slate-50 border-slate-200'
                             : isMusicianView && service.isOpen && !isExpired
-                            ? 'bg-white border-slate-200 hover:border-blue-400 hover:shadow-sm cursor-pointer'
+                            ? 'bg-white border-slate-200 hover:border-emerald-400 hover:shadow-2xs cursor-pointer'
                             : 'bg-white border-slate-200'
                         }`}
                       >
@@ -371,7 +371,7 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                                   <button
                                     onClick={() => adminClearSlot(service.id, slot.key)}
                                     title="Quitar asignación"
-                                    className="p-1 text-slate-400 hover:text-red-600"
+                                    className="p-1 text-slate-400 hover:text-rose-600"
                                   >
                                     <Trash2 className="w-3.5 h-3.5" />
                                   </button>
@@ -385,17 +385,18 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                                 className={`inline-flex items-center gap-1 px-2.5 py-1 text-xs font-bold rounded-xl transition-all ${
                                   isExpired
                                     ? 'text-emerald-800 bg-emerald-50 border border-emerald-200 cursor-default'
-                                    : 'text-emerald-800 bg-emerald-100 hover:bg-red-50 hover:text-red-700 hover:border-red-200 border border-emerald-300'
+                                    : 'text-emerald-800 bg-emerald-100 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-200 border border-emerald-300 shadow-2xs'
                                 }`}
                                 title={isExpired ? 'Inscripción confirmada (expirada)' : 'Hacer clic para desmarcarte'}
                               >
                                 <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                <span>Anotado</span>
+                                <span>Confirmado</span>
                               </button>
                             ) : isOccupied ? (
                               // MUSICIAN: OCCUPIED BY SOMEONE ELSE (CANNOT SELECT OTHERS)
-                              <span className="px-2 py-1 text-[11px] font-medium text-slate-500 bg-slate-100 border border-slate-200 rounded-lg">
-                                Ocupado
+                              <span className="px-2.5 py-1 text-[11px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Confirmado
                               </span>
                             ) : isExpired ? (
                               <span className="px-2.5 py-1 text-[11px] font-medium text-slate-400 bg-slate-100 border border-slate-200 rounded-lg">
@@ -406,14 +407,14 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
                               <button
                                 onClick={() => handleClaim(slot.key)}
                                 disabled={!service.isOpen || isExpired}
-                                className={`inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-xl transition-all shadow-2xs ${
+                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl transition-all shadow-2xs ${
                                   service.isOpen && !isExpired
-                                    ? 'bg-blue-600 hover:bg-blue-700 text-white hover:scale-105 active:scale-95'
+                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-105 active:scale-95 shadow-sm shadow-emerald-600/20'
                                     : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
                                 }`}
                               >
                                 <Check className="w-3.5 h-3.5 stroke-[2.5]" />
-                                <span>Ponerme aquí</span>
+                                <span>Anotarme</span>
                               </button>
                             )}
                           </div>

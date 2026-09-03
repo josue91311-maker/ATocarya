@@ -99,7 +99,7 @@ export const AdminDuplicateModal: React.FC<Props> = ({ service, isOpen, onClose 
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 bg-slate-50/50">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-200/80 flex items-center justify-center text-blue-600">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200/80 flex items-center justify-center text-emerald-700">
               <Copy className="w-5 h-5" />
             </div>
             <div>
@@ -124,7 +124,7 @@ export const AdminDuplicateModal: React.FC<Props> = ({ service, isOpen, onClose 
           <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 text-xs text-slate-600 space-y-1">
             <div className="flex items-center justify-between font-semibold text-slate-800">
               <span className="truncate">{service.title}</span>
-              <span className="text-blue-600 text-[11px] bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">
+              <span className="text-emerald-800 text-[11px] bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 font-bold">
                 {enabledSlotsCount} instrumentos activos
               </span>
             </div>
@@ -257,7 +257,7 @@ export const AdminDuplicateModal: React.FC<Props> = ({ service, isOpen, onClose 
             </button>
             <button
               type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/20 transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 transition-all"
             >
               <Copy className="w-4 h-4" />
               <span>Confirmar y Duplicar</span>

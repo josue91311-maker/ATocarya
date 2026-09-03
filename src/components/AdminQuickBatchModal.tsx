@@ -148,7 +148,7 @@ export const AdminQuickBatchModal: React.FC<Props> = ({ isOpen, onClose }) => {
                       onClick={() => handleSelectWeekday(w.value)}
                       className={`py-2 px-1 rounded-xl text-xs font-bold transition-all text-center border ${
                         isSelected
-                          ? 'bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-600/30'
+                          ? 'bg-emerald-600 border-emerald-600 text-white shadow-sm shadow-emerald-600/30'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
@@ -174,7 +174,7 @@ export const AdminQuickBatchModal: React.FC<Props> = ({ isOpen, onClose }) => {
                       onClick={() => setCount(num)}
                       className={`flex-1 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
                         count === num
-                          ? 'bg-indigo-50 border-indigo-300 text-indigo-700'
+                          ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
                           : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -283,7 +283,7 @@ export const AdminQuickBatchModal: React.FC<Props> = ({ isOpen, onClose }) => {
           <button
             type="submit"
             form="batch-form"
-            className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-md shadow-blue-600/20 transition-all"
+            className="flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 transition-all"
           >
             <Sparkles className="w-4 h-4" />
             <span>Generar {count} Eventos</span>

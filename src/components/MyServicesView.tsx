@@ -73,11 +73,11 @@ export const MyServicesView: React.FC<Props> = ({ onSelectService }) => {
                 className="p-4 sm:p-5 hover:bg-slate-50/70 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer group"
               >
                 <div className="flex items-center gap-4 min-w-0">
-                  <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center flex-shrink-0 text-slate-800 group-hover:border-blue-200 transition-colors">
-                    <span className="text-[10px] uppercase font-bold text-blue-600 leading-none">
+                  <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col items-center justify-center flex-shrink-0 text-slate-800 group-hover:border-emerald-300 shadow-2xs transition-colors">
+                    <span className="text-[10px] uppercase font-bold text-emerald-700 leading-none">
                       {dateObj.toLocaleDateString('es-ES', { month: 'short' })}
                     </span>
-                    <span className="text-lg font-bold font-display leading-tight tabular-nums">
+                    <span className="text-lg font-bold font-display leading-tight tabular-nums text-slate-900">
                       {dateObj.getDate()}
                     </span>
                   </div>

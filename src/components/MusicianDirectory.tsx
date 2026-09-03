@@ -56,7 +56,7 @@ export const MusicianDirectory: React.FC = () => {
 
         <button
           onClick={() => setRegisterModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-2xs"
+          className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all shadow-sm shadow-emerald-600/20"
         >
           <UserPlus className="w-4 h-4" />
           <span>Registrar Nuevo Músico</span>
@@ -132,9 +132,14 @@ export const MusicianDirectory: React.FC = () => {
                   return (
                     <tr key={m.id} className="hover:bg-slate-50/70 transition-colors">
                       
-                      {/* Name */}
+                      {/* Name with Planning Center Avatar */}
                       <td className="py-3 px-4 font-bold text-slate-900">
-                        {m.fullName}
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center text-xs flex-shrink-0 shadow-2xs">
+                            {m.fullName.charAt(0).toUpperCase()}
+                          </div>
+                          <span>{m.fullName}</span>
+                        </div>
                       </td>
 
                       {/* Instrument */}
