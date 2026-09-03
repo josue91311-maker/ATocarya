@@ -33,29 +33,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // GET /api/musicians - Listar todos los músicos
     if (req.method === 'GET') {
       const result = await db.execute('SELECT * FROM musicians ORDER BY full_name ASC');
-      
-      // Si la base de datos está recién creada y vacía, sembrar músicos iniciales
-      if (result.rows.length === 0) {
-        const now = new Date().toISOString();
-        for (const m of INITIAL_SEEDS) {
-          await db.execute({
-            sql: `INSERT INTO musicians (id, full_name, age, pin, primary_instrument, phone, created_at)
-                  VALUES (?, ?, ?, ?, ?, ?, ?)`,
-            args: [m.id, m.fullName, m.age, m.pin, m.primaryInstrument, m.phone, now],
-          });
-        }
-        const seededResult = await db.execute('SELECT * FROM musicians ORDER BY full_name ASC');
-        const list = seededResult.rows.map(r => ({
-          id: String(r.id),
-          fullName: String(r.full_name),
-          age: Number(r.age),
-          pin: String(r.pin),
-          primaryInstrument: String(r.primary_instrument),
-          phone: r.phone ? String(r.phone) : undefined,
-          createdAt: String(r.created_at),
-        }));
-        return res.status(200).json(list);
-      }
 
       const list = result.rows.map(r => ({
         id: String(r.id),

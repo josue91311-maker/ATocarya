@@ -61,11 +61,11 @@ interface AppContextType {
 }
 
 const STORAGE_KEYS = {
-  MUSICIANS: 'atocarya_musicians_v2',
-  SERVICES: 'atocarya_services_v2',
-  MUSICIAN_USER: 'atocarya_musician_user_v2',
-  ADMIN_AUTH: 'atocarya_admin_auth_v2',
-  ADMIN_PIN: 'atocarya_admin_pin_v2',
+  MUSICIANS: 'atocarya_musicians_v3',
+  SERVICES: 'atocarya_services_v3',
+  MUSICIAN_USER: 'atocarya_musician_user_v3',
+  ADMIN_AUTH: 'atocarya_admin_auth_v3',
+  ADMIN_PIN: 'atocarya_admin_pin_v3',
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -76,7 +76,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
-    return INITIAL_MUSICIANS;
+    return [];
   });
 
   const [services, setServices] = useState<ServiceDate[]>(() => {
@@ -84,7 +84,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (saved) {
       try { return JSON.parse(saved); } catch (e) { console.error(e); }
     }
-    return generateInitialServices();
+    return [];
   });
 
   const [musicianUser, setMusicianUser] = useState<Musician | null>(() => {
@@ -136,10 +136,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           apiGetMusicians(),
           apiGetServices(),
         ]);
-        if (remoteMusicians && remoteMusicians.length > 0) {
+        if (remoteMusicians !== null) {
           setMusicians(remoteMusicians);
         }
-        if (remoteServices && remoteServices.length > 0) {
+        if (remoteServices !== null) {
           setServices(remoteServices);
         }
       } catch (err) {
