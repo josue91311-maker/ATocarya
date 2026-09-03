@@ -4,6 +4,7 @@ import { ServiceDate, SlotConfig } from '../types';
 import { Clock, ChevronRight, Check, Sparkles, AlertCircle, Lock } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 import { isServiceExpired } from '../utils/dateUtils';
+import { getBestMatchingSlot } from '../utils/instrumentMatcher';
 
 interface Props {
   service: ServiceDate;
@@ -32,14 +33,9 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
     ? slotsList.find(s => s.musicianId === musicianUser.id)
     : null;
 
-  // Acceso rápido: slot que coincide con el instrumento del usuario
-  const matchPrimarySlot = musicianUser && !myAssignedSlot
-    ? slotsList.find(s => 
-        !s.musicianId && 
-        (s.label.toLowerCase().includes(musicianUser.primaryInstrument.toLowerCase()) || 
-         musicianUser.primaryInstrument.toLowerCase().includes(s.label.toLowerCase()) ||
-         musicianUser.primaryInstrument.toLowerCase().includes(s.category.toLowerCase()))
-      )
+  // Sugerencia inteligente de 1 toque según instrumento del usuario (Voz -> Voz Coro 1, etc.)
+  const matchPrimarySlot = musicianUser && !myAssignedSlot && !isExpired
+    ? getBestMatchingSlot(service.slots, musicianUser.primaryInstrument)
     : null;
 
   return (
@@ -139,22 +135,31 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
         </div>
       </div>
 
-      {/* Acceso Rápido de 1-Clic para el músico (Planning Center Aceptar / Confirmar) */}
+      {/* Acceso Rápido de 1-Toque para el músico en Móvil */}
       {matchPrimarySlot && !myAssignedSlot && !isExpired && (
         <div 
-          className="mt-3.5 p-2.5 bg-emerald-50/70 border border-emerald-200/90 rounded-xl flex items-center justify-between gap-2"
+          className="mt-3.5 p-3 bg-emerald-50 border border-emerald-300 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shadow-2xs"
           onClick={(e) => e.stopPropagation()}
         >
-          <span className="text-xs text-emerald-950 font-bold flex items-center gap-1.5 truncate">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-            <span className="truncate">¿Tocas este {dayName}?</span>
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 font-bold">
+              <Sparkles className="w-3.5 h-3.5" />
+            </span>
+            <div className="min-w-0">
+              <span className="text-xs text-emerald-950 font-bold block">
+                Sugerido para ti: <strong>{matchPrimarySlot.label}</strong>
+              </span>
+              <span className="text-[10px] text-emerald-700">
+                Puesto libre para tu instrumento ({musicianUser?.primaryInstrument})
+              </span>
+            </div>
+          </div>
           <button
             onClick={() => claimSlot(service.id, matchPrimarySlot.key)}
-            className="touch-target px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-emerald-600/20 hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+            className="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black flex items-center justify-center gap-1.5 transition-all shadow-sm shadow-emerald-600/30 hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Check className="w-3.5 h-3.5 stroke-[3]" />
-            <span>Aceptar ({matchPrimarySlot.label.split(' ')[0]})</span>
+            <Check className="w-4 h-4 stroke-[3]" />
+            <span>Confirmar {matchPrimarySlot.label}</span>
           </button>
         </div>
       )}

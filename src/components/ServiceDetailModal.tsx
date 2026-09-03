@@ -16,6 +16,7 @@ import {
 import { InstrumentIcon } from './InstrumentIcon';
 import { ConfirmModal, ConfirmDialogOptions } from './ConfirmModal';
 import { isServiceExpired } from '../utils/dateUtils';
+import { getBestMatchingSlot } from '../utils/instrumentMatcher';
 
 interface Props {
   service: ServiceDate | null;
@@ -63,14 +64,9 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
     ? slotsList.find(s => s.musicianId === musicianUser.id)
     : null;
 
-  // Find quick recommended slot matching musician's instrument
+  // Sugerencia inteligente según instrumento del músico (Voz -> Voz Coro 1, etc.)
   const recommendedSlot = musicianUser && !myAssignedSlot
-    ? slotsList.find(s => 
-        !s.musicianId &&
-        (s.label.toLowerCase().includes(musicianUser.primaryInstrument.toLowerCase()) ||
-         musicianUser.primaryInstrument.toLowerCase().includes(s.label.toLowerCase()) ||
-         musicianUser.primaryInstrument.toLowerCase().includes(s.category.toLowerCase()))
-      )
+    ? getBestMatchingSlot(service.slots, musicianUser.primaryInstrument)
     : null;
 
   const handleClaim = (slotKey: SlotKey) => {

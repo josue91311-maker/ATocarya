@@ -155,11 +155,11 @@ export const Navbar: React.FC<Props> = ({
                     <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center text-xs font-bold shadow-2xs">
                       {musicianUser.fullName.charAt(0).toUpperCase()}
                     </div>
-                    <div className="text-left hidden sm:block">
+                    <div className="text-left">
                       <p className="text-xs font-bold text-slate-900 leading-tight">
                         {musicianUser.fullName.split(' ')[0]}
                       </p>
-                      <p className="text-[10px] text-slate-500 font-medium leading-none">
+                      <p className="text-[10px] text-emerald-800 font-semibold leading-none">
                         {musicianUser.primaryInstrument}
                       </p>
                     </div>

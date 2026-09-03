@@ -24,6 +24,7 @@ import {
   getMonthKey, 
   getMonthLabel 
 } from '../utils/dateUtils';
+import { getBestMatchingSlot } from '../utils/instrumentMatcher';
 
 interface Props {
   onSelectService: (service: ServiceDate) => void;
@@ -34,7 +35,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
   const [filterType, setFilterType] = useState<'all' | 'available' | 'mine'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [viewMode, setViewMode] = useState<'month' | 'grid' | 'list'>('month');
+  const [viewMode, setViewMode] = useState<'month' | 'grid' | 'list'>('grid');
 
   // Interactive Month Calendar Navigation State
   const today = new Date();
@@ -106,14 +107,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
     ? (Object.values(nextService.slots || {}) as SlotConfig[]).find(s => s && s.musicianId === musicianUser.id)
     : null;
   const recommendedSlotInNext = (nextService && musicianUser && !myAssignedSlotInNext && !isNextExpired)
-    ? (Object.values(nextService.slots || {}) as SlotConfig[]).find(s =>
-        s &&
-        s.enabled !== false &&
-        !s.musicianId &&
-        (s.label.toLowerCase().includes(musicianUser.primaryInstrument.toLowerCase()) ||
-         musicianUser.primaryInstrument.toLowerCase().includes(s.label.toLowerCase()) ||
-         musicianUser.primaryInstrument.toLowerCase().includes(s.category.toLowerCase()))
-      )
+    ? getBestMatchingSlot(nextService.slots, musicianUser.primaryInstrument)
     : null;
 
   // Calendar Grid Calculation
@@ -145,11 +139,11 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       
-      {/* ⚡ TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
+      {/* ⚡ TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC (MÓVIL FRIENDLY) */}
       {nextService && musicianUser && (
         <div>
           {myAssignedSlotInNext ? (
-            <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
+            <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
               <div className="flex items-center gap-3.5">
                 <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
                   <Check className="w-6 h-6 stroke-[3]" />
@@ -157,20 +151,20 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-2xs">
-                      Confirmado
+                      ✓ Confirmado
                     </span>
                     <span className="text-xs font-bold text-emerald-950">
                       Próximo Culto: {nextService.date} ({nextService.time})
                     </span>
                   </div>
                   <h3 className="text-sm sm:text-base font-bold text-emerald-950 mt-0.5 font-display">
-                    ¡{musicianUser.fullName}, estás confirmado en {myAssignedSlotInNext.label}!
+                    ¡{musicianUser.fullName}, estás anotado en {myAssignedSlotInNext.label}!
                   </h3>
                 </div>
               </div>
               <button
                 onClick={() => onSelectService(nextService)}
-                className="px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition-all shadow-2xs self-start sm:self-auto"
+                className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition-all shadow-2xs text-center"
               >
                 Ver servicio completo
               </button>
@@ -199,21 +193,21 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                     {musicianUser.fullName}, ¿tocas este {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long' })}?
                   </h3>
                   <p className="text-xs text-emerald-100/90 mt-0.5">
-                    Tu instrumento es <strong>{musicianUser.primaryInstrument}</strong> y el puesto <strong>{recommendedSlotInNext.label}</strong> está libre.
+                    Tu instrumento es <strong>{musicianUser.primaryInstrument}</strong> y el puesto <strong>{recommendedSlotInNext.label}</strong> está disponible.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 self-start md:self-auto flex-shrink-0">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto flex-shrink-0">
                 <button
                   onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
-                  className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 rounded-xl text-xs font-black flex items-center gap-2 shadow-sm transition-all hover:scale-105 active:scale-95"
+                  className="w-full sm:w-auto px-5 py-3 bg-white hover:bg-emerald-50 text-emerald-900 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-105 active:scale-95"
                 >
                   <Check className="w-4 h-4 stroke-[3] text-emerald-600" />
-                  <span>Anotarme en {recommendedSlotInNext.label} (1 Clic)</span>
+                  <span>Anotarme en {recommendedSlotInNext.label} (1 Toque)</span>
                 </button>
                 <button
                   onClick={() => onSelectService(nextService)}
-                  className="px-3.5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-xs font-bold transition-colors"
+                  className="w-full sm:w-auto px-3.5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-xs font-bold transition-colors text-center"
                 >
                   Ver todos
                 </button>
