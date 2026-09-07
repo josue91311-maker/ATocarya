@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import * as Tone from 'tone';
 import { 
   Play, 
   Pause, 
@@ -7,10 +8,9 @@ import {
   VolumeX, 
   ExternalLink, 
   Music, 
-  Sparkles,
-  AlertCircle,
-  Clock,
-  Gauge
+  Sparkles, 
+  AlertCircle, 
+  Gauge 
 } from 'lucide-react';
 import { transposeChord } from '../utils/chordTransposer';
 
@@ -34,11 +34,12 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   const [volume, setVolume] = useState<number>(1.0);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Web Audio API refs
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const audioBufferRef = useRef<AudioBuffer | null>(null);
-  const sourceNodeRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
+  // Tone.js refs
+  const toneBufferRef = useRef<Tone.ToneAudioBuffer | null>(null);
+  const playerRef = useRef<Tone.Player | null>(null);
+  const pitchShiftRef = useRef<Tone.PitchShift | null>(null);
+  const volumeNodeRef = useRef<Tone.Volume | null>(null);
+  
   const playStartTimeRef = useRef<number>(0);
   const pausedAtRef = useRef<number>(0);
   const animFrameRef = useRef<number | null>(null);
@@ -54,14 +55,13 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   // Convertir URL de Google Drive a Stream
   const getStreamUrl = (url: string): string => {
     const trimmed = url.trim();
-    // Si es Google Drive, usar el proxy para evitar restricciones CORS
     if (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com')) {
       return `/api/audio-proxy?url=${encodeURIComponent(trimmed)}`;
     }
     return trimmed;
   };
 
-  // Cargar y decodificar audio en AudioBuffer
+  // Cargar y decodificar audio en ToneAudioBuffer
   useEffect(() => {
     let isCancelled = false;
     stopAudio();
@@ -92,23 +92,19 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
         const arrayBuffer = await response.arrayBuffer();
         if (isCancelled) return;
 
-        setLoadProgress('Decodificando frecuencias musicales...');
-        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-        if (!audioContextRef.current) {
-          audioContextRef.current = new AudioContextClass();
-        }
-        const ctx = audioContextRef.current;
+        setLoadProgress('Configurando motor de transposición...');
 
-        // Decodificar el archivo de audio
-        const decodedBuffer = await ctx.decodeAudioData(arrayBuffer);
+        // Asegurar contexto de audio Tone.js
+        const rawBuffer = await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
         if (isCancelled) return;
 
-        audioBufferRef.current = decodedBuffer;
-        setDuration(decodedBuffer.duration);
+        const tBuffer = new Tone.ToneAudioBuffer(rawBuffer);
+        toneBufferRef.current = tBuffer;
+        setDuration(tBuffer.duration);
         setIsLoading(false);
       } catch (err: any) {
         if (isCancelled) return;
-        console.warn('Error al decodificar audio Web Audio API:', err);
+        console.warn('Error al decodificar audio:', err);
         setError('No se pudo decodificar el archivo directamente. Puedes abrir el enlace original.');
         setIsLoading(false);
       }
@@ -119,82 +115,97 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
     return () => {
       isCancelled = true;
       stopAudio();
-      if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-        audioContextRef.current.close().catch(() => {});
-        audioContextRef.current = null;
-      }
     };
   }, [audioUrl]);
 
-  // Actualizar Gain de volumen
+  // Actualizar volumen / mute
   useEffect(() => {
-    if (gainNodeRef.current) {
-      gainNodeRef.current.gain.value = isMuted ? 0 : volume;
+    if (volumeNodeRef.current) {
+      if (isMuted) {
+        volumeNodeRef.current.mute = true;
+      } else {
+        volumeNodeRef.current.mute = false;
+        // Escala logarítmica / decibeles: 0 es silencio total (-Infinity), 1 es 0 dB
+        volumeNodeRef.current.volume.value = volume <= 0 ? -100 : Tone.gainToDb(volume);
+      }
     }
   }, [volume, isMuted]);
 
-  // Iniciar reproducción desde una posición específica
-  const playFrom = (offset: number) => {
-    if (!audioBufferRef.current) return;
+  // Iniciar reproducción desde un punto específico
+  const playFrom = async (offset: number) => {
+    if (!toneBufferRef.current || !toneBufferRef.current.loaded) return;
 
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
-      audioContextRef.current = new AudioContextClass();
-    }
-    const ctx = audioContextRef.current;
-
-    if (ctx.state === 'suspended') {
-      ctx.resume();
-    }
-
-    // Detener nodo anterior si existía
-    if (sourceNodeRef.current) {
-      try {
-        sourceNodeRef.current.stop();
-        sourceNodeRef.current.disconnect();
-      } catch {}
-    }
-
-    const source = ctx.createBufferSource();
-    source.buffer = audioBufferRef.current;
-
-    // Aplicar transposición (detune: 100 cents = 1 semitono)
-    source.detune.value = semitones * 100;
-    source.playbackRate.value = playbackSpeed;
-
-    // Conectar ganancia (volumen)
-    const gainNode = ctx.createGain();
-    gainNode.gain.value = isMuted ? 0 : volume;
-    gainNodeRef.current = gainNode;
-
-    source.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    const safeOffset = Math.max(0, Math.min(offset, audioBufferRef.current.duration));
-    source.start(0, safeOffset);
-    sourceNodeRef.current = source;
-
-    playStartTimeRef.current = ctx.currentTime;
-    pausedAtRef.current = safeOffset;
-    setIsPlaying(true);
-
-    source.onended = () => {
-      // Si llegó al final natural
-      if (currentTime >= (audioBufferRef.current?.duration || 0) - 0.5) {
-        setIsPlaying(false);
-        pausedAtRef.current = 0;
-        setCurrentTime(0);
+    try {
+      // Iniciar el contexto de audio si estaba suspendido (política del navegador)
+      if (Tone.getContext().state !== 'running') {
+        await Tone.start();
       }
-    };
+
+      // Limpiar nodo anterior si existía
+      if (playerRef.current) {
+        try {
+          playerRef.current.stop();
+          playerRef.current.dispose();
+        } catch {}
+        playerRef.current = null;
+      }
+
+      // Construir o reusar la cadena de efectos Tone:
+      // Player -> PitchShift (mantiene velocidad) -> Volume -> Destination
+      if (!pitchShiftRef.current) {
+        pitchShiftRef.current = new Tone.PitchShift({
+          pitch: semitones,
+          windowSize: 0.08,
+          delayTime: 0,
+          feedback: 0
+        });
+      } else {
+        pitchShiftRef.current.pitch = semitones;
+      }
+
+      if (!volumeNodeRef.current) {
+        volumeNodeRef.current = new Tone.Volume(volume <= 0 ? -100 : Tone.gainToDb(volume));
+        volumeNodeRef.current.mute = isMuted;
+      }
+
+      // Conectar: PitchShift -> Volume -> Destination
+      pitchShiftRef.current.disconnect();
+      pitchShiftRef.current.connect(volumeNodeRef.current);
+      volumeNodeRef.current.toDestination();
+
+      // Crear nuevo Player con el buffer cargado
+      const player = new Tone.Player(toneBufferRef.current);
+      player.playbackRate = playbackSpeed;
+      player.connect(pitchShiftRef.current);
+
+      const safeOffset = Math.max(0, Math.min(offset, toneBufferRef.current.duration));
+      player.start(0, safeOffset);
+      playerRef.current = player;
+
+      playStartTimeRef.current = Tone.now();
+      pausedAtRef.current = safeOffset;
+      setIsPlaying(true);
+
+      player.onstop = () => {
+        // Solo marcar pausado si realmente terminó la duración
+        if (currentTime >= (toneBufferRef.current?.duration || 0) - 0.5) {
+          setIsPlaying(false);
+          pausedAtRef.current = 0;
+          setCurrentTime(0);
+        }
+      };
+    } catch (err) {
+      console.error('Error al iniciar Tone.Player:', err);
+    }
   };
 
   const stopAudio = () => {
-    if (sourceNodeRef.current) {
+    if (playerRef.current) {
       try {
-        sourceNodeRef.current.stop();
-        sourceNodeRef.current.disconnect();
+        playerRef.current.stop();
+        playerRef.current.dispose();
       } catch {}
-      sourceNodeRef.current = null;
+      playerRef.current = null;
     }
     setIsPlaying(false);
     if (animFrameRef.current) {
@@ -205,11 +216,9 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
 
   const handleTogglePlay = () => {
     if (isPlaying) {
-      // Pausar
-      if (audioContextRef.current) {
-        const elapsed = (audioContextRef.current.currentTime - playStartTimeRef.current) * playbackSpeed * Math.pow(2, semitones / 12);
-        pausedAtRef.current = Math.min(duration, pausedAtRef.current + elapsed);
-      }
+      // Pausar y registrar segundo actual
+      const elapsed = (Tone.now() - playStartTimeRef.current) * playbackSpeed;
+      pausedAtRef.current = Math.min(duration, pausedAtRef.current + elapsed);
       stopAudio();
     } else {
       // Reanudar
@@ -230,36 +239,40 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
     handleSeek(nextTime);
   };
 
-  // Cambio de Tono en Semitonos en Vivo
+  // Cambio de Tono en Semitonos (Pitch Shift sin alterar la velocidad)
   const handleSemitoneChange = (delta: number) => {
-    const newSemitones = delta;
-    setSemitones(newSemitones);
-
-    if (sourceNodeRef.current && audioContextRef.current) {
-      // Ajuste suave e inmediato en tiempo real
-      sourceNodeRef.current.detune.setValueAtTime(newSemitones * 100, audioContextRef.current.currentTime);
+    setSemitones(delta);
+    if (pitchShiftRef.current) {
+      // Modifica la frecuencia y los formantes sin tocar playbackRate ni el tempo de la canción
+      pitchShiftRef.current.pitch = delta;
     }
   };
 
-  // Cambio de velocidad de reproducción
+  // Cambio de velocidad de reproducción (Tempo independiente)
   const handleSpeedChange = (speed: number) => {
     setPlaybackSpeed(speed);
-    if (sourceNodeRef.current && audioContextRef.current) {
-      sourceNodeRef.current.playbackRate.setValueAtTime(speed, audioContextRef.current.currentTime);
+    if (playerRef.current) {
+      // Ajustar posición base para que el cálculo de tiempo transcurrido sea exacto
+      const elapsed = (Tone.now() - playStartTimeRef.current) * playbackSpeed;
+      pausedAtRef.current = Math.min(duration, pausedAtRef.current + elapsed);
+      playStartTimeRef.current = Tone.now();
+      playerRef.current.playbackRate = speed;
     }
   };
 
-  // Loop de animación para actualizar tiempo
+  // Loop de animación para actualizar tiempo de progreso
   useEffect(() => {
     if (!isPlaying) return;
 
     const updateProgress = () => {
-      if (audioContextRef.current && isPlaying) {
-        const elapsed = (audioContextRef.current.currentTime - playStartTimeRef.current) * playbackSpeed * Math.pow(2, semitones / 12);
+      if (isPlaying) {
+        // Nota: la duración y el progreso avanzan según la velocidad de reproducción,
+        // completamente INDEPENDIENTES de la transposición de tono (PitchShift).
+        const elapsed = (Tone.now() - playStartTimeRef.current) * playbackSpeed;
         const current = Math.min(duration, pausedAtRef.current + elapsed);
         setCurrentTime(current);
 
-        if (current >= duration) {
+        if (current >= duration && duration > 0) {
           setIsPlaying(false);
           pausedAtRef.current = 0;
           setCurrentTime(0);
@@ -276,7 +289,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
         cancelAnimationFrame(animFrameRef.current);
       }
     };
-  }, [isPlaying, playbackSpeed, semitones, duration]);
+  }, [isPlaying, playbackSpeed, duration]);
 
   // Cálculo del Tono Resultante
   const currentKeyDisplay = (() => {
