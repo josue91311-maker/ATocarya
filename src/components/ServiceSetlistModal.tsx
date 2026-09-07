@@ -42,7 +42,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
   // Autocompletado del Banco de Canciones
   const [showBankSuggestions, setShowBankSuggestions] = useState(false);
-  const [saveToBankChecked, setSaveToBankChecked] = useState(true);
+  const [saveToBankChecked, setSaveToBankChecked] = useState(false);
+  const [selectedBankSongId, setSelectedBankSongId] = useState<string | null>(null);
 
   // Estado de edición de canción existente
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
@@ -108,6 +109,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
   const handleCancelEdit = () => {
     setEditingSongId(null);
+    setSelectedBankSongId(null);
+    setSaveToBankChecked(false);
     setNewTitle('');
     setNewUrl('');
     setNewKey('G');
@@ -121,6 +124,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   };
 
   const handleSelectFromBank = (bankSong: BankSong) => {
+    setSelectedBankSongId(bankSong.id);
     setNewTitle(bankSong.title);
     if (bankSong.youtubeUrl) setNewUrl(bankSong.youtubeUrl);
     if (bankSong.defaultKey) setNewKey(bankSong.defaultKey);
@@ -130,6 +134,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     if (bankSong.chordChart) setNewChordChart(bankSong.chordChart);
     if (bankSong.lyrics) setNewLyrics(bankSong.lyrics);
     if (bankSong.chordsUrl) setNewChordsUrl(bankSong.chordsUrl);
+    // Al cargar del banco NO debe auto-guardar nuevamente en el banco
+    setSaveToBankChecked(false);
     setShowBankSuggestions(false);
   };
 
@@ -162,9 +168,10 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       setSongs(prev => [...prev, songData]);
     }
 
-    // Si está marcado guardar en el banco central de canciones:
+    // Si el usuario explícitamente marcó guardar o actualizar en el banco central:
     if (saveToBankChecked) {
       saveBankSong({
+        id: selectedBankSongId || undefined,
         title: songData.title,
         defaultKey: songData.key,
         originalKey: songData.originalKey,
@@ -177,6 +184,9 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       }).catch(err => console.warn('Error al sincronizar con banco de canciones:', err));
     }
 
+    // Resetear formulario
+    setSelectedBankSongId(null);
+    setSaveToBankChecked(false);
     setNewTitle('');
     setNewUrl('');
     setNewKey('G');
@@ -660,17 +670,20 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               </div>
             </div>
 
-            {/* Checkbox guardar en el banco automáticamente */}
-            <div className="flex items-center gap-2 p-2 bg-emerald-50/60 border border-emerald-200/80 rounded-xl">
+            {/* Checkbox guardar en el banco */}
+            <div className="flex items-start gap-2.5 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
               <input
                 type="checkbox"
                 id="saveToBank"
                 checked={saveToBankChecked}
                 onChange={(e) => setSaveToBankChecked(e.target.checked)}
-                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                className="w-4 h-4 mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
               />
-              <label htmlFor="saveToBank" className="text-xs font-bold text-emerald-950 cursor-pointer select-none">
-                Guardar o actualizar automáticamente en el Banco Central de Canciones
+              <label htmlFor="saveToBank" className="text-xs text-slate-700 cursor-pointer select-none">
+                <span className="font-bold text-slate-900 block">Guardar o actualizar cambios en el Banco Central de Canciones</span>
+                <span className="text-[10px] text-slate-500 block leading-tight mt-0.5">
+                  (Opcional / Desmarcado por defecto): Al seleccionar canciones del banco para armar el culto, no se duplicarán en el banco. Marca esta casilla solo si deseas sobreescribir la canción maestra con nuevos datos.
+                </span>
               </label>
             </div>
 

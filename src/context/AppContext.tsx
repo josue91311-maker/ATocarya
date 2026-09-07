@@ -86,6 +86,28 @@ const STORAGE_KEYS = {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+const deduplicateSongBank = (songs: BankSong[]): BankSong[] => {
+  const seen = new Map<string, BankSong>();
+  for (const s of songs) {
+    const key = s.title.trim().toLowerCase();
+    if (!seen.has(key)) {
+      seen.set(key, s);
+    } else {
+      const prev = seen.get(key)!;
+      seen.set(key, {
+        ...s,
+        ...prev,
+        artist: prev.artist || s.artist,
+        youtubeUrl: prev.youtubeUrl || s.youtubeUrl,
+        chordsUrl: prev.chordsUrl || s.chordsUrl,
+        chordChart: prev.chordChart || s.chordChart,
+        lyrics: prev.lyrics || s.lyrics,
+      });
+    }
+  }
+  return Array.from(seen.values()).sort((a, b) => a.title.localeCompare(b.title));
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [musicians, setMusicians] = useState<Musician[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MUSICIANS);
@@ -114,7 +136,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [songBank, setSongBank] = useState<BankSong[]>(() => {
     const saved = localStorage.getItem('atocarya_song_bank_v1');
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+      try { 
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) return deduplicateSongBank(parsed);
+      } catch (e) { console.error(e); }
     }
     return [];
   });
@@ -172,7 +197,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setServices(remoteServices);
         }
         if (remoteSongBank !== null) {
-          setSongBank(remoteSongBank);
+          setSongBank(deduplicateSongBank(remoteSongBank));
         }
       } catch (err) {
         console.warn('Operando con persistencia local:', err);
@@ -832,29 +857,42 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const saveBankSong = async (
     songData: Partial<BankSong> & { title: string }
   ): Promise<{ success: boolean; message?: string; song?: BankSong }> => {
-    if (!songData.title || !songData.title.trim()) {
+    const trimmedTitle = songData.title?.trim();
+    if (!trimmedTitle) {
       return { success: false, message: 'El título de la canción es obligatorio.' };
     }
 
+    // Buscar si ya existe una canción con el mismo ID o el mismo Título (ignorando mayúsculas/minúsculas)
+    const existing = songBank.find(
+      s => (songData.id && s.id === songData.id) ||
+           s.title.trim().toLowerCase() === trimmedTitle.toLowerCase()
+    );
+
+    const finalId = songData.id || existing?.id || `bank_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`;
+
     const fullSong: BankSong = {
-      id: songData.id || `bank_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      title: songData.title.trim(),
-      artist: songData.artist?.trim() || undefined,
-      defaultKey: songData.defaultKey?.trim() || undefined,
-      originalKey: songData.originalKey?.trim() || undefined,
-      bpm: songData.bpm ? Number(songData.bpm) : undefined,
-      youtubeUrl: songData.youtubeUrl?.trim() || undefined,
-      chordsUrl: songData.chordsUrl?.trim() || undefined,
-      chordChart: songData.chordChart?.trim() || undefined,
-      lyrics: songData.lyrics?.trim() || undefined,
-      notes: songData.notes?.trim() || undefined,
-      createdAt: songData.createdAt || new Date().toISOString(),
+      id: finalId,
+      title: trimmedTitle,
+      artist: songData.artist !== undefined ? (songData.artist?.trim() || undefined) : existing?.artist,
+      defaultKey: songData.defaultKey !== undefined ? (songData.defaultKey?.trim() || undefined) : existing?.defaultKey,
+      originalKey: songData.originalKey !== undefined ? (songData.originalKey?.trim() || undefined) : existing?.originalKey,
+      bpm: songData.bpm !== undefined ? (songData.bpm ? Number(songData.bpm) : undefined) : existing?.bpm,
+      youtubeUrl: songData.youtubeUrl !== undefined ? (songData.youtubeUrl?.trim() || undefined) : existing?.youtubeUrl,
+      chordsUrl: songData.chordsUrl !== undefined ? (songData.chordsUrl?.trim() || undefined) : existing?.chordsUrl,
+      chordChart: songData.chordChart !== undefined ? (songData.chordChart?.trim() || undefined) : existing?.chordChart,
+      lyrics: songData.lyrics !== undefined ? (songData.lyrics?.trim() || undefined) : existing?.lyrics,
+      notes: songData.notes !== undefined ? (songData.notes?.trim() || undefined) : existing?.notes,
+      createdAt: existing?.createdAt || songData.createdAt || new Date().toISOString(),
     };
 
     setSongBank(prev => {
-      const exists = prev.some(s => s.id === fullSong.id);
-      if (exists) {
-        return prev.map(s => (s.id === fullSong.id ? fullSong : s));
+      const idx = prev.findIndex(
+        s => s.id === fullSong.id || s.title.trim().toLowerCase() === fullSong.title.trim().toLowerCase()
+      );
+      if (idx !== -1) {
+        const next = [...prev];
+        next[idx] = fullSong;
+        return next;
       }
       return [...prev, fullSong].sort((a, b) => a.title.localeCompare(b.title));
     });
