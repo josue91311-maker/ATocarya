@@ -362,71 +362,67 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   </div>
 
                   {/* Selector de Pestañas: Cifrado & Compases / Audio & Pista / Letra / Partitura Externa */}
-                  {(hasChords || hasAudio || hasLyrics || activeSong.chordsUrl) && (
-                    <div className="pt-2 border-t border-slate-100">
-                      <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-lg flex-wrap">
-                        {hasChords && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab('chords')}
-                            className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                              activeTab === 'chords'
-                                ? 'bg-white text-emerald-950 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                            }`}
-                          >
-                            <Music className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Cifrado & Compases</span>
-                          </button>
-                        )}
+                  <div className="pt-2 border-t border-slate-100">
+                    <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-lg flex-wrap">
+                      {hasChords && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('chords')}
+                          className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            activeTab === 'chords'
+                              ? 'bg-white text-emerald-950 shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          <Music className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Cifrado & Compases</span>
+                        </button>
+                      )}
 
-                        {hasAudio && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab('audio')}
-                            className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                              activeTab === 'audio'
-                                ? 'bg-white text-emerald-950 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                            }`}
-                          >
-                            <Headphones className="w-3.5 h-3.5 text-teal-600" />
-                            <span>🎧 Pista & Tono</span>
-                          </button>
-                        )}
+                      <button
+                        type="button"
+                        onClick={() => setActiveTab('audio')}
+                        className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                          activeTab === 'audio'
+                            ? 'bg-white text-emerald-950 shadow-xs'
+                            : 'text-slate-600 hover:text-slate-900'
+                        }`}
+                      >
+                        <Headphones className="w-3.5 h-3.5 text-teal-600" />
+                        <span>🎧 Pista & Tono</span>
+                      </button>
 
-                        {hasLyrics && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab('lyrics')}
-                            className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                              activeTab === 'lyrics'
-                                ? 'bg-white text-emerald-950 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                            }`}
-                          >
-                            <FileText className="w-3.5 h-3.5 text-blue-600" />
-                            <span>Letra</span>
-                          </button>
-                        )}
+                      {hasLyrics && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('lyrics')}
+                          className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            activeTab === 'lyrics'
+                              ? 'bg-white text-emerald-950 shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          <FileText className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Letra</span>
+                        </button>
+                      )}
 
-                        {activeSong.chordsUrl && (
-                          <button
-                            type="button"
-                            onClick={() => setActiveTab('pdf')}
-                            className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                              activeTab === 'pdf'
-                                ? 'bg-white text-emerald-950 shadow-xs'
-                                : 'text-slate-600 hover:text-slate-900'
-                            }`}
-                          >
-                            <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
-                            <span>Visor PDF</span>
-                          </button>
-                        )}
-                      </div>
+                      {activeSong.chordsUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setActiveTab('pdf')}
+                          className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            activeTab === 'pdf'
+                              ? 'bg-white text-emerald-950 shadow-xs'
+                              : 'text-slate-600 hover:text-slate-900'
+                          }`}
+                        >
+                          <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>Visor PDF</span>
+                        </button>
+                      )}
                     </div>
-                  )}
+                  </div>
 
                   {/* CONTENIDO 1: VISOR DE CIFRADO ARMÓNICO Y COMPASES CON TRANSPOSE */}
                   {activeTab === 'chords' && hasChords && (
@@ -595,12 +591,32 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   )}
 
                   {/* CONTENIDO 4: REPRODUCTOR DE PISTA DE AUDIO CON TRANSPOSICIÓN EN VIVO */}
-                  {activeTab === 'audio' && activeSong.audioUrl && (
-                    <AudioTransposerPlayer
-                      audioUrl={activeSong.audioUrl}
-                      songTitle={activeSong.title}
-                      baseKey={activeSong.key}
-                    />
+                  {activeTab === 'audio' && (
+                    activeSong.audioUrl ? (
+                      <AudioTransposerPlayer
+                        audioUrl={activeSong.audioUrl}
+                        songTitle={activeSong.title}
+                        baseKey={activeSong.key}
+                      />
+                    ) : (
+                      <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center text-white space-y-3 shadow-xl">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center mx-auto">
+                          <Headphones className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-white">
+                          Pista de Audio con Transpositor Musical (Pitch Shift)
+                        </h4>
+                        <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+                          Esta alabanza aún no tiene configurado un archivo de audio MP3 o enlace de Google Drive.
+                        </p>
+                        <div className="p-3.5 bg-slate-800/80 rounded-2xl max-w-md mx-auto text-left text-[11px] text-slate-300 space-y-1.5 border border-slate-700/60">
+                          <p className="font-bold text-teal-400">💡 ¿Cómo activarlo para los músicos?</p>
+                          <p>1. Ingresa al panel de <strong>Cultos</strong> o al <strong>Banco de Canciones</strong>.</p>
+                          <p>2. Haz clic en <strong>Editar</strong> en esta alabanza.</p>
+                          <p>3. Pega el enlace de Google Drive en el campo <strong>"Audio / Pista MP3 (Drive)"</strong> y guarda los cambios.</p>
+                        </div>
+                      </div>
+                    )
                   )}
 
                   {/* Botones de Herramientas Musicales (Sin Moises) */}
