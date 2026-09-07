@@ -16,6 +16,7 @@ import { AdminEditServiceModal } from './components/AdminEditServiceModal';
 import { WhatsAppShareModal } from './components/WhatsAppShareModal';
 import { PublicSetlistView } from './components/PublicSetlistView';
 import { ServiceSetlistModal } from './components/ServiceSetlistModal';
+import { SongBankManager } from './components/SongBankManager';
 
 type PortalType = 'musician' | 'admin';
 
@@ -25,8 +26,8 @@ const getPublicRepertoireServiceId = (): string | null => {
   if (match && match[1]) return match[1];
 
   const params = new URLSearchParams(window.location.search);
-  const fromParam = params.get('repertorio') || params.get('canciones') || params.get('setlist');
-  if (fromParam) return fromParam;
+  const repParam = params.get('repertorio') || params.get('canciones') || params.get('setlist');
+  if (repParam) return repParam;
 
   return null;
 };
@@ -51,7 +52,7 @@ const MainRouter: React.FC = () => {
 
   const [portal, setPortal] = useState<PortalType>(getInitialPortal);
   const [musicianTab, setMusicianTab] = useState<'calendar' | 'my-services'>('calendar');
-  const [adminTab, setAdminTab] = useState<'visual-board' | 'schedule' | 'musicians'>('visual-board');
+  const [adminTab, setAdminTab] = useState<'visual-board' | 'schedule' | 'musicians' | 'songs-bank'>('visual-board');
 
   const [selectedService, setSelectedService] = useState<ServiceDate | null>(null);
   const [editingService, setEditingService] = useState<ServiceDate | null>(null);
@@ -225,6 +226,11 @@ const MainRouter: React.FC = () => {
         {/* Directorio de músicos y registro exclusivo por admin */}
         {adminTab === 'musicians' && (
           <MusicianDirectory />
+        )}
+
+        {/* Banco Central de Canciones */}
+        {adminTab === 'songs-bank' && (
+          <SongBankManager />
         )}
       </main>
 

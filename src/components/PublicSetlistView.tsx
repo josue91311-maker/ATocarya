@@ -43,7 +43,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics'>('chords');
+  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf'>('chords');
   const [transposeDelta, setTransposeDelta] = useState<number>(0);
 
   if (!service) {
@@ -393,16 +393,18 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         )}
 
                         {activeSong.chordsUrl && (
-                          <a
-                            href={activeSong.chordsUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 py-1.5 px-3 rounded-xl text-xs font-bold text-indigo-700 hover:bg-white transition-all flex items-center justify-center gap-1.5"
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('pdf')}
+                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                              activeTab === 'pdf'
+                                ? 'bg-white text-emerald-950 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
                           >
-                            <FileCheck className="w-3.5 h-3.5" />
-                            <span>PDF / Cifrado</span>
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
+                            <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>Visor PDF</span>
+                          </button>
                         )}
                       </div>
                     </div>
@@ -531,6 +533,45 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       </h4>
                       <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
                         {activeSong.lyrics}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CONTENIDO 3: VISOR INTEGRADO DE PDF / PARTITURA */}
+                  {activeTab === 'pdf' && activeSong.chordsUrl && (
+                    <div className="p-4 sm:p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between text-white border-b border-slate-800 pb-2">
+                        <div className="flex items-center gap-2">
+                          <FileCheck className="w-4 h-4 text-indigo-400" />
+                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">
+                            Visor de Cifrado / Partitura (PDF)
+                          </span>
+                        </div>
+                        <a
+                          href={activeSong.chordsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
+                        >
+                          <span>Abrir en Pestaña Completa</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      </div>
+
+                      {/* Contenedor Iframe con Fallback Automático */}
+                      <div className="w-full h-[550px] sm:h-[650px] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative">
+                        <iframe
+                          src={
+                            activeSong.chordsUrl.includes('drive.google.com')
+                              ? activeSong.chordsUrl.replace('/view', '/preview')
+                              : activeSong.chordsUrl.endsWith('.pdf')
+                              ? `https://docs.google.com/viewer?url=${encodeURIComponent(activeSong.chordsUrl)}&embedded=true`
+                              : activeSong.chordsUrl
+                          }
+                          title="Visor de PDF"
+                          className="w-full h-full border-0 bg-white"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        />
                       </div>
                     </div>
                   )}

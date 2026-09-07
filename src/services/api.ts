@@ -1,4 +1,4 @@
-import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem } from '../types';
+import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem, BankSong } from '../types';
 import {
   tursoGetMusicians,
   tursoCreateMusician,
@@ -9,6 +9,9 @@ import {
   tursoDeleteService,
   tursoUpdateSlots,
   tursoUpdateServiceSongs,
+  tursoGetSongBank,
+  tursoSaveBankSong,
+  tursoDeleteBankSong,
 } from './tursoDirect';
 
 const API_BASE = '/api';
@@ -294,5 +297,19 @@ export const apiUpdateServiceSongs = async (
   isPublished: boolean
 ): Promise<boolean> => {
   return await tursoUpdateServiceSongs(serviceId, songs, isPublished);
+};
+
+// --- Banco de Canciones ---
+
+export const apiGetSongBank = async (): Promise<BankSong[] | null> => {
+  return await tursoGetSongBank();
+};
+
+export const apiSaveBankSong = async (song: BankSong): Promise<boolean> => {
+  return await tursoSaveBankSong(song);
+};
+
+export const apiDeleteBankSong = async (songId: string): Promise<boolean> => {
+  return await tursoDeleteBankSong(songId);
 };
 

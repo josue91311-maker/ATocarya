@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Musician, ServiceDate, CurrentUser, SlotKey, SlotConfig, PrimaryInstrument, SongItem } from '../types';
+import { Musician, ServiceDate, CurrentUser, SlotKey, SlotConfig, PrimaryInstrument, SongItem, BankSong } from '../types';
 import { INITIAL_MUSICIANS, generateInitialServices, createEmptySlots } from '../data/initialData';
 import { isServiceExpired } from '../utils/dateUtils';
 import { 
@@ -17,12 +17,16 @@ import {
   apiAdminClearSlot, 
   apiToggleServiceOpen,
   apiSaveWholeService,
-  apiUpdateServiceSongs
+  apiUpdateServiceSongs,
+  apiGetSongBank,
+  apiSaveBankSong,
+  apiDeleteBankSong
 } from '../services/api';
 
 interface AppContextType {
   musicians: Musician[];
   services: ServiceDate[];
+  songBank: BankSong[];
   adminPin: string;
   // Separate auth sessions for Musician and Admin links
   musicianUser: Musician | null;
@@ -60,6 +64,11 @@ interface AppContextType {
 
   // Repertorio de Canciones (Admin y Voz Director asignado)
   updateServiceSongs: (serviceId: string, songs: SongItem[], isPublished: boolean) => Promise<{ success: boolean; message?: string }>;
+  
+  // Banco Central de Canciones (Song Bank)
+  saveBankSong: (song: Partial<BankSong> & { title: string }) => Promise<{ success: boolean; message?: string; song?: BankSong }>;
+  deleteBankSong: (songId: string) => Promise<boolean>;
+  reloadSongBank: () => Promise<void>;
   
   // Database backup
   resetAllData: () => void;
@@ -102,6 +111,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return null;
   });
 
+  const [songBank, setSongBank] = useState<BankSong[]>(() => {
+    const saved = localStorage.getItem('atocarya_song_bank_v1');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+    }
+    return [];
+  });
+
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
     return localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH) === 'true';
   });
@@ -118,6 +135,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(services));
   }, [services]);
+
+  useEffect(() => {
+    localStorage.setItem('atocarya_song_bank_v1', JSON.stringify(songBank));
+  }, [songBank]);
 
   useEffect(() => {
     if (musicianUser) {
@@ -139,15 +160,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     const fetchRemoteData = async () => {
       try {
-        const [remoteMusicians, remoteServices] = await Promise.all([
+        const [remoteMusicians, remoteServices, remoteSongBank] = await Promise.all([
           apiGetMusicians(),
           apiGetServices(),
+          apiGetSongBank(),
         ]);
         if (remoteMusicians !== null) {
           setMusicians(remoteMusicians);
         }
         if (remoteServices !== null) {
           setServices(remoteServices);
+        }
+        if (remoteSongBank !== null) {
+          setSongBank(remoteSongBank);
         }
       } catch (err) {
         console.warn('Operando con persistencia local:', err);
@@ -803,6 +828,66 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return { success: true };
   };
 
+  // --- Banco Central de Canciones (Song Bank) ---
+  const saveBankSong = async (
+    songData: Partial<BankSong> & { title: string }
+  ): Promise<{ success: boolean; message?: string; song?: BankSong }> => {
+    if (!songData.title || !songData.title.trim()) {
+      return { success: false, message: 'El título de la canción es obligatorio.' };
+    }
+
+    const fullSong: BankSong = {
+      id: songData.id || `bank_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      title: songData.title.trim(),
+      artist: songData.artist?.trim() || undefined,
+      defaultKey: songData.defaultKey?.trim() || undefined,
+      originalKey: songData.originalKey?.trim() || undefined,
+      bpm: songData.bpm ? Number(songData.bpm) : undefined,
+      youtubeUrl: songData.youtubeUrl?.trim() || undefined,
+      chordsUrl: songData.chordsUrl?.trim() || undefined,
+      chordChart: songData.chordChart?.trim() || undefined,
+      lyrics: songData.lyrics?.trim() || undefined,
+      notes: songData.notes?.trim() || undefined,
+      createdAt: songData.createdAt || new Date().toISOString(),
+    };
+
+    setSongBank(prev => {
+      const exists = prev.some(s => s.id === fullSong.id);
+      if (exists) {
+        return prev.map(s => (s.id === fullSong.id ? fullSong : s));
+      }
+      return [...prev, fullSong].sort((a, b) => a.title.localeCompare(b.title));
+    });
+
+    try {
+      await apiSaveBankSong(fullSong);
+    } catch (err) {
+      console.warn('Error al guardar en Turso song_bank:', err);
+    }
+
+    return { success: true, song: fullSong };
+  };
+
+  const deleteBankSong = async (songId: string): Promise<boolean> => {
+    setSongBank(prev => prev.filter(s => s.id !== songId));
+    try {
+      await apiDeleteBankSong(songId);
+      return true;
+    } catch (err) {
+      console.warn('Error al borrar de Turso song_bank:', err);
+      return false;
+    }
+  };
+
+  const reloadSongBank = async () => {
+    try {
+      const remote = await apiGetSongBank();
+      if (remote) setSongBank(remote);
+    } catch (err) {
+      console.warn('Error al recargar song_bank:', err);
+    }
+  };
+
   const resetAllData = () => {
     setMusicians(INITIAL_MUSICIANS);
     setServices(generateInitialServices());
@@ -866,6 +951,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         adminAssignSlot,
         adminClearSlot,
         updateServiceSongs,
+        songBank,
+        saveBankSong,
+        deleteBankSong,
+        reloadSongBank,
         resetAllData,
         exportDatabaseJSON,
         importDatabaseJSON,

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ServiceDate, SongItem } from '../types';
+import { ServiceDate, SongItem, BankSong } from '../types';
 import { 
   X, 
   Music, 
@@ -32,13 +32,17 @@ const COMMON_KEYS = [
 ];
 
 export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose }) => {
-  const { musicianUser, isAdminAuthenticated, updateServiceSongs } = useApp();
+  const { musicianUser, isAdminAuthenticated, updateServiceSongs, songBank, saveBankSong } = useApp();
 
   const [songs, setSongs] = useState<SongItem[]>(() => service.songs || []);
   const [isPublished, setIsPublished] = useState<boolean>(() => Boolean(service.isSongsPublished));
   const [isSaving, setIsSaving] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [activePreviewSongId, setActivePreviewSongId] = useState<string | null>(null);
+
+  // Autocompletado del Banco de Canciones
+  const [showBankSuggestions, setShowBankSuggestions] = useState(false);
+  const [saveToBankChecked, setSaveToBankChecked] = useState(true);
 
   // Estado de edición de canción existente
   const [editingSongId, setEditingSongId] = useState<string | null>(null);
@@ -116,6 +120,19 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setErrorMsg(null);
   };
 
+  const handleSelectFromBank = (bankSong: BankSong) => {
+    setNewTitle(bankSong.title);
+    if (bankSong.youtubeUrl) setNewUrl(bankSong.youtubeUrl);
+    if (bankSong.defaultKey) setNewKey(bankSong.defaultKey);
+    if (bankSong.originalKey) setNewOriginalKey(bankSong.originalKey);
+    if (bankSong.bpm) setNewBpm(String(bankSong.bpm));
+    if (bankSong.notes) setNewNotes(bankSong.notes);
+    if (bankSong.chordChart) setNewChordChart(bankSong.chordChart);
+    if (bankSong.lyrics) setNewLyrics(bankSong.lyrics);
+    if (bankSong.chordsUrl) setNewChordsUrl(bankSong.chordsUrl);
+    setShowBankSuggestions(false);
+  };
+
   const handleAddOrUpdateSong = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) {
@@ -123,39 +140,41 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       return;
     }
 
+    const songData: SongItem = {
+      id: editingSongId || `song_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+      title: newTitle.trim(),
+      youtubeUrl: newUrl.trim() || undefined,
+      key: newKey.trim() || undefined,
+      originalKey: newOriginalKey.trim() || undefined,
+      bpm: newBpm ? Number(newBpm) : undefined,
+      notes: newNotes.trim() || undefined,
+      chordChart: newChordChart.trim() || undefined,
+      lyrics: newLyrics.trim() || undefined,
+      chordsUrl: newChordsUrl.trim() || undefined,
+    };
+
     if (editingSongId) {
-      // Actualizar canción existente
-      setSongs(prev => prev.map(s => {
-        if (s.id !== editingSongId) return s;
-        return {
-          ...s,
-          title: newTitle.trim(),
-          youtubeUrl: newUrl.trim() || undefined,
-          key: newKey.trim() || undefined,
-          originalKey: newOriginalKey.trim() || undefined,
-          bpm: newBpm ? Number(newBpm) : undefined,
-          notes: newNotes.trim() || undefined,
-          chordChart: newChordChart.trim() || undefined,
-          lyrics: newLyrics.trim() || undefined,
-          chordsUrl: newChordsUrl.trim() || undefined,
-        };
-      }));
+      // Actualizar canción existente en este culto
+      setSongs(prev => prev.map(s => (s.id === editingSongId ? songData : s)));
       setEditingSongId(null);
     } else {
-      // Agregar nueva canción
-      const song: SongItem = {
-        id: `song_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-        title: newTitle.trim(),
-        youtubeUrl: newUrl.trim() || undefined,
-        key: newKey.trim() || undefined,
-        originalKey: newOriginalKey.trim() || undefined,
-        bpm: newBpm ? Number(newBpm) : undefined,
-        notes: newNotes.trim() || undefined,
-        chordChart: newChordChart.trim() || undefined,
-        lyrics: newLyrics.trim() || undefined,
-        chordsUrl: newChordsUrl.trim() || undefined,
-      };
-      setSongs(prev => [...prev, song]);
+      // Agregar nueva canción al culto
+      setSongs(prev => [...prev, songData]);
+    }
+
+    // Si está marcado guardar en el banco central de canciones:
+    if (saveToBankChecked) {
+      saveBankSong({
+        title: songData.title,
+        defaultKey: songData.key,
+        originalKey: songData.originalKey,
+        bpm: songData.bpm,
+        youtubeUrl: songData.youtubeUrl,
+        chordsUrl: songData.chordsUrl,
+        chordChart: songData.chordChart,
+        lyrics: songData.lyrics,
+        notes: songData.notes,
+      }).catch(err => console.warn('Error al sincronizar con banco de canciones:', err));
     }
 
     setNewTitle('');
@@ -554,17 +573,77 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                  Nombre de la Canción *
-                </label>
+              <div className="relative">
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-[11px] font-bold text-slate-700">
+                    Nombre de la Canción *
+                  </label>
+                  {songBank.length > 0 && (
+                    <span className="text-[10px] text-emerald-700 font-bold">
+                      💡 {songBank.length} en tu Banco
+                    </span>
+                  )}
+                </div>
+
                 <input
                   type="text"
                   placeholder="ej. La Bendición, Way Maker, etc."
                   value={newTitle}
-                  onChange={(e) => setNewTitle(e.target.value)}
+                  onFocus={() => setShowBankSuggestions(true)}
+                  onChange={(e) => {
+                    setNewTitle(e.target.value);
+                    setShowBankSuggestions(true);
+                  }}
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
                 />
+
+                {/* Desplegable de Autocompletado desde el Banco de Canciones */}
+                {showBankSuggestions && newTitle.trim().length > 0 && (
+                  (() => {
+                    const matches = songBank.filter(b => 
+                      b.title.toLowerCase().includes(newTitle.trim().toLowerCase())
+                    ).slice(0, 5);
+
+                    if (matches.length === 0) return null;
+
+                    return (
+                      <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden py-1 divide-y divide-slate-100">
+                        <div className="px-3 py-1 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
+                          <span>Canciones en el Banco</span>
+                          <button
+                            type="button"
+                            onClick={() => setShowBankSuggestions(false)}
+                            className="text-slate-400 hover:text-slate-600 font-normal text-xs"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        {matches.map(item => (
+                          <div
+                            key={item.id}
+                            onClick={() => handleSelectFromBank(item)}
+                            className="px-3 py-2 hover:bg-emerald-50 cursor-pointer transition-colors flex items-center justify-between gap-2"
+                          >
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-slate-900 truncate">
+                                {item.title}
+                              </p>
+                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                {item.defaultKey && <span className="font-semibold text-emerald-800">Tono: {item.defaultKey}</span>}
+                                {item.artist && <span>· {item.artist}</span>}
+                                {item.chordsUrl && <span>· 📄 PDF</span>}
+                                {item.chordChart && <span>· 🎸 Cifrado</span>}
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded flex-shrink-0">
+                              Cargar Datos
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    );
+                  })()
+                )}
               </div>
 
               <div>
@@ -579,6 +658,20 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
                 />
               </div>
+            </div>
+
+            {/* Checkbox guardar en el banco automáticamente */}
+            <div className="flex items-center gap-2 p-2 bg-emerald-50/60 border border-emerald-200/80 rounded-xl">
+              <input
+                type="checkbox"
+                id="saveToBank"
+                checked={saveToBankChecked}
+                onChange={(e) => setSaveToBankChecked(e.target.checked)}
+                className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+              />
+              <label htmlFor="saveToBank" className="text-xs font-bold text-emerald-950 cursor-pointer select-none">
+                Guardar o actualizar automáticamente en el Banco Central de Canciones
+              </label>
             </div>
 
             {/* Tonalidad con botones rápidos */}

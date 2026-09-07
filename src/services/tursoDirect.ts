@@ -1,5 +1,5 @@
 import { createClient, Client } from '@libsql/client/web';
-import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem } from '../types';
+import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem, BankSong } from '../types';
 
 const TURSO_URL = (import.meta as any).env?.VITE_TURSO_DATABASE_URL || 'libsql://atocarya-db-jothejmaster.aws-us-west-2.turso.io';
 const TURSO_TOKEN = (import.meta as any).env?.VITE_TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg0NjA4MTMsImlkIjoiMDFhMDY4OTEtZjkwMS03MWE0LWI5YzYtZDE2Mzc1MjNiZTFiIiwia2lkIjoiWVEybHJTYVROWk9hU3BRYUtrM0UtN3BqWnBXbkExa045SVdXSTQ5N0hPVSIsInJpZCI6IjQzOGRhODNjLWQzMTYtNDI0Yi1iMzk3LTcxMzZlZGU1NDkzMiJ9.ThZ8YS1HyVPIZJNT9jdwQxlmUcpj4PnBDBsOiq3OzIDU58cbW8V43j_u2i5SVdkH7aedbVJuM-X5C5lbVBKdDw';
@@ -233,6 +233,76 @@ export const tursoUpdateSlots = async (serviceId: string, slots: Record<SlotKey,
     return true;
   } catch (err) {
     console.warn('Error al actualizar cupos en Turso:', err);
+    return false;
+  }
+};
+
+// --- Banco Central de Canciones (Song Bank) ---
+
+export const tursoGetSongBank = async (): Promise<BankSong[] | null> => {
+  try {
+    const db = getTursoClient();
+    const result = await db.execute('SELECT * FROM song_bank ORDER BY title ASC');
+    return result.rows.map(r => ({
+      id: String(r.id),
+      title: String(r.title),
+      artist: r.artist ? String(r.artist) : undefined,
+      defaultKey: r.default_key ? String(r.default_key) : undefined,
+      originalKey: r.original_key ? String(r.original_key) : undefined,
+      bpm: r.bpm ? Number(r.bpm) : undefined,
+      youtubeUrl: r.youtube_url ? String(r.youtube_url) : undefined,
+      chordsUrl: r.chords_url ? String(r.chords_url) : undefined,
+      chordChart: r.chord_chart ? String(r.chord_chart) : undefined,
+      lyrics: r.lyrics ? String(r.lyrics) : undefined,
+      notes: r.notes ? String(r.notes) : undefined,
+      createdAt: String(r.created_at || new Date().toISOString()),
+    }));
+  } catch (err) {
+    console.warn('Error al obtener banco de canciones en Turso:', err);
+    return null;
+  }
+};
+
+export const tursoSaveBankSong = async (song: BankSong): Promise<boolean> => {
+  try {
+    const db = getTursoClient();
+    await db.execute({
+      sql: `INSERT OR REPLACE INTO song_bank (
+              id, title, artist, default_key, original_key, bpm,
+              youtube_url, chords_url, chord_chart, lyrics, notes, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      args: [
+        song.id,
+        song.title.trim(),
+        song.artist?.trim() || null,
+        song.defaultKey?.trim() || null,
+        song.originalKey?.trim() || null,
+        song.bpm || null,
+        song.youtubeUrl?.trim() || null,
+        song.chordsUrl?.trim() || null,
+        song.chordChart?.trim() || null,
+        song.lyrics?.trim() || null,
+        song.notes?.trim() || null,
+        song.createdAt || new Date().toISOString(),
+      ],
+    });
+    return true;
+  } catch (err) {
+    console.warn('Error al guardar canción en el banco de Turso:', err);
+    return false;
+  }
+};
+
+export const tursoDeleteBankSong = async (songId: string): Promise<boolean> => {
+  try {
+    const db = getTursoClient();
+    await db.execute({
+      sql: 'DELETE FROM song_bank WHERE id = ?',
+      args: [songId],
+    });
+    return true;
+  } catch (err) {
+    console.warn('Error al eliminar canción del banco en Turso:', err);
     return false;
   }
 };

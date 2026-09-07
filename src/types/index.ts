@@ -58,6 +58,21 @@ export interface SongItem {
   chordsUrl?: string; // URL externa de cifrado o partitura (Drive, PDF, LaCuerda, etc.)
 }
 
+export interface BankSong {
+  id: string;
+  title: string;
+  artist?: string;
+  defaultKey?: string;
+  originalKey?: string;
+  bpm?: number;
+  youtubeUrl?: string;
+  chordsUrl?: string; // URL de PDF o partitura
+  chordChart?: string;
+  lyrics?: string;
+  notes?: string;
+  createdAt: string;
+}
+
 export interface ServiceDate {
   id: string;
   date: string; // YYYY-MM-DD

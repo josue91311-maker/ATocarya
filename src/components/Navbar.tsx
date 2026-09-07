@@ -18,8 +18,8 @@ interface Props {
   portal: 'musician' | 'admin';
   musicianTab: 'calendar' | 'my-services';
   setMusicianTab: (tab: 'calendar' | 'my-services') => void;
-  adminTab: 'visual-board' | 'schedule' | 'musicians';
-  setAdminTab: (tab: 'visual-board' | 'schedule' | 'musicians') => void;
+  adminTab: 'visual-board' | 'schedule' | 'musicians' | 'songs-bank';
+  setAdminTab: (tab: 'visual-board' | 'schedule' | 'musicians' | 'songs-bank') => void;
   openShareModal: () => void;
   onNavigatePortal: (portal: 'musician' | 'admin') => void;
 }
@@ -130,6 +130,18 @@ export const Navbar: React.FC<Props> = ({
                   >
                     <Users className="w-4 h-4 text-slate-500" />
                     <span>Equipo de Músicos</span>
+                  </button>
+
+                  <button
+                    onClick={() => setAdminTab('songs-bank')}
+                    className={`h-full flex items-center gap-2 px-3 text-xs font-bold transition-all border-b-2 ${
+                      adminTab === 'songs-bank'
+                        ? 'border-emerald-600 text-emerald-800'
+                        : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'
+                    }`}
+                  >
+                    <Music2 className="w-4 h-4 text-emerald-600" />
+                    <span>Banco Canciones</span>
                   </button>
                 </nav>
               )}
@@ -271,14 +283,26 @@ export const Navbar: React.FC<Props> = ({
 
             <button
               onClick={() => setAdminTab('musicians')}
-              className={`flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-colors touch-target ${
+              className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-colors touch-target ${
                 adminTab === 'musicians'
                   ? 'text-emerald-700 font-bold'
                   : 'text-slate-500 hover:text-slate-900 font-medium'
               }`}
             >
               <Users className="w-5 h-5 mb-0.5" />
-              <span className="text-[11px]">Músicos</span>
+              <span className="text-[10px]">Músicos</span>
+            </button>
+
+            <button
+              onClick={() => setAdminTab('songs-bank')}
+              className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-colors touch-target ${
+                adminTab === 'songs-bank'
+                  ? 'text-emerald-700 font-bold'
+                  : 'text-slate-500 hover:text-slate-900 font-medium'
+              }`}
+            >
+              <Music2 className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px]">Banco</span>
             </button>
           </>
         )}
