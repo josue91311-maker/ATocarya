@@ -57,8 +57,6 @@ export const getExternalMusicToolLinks = (songTitle: string, key?: string) => {
   return {
     // Extensión de Chrome Transpose (Pitch Shift para YouTube en vivo)
     transposeExtension: 'https://chromewebstore.google.com/detail/transpose-%E2%96%B2%E2%96%BC-pitch-speed/ioimlbgeacgihiffbeabdnkbpneaakcl',
-    // Moises App (separador de pistas y cambiador de tono)
-    moisesWeb: 'https://moises.ai/',
     // Búsqueda de acordes en LaCuerda
     laCuerdaSearch: `https://www.google.com/search?q=site:lacuerda.net+${encodedTitle}+acordes`,
     // Búsqueda de acordes en Ultimate Guitar

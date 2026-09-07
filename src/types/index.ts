@@ -53,6 +53,9 @@ export interface SongItem {
   originalKey?: string; // Tonalidad original del tema
   bpm?: number;
   notes?: string; // Dinámica, estructura o acordes clave
+  chordChart?: string; // Cifrado armónico de compases, cortes y notas de paso
+  lyrics?: string; // Letra de la canción
+  chordsUrl?: string; // URL externa de cifrado o partitura (Drive, PDF, LaCuerda, etc.)
 }
 
 export interface ServiceDate {

@@ -50,6 +50,10 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const [newOriginalKey, setNewOriginalKey] = useState('');
   const [newBpm, setNewBpm] = useState<string>('');
   const [newNotes, setNewNotes] = useState('');
+  const [newChordChart, setNewChordChart] = useState('');
+  const [newLyrics, setNewLyrics] = useState('');
+  const [newChordsUrl, setNewChordsUrl] = useState('');
+  const [activeFormTab, setActiveFormTab] = useState<'chords' | 'lyrics' | 'external'>('chords');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   if (!isOpen) return null;
@@ -92,6 +96,9 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setNewOriginalKey(song.originalKey || '');
     setNewBpm(song.bpm ? String(song.bpm) : '');
     setNewNotes(song.notes || '');
+    setNewChordChart(song.chordChart || '');
+    setNewLyrics(song.lyrics || '');
+    setNewChordsUrl(song.chordsUrl || '');
     setErrorMsg(null);
   };
 
@@ -103,6 +110,9 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setNewOriginalKey('');
     setNewBpm('');
     setNewNotes('');
+    setNewChordChart('');
+    setNewLyrics('');
+    setNewChordsUrl('');
     setErrorMsg(null);
   };
 
@@ -125,6 +135,9 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
           originalKey: newOriginalKey.trim() || undefined,
           bpm: newBpm ? Number(newBpm) : undefined,
           notes: newNotes.trim() || undefined,
+          chordChart: newChordChart.trim() || undefined,
+          lyrics: newLyrics.trim() || undefined,
+          chordsUrl: newChordsUrl.trim() || undefined,
         };
       }));
       setEditingSongId(null);
@@ -138,6 +151,9 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
         originalKey: newOriginalKey.trim() || undefined,
         bpm: newBpm ? Number(newBpm) : undefined,
         notes: newNotes.trim() || undefined,
+        chordChart: newChordChart.trim() || undefined,
+        lyrics: newLyrics.trim() || undefined,
+        chordsUrl: newChordsUrl.trim() || undefined,
       };
       setSongs(prev => [...prev, song]);
     }
@@ -148,6 +164,9 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setNewOriginalKey('');
     setNewBpm('');
     setNewNotes('');
+    setNewChordChart('');
+    setNewLyrics('');
+    setNewChordsUrl('');
     setErrorMsg(null);
   };
 
@@ -604,7 +623,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
             {/* Notas opcionales */}
             <div>
               <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                Notas / Dinámica de Ensayo (opcional)
+                Notas Breves / Dinámica de Ensayo (opcional)
               </label>
               <input
                 type="text"
@@ -613,6 +632,200 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                 onChange={(e) => setNewNotes(e.target.value)}
                 className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
               />
+            </div>
+
+            {/* SECCIÓN ESPECIALIZADA: CIFRADO ARMÓNICO, LETRA Y URL EXTERNA */}
+            <div className="pt-3 border-t border-slate-200/80">
+              {/* Selector de pestañas del editor */}
+              <div className="flex items-center gap-1.5 p-1 bg-slate-200/60 rounded-xl mb-3">
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('chords')}
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    activeFormTab === 'chords'
+                      ? 'bg-white text-emerald-950 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>🎸 Cifrado & Compases</span>
+                  {newChordChart.trim() && <span className="w-2 h-2 rounded-full bg-emerald-500"></span>}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('lyrics')}
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    activeFormTab === 'lyrics'
+                      ? 'bg-white text-emerald-950 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>🎤 Letra de la Canción</span>
+                  {newLyrics.trim() && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActiveFormTab('external')}
+                  className={`flex-1 py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                    activeFormTab === 'external'
+                      ? 'bg-white text-emerald-950 shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <span>📄 URL Cifrado / PDF</span>
+                  {newChordsUrl.trim() && <span className="w-2 h-2 rounded-full bg-indigo-500"></span>}
+                </button>
+              </div>
+
+              {/* PESTAÑA 1: CIFRADO ARMÓNICO Y COMPASES */}
+              {activeFormTab === 'chords' && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-[11px] font-bold text-slate-800">
+                      Cifrado por Compases, Cortes y Repeticiones (Map Chart)
+                    </label>
+                    <span className="text-[10px] text-slate-500">
+                      Usa barras <strong>|</strong> para separar compases
+                    </span>
+                  </div>
+
+                  {/* Barra de botones rápidos para escribir compases y notas de paso */}
+                  <div className="flex flex-wrap items-center gap-1 p-2 bg-slate-100 rounded-xl border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-500 mr-1">Insertar:</span>
+                    
+                    {/* Secciones */}
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[INTRO]\n| ')}
+                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
+                    >
+                      [INTRO]
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[VERSO]\n| ')}
+                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
+                    >
+                      [VERSO]
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[CORO]\n|: ')}
+                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
+                    >
+                      [CORO]
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[PUENTE]\n| ')}
+                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
+                    >
+                      [PUENTE]
+                    </button>
+
+                    <span className="text-slate-300">|</span>
+
+                    {/* Barras de compás */}
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + ' | ')}
+                      className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[11px] font-black font-mono"
+                      title="Barra de compás"
+                    >
+                      |
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + '|: ')}
+                      className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[11px] font-black font-mono"
+                      title="Inicio de repetición"
+                    >
+                      |:
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + ' :| (x2)')}
+                      className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[11px] font-black font-mono"
+                      title="Fin de repetición"
+                    >
+                      :| (x2)
+                    </button>
+
+                    <span className="text-slate-300">|</span>
+
+                    {/* NOTAS DE PASO Y CORTES */}
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + ' (D#dim paso) ')}
+                      className="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded text-[11px] font-black"
+                      title="Insertar Nota de Paso entre paréntesis"
+                    >
+                      + (Nota de Paso)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + ' -> [CORTE] ')}
+                      className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded text-[11px] font-black"
+                    >
+                      ✂️ CORTE
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setNewChordChart(prev => prev + ' -> [STOP] ')}
+                      className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded text-[11px] font-black"
+                    >
+                      🛑 STOP
+                    </button>
+                  </div>
+
+                  <textarea
+                    rows={6}
+                    placeholder={`Ejemplo:\n[INTRO]\n|: G | Em7 | C2 | D4 :| (x2)\n\n[VERSO 1]\n| G | Em7 | C2 | (D#dim paso) | Em7 | -> CORTE en 4to tiempo\n\n[CORO]\n|: G | D/F# | Em7 | C2 :|`}
+                    value={newChordChart}
+                    onChange={(e) => setNewChordChart(e.target.value)}
+                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500 leading-relaxed"
+                  />
+                  <p className="text-[10px] text-slate-500">
+                    💡 <strong>Tip para Músicos:</strong> Las notas entre paréntesis como <code className="bg-slate-100 px-1 py-0.5 rounded text-amber-800 font-bold">(D#dim)</code> se reconocen automáticamente como <strong>notas de paso</strong> y se trasladan solas si cambias de tono.
+                  </p>
+                </div>
+              )}
+
+              {/* PESTAÑA 2: LETRA */}
+              {activeFormTab === 'lyrics' && (
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold text-slate-800">
+                    Letra Completa de la Canción
+                  </label>
+                  <textarea
+                    rows={6}
+                    placeholder="Pega aquí la letra de la canción (versos, coro, puente)..."
+                    value={newLyrics}
+                    onChange={(e) => setNewLyrics(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500 leading-relaxed"
+                  />
+                </div>
+              )}
+
+              {/* PESTAÑA 3: URL EXTERNA DE CIFRADO O PDF */}
+              {activeFormTab === 'external' && (
+                <div className="space-y-2">
+                  <label className="block text-[11px] font-bold text-slate-800">
+                    Enlace Externo a Cifrado / Partitura (PDF, Google Drive, LaCuerda, etc.)
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://drive.google.com/... o https://lacuerda.net/..."
+                    value={newChordsUrl}
+                    onChange={(e) => setNewChordsUrl(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
+                  />
+                  <p className="text-[10px] text-slate-500">
+                    Los músicos tendrán un botón directo para abrir este archivo o partitura con un solo toque.
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="flex items-center gap-2">

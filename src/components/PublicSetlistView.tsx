@@ -15,8 +15,9 @@ import {
   AlertCircle,
   Copy,
   Check,
-  Headphones,
-  Sliders
+  Sliders,
+  FileText,
+  FileCheck
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { 
@@ -25,6 +26,11 @@ import {
   getYouTubeThumbnailUrl, 
   getExternalMusicToolLinks 
 } from '../utils/youtubeUtils';
+import { 
+  transposeChordChartText, 
+  transposeChord, 
+  parseChordChart 
+} from '../utils/chordTransposer';
 
 interface Props {
   serviceId: string;
@@ -37,6 +43,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics'>('chords');
+  const [transposeDelta, setTransposeDelta] = useState<number>(0);
 
   if (!service) {
     return (
@@ -73,6 +81,21 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const directorName = service.slots?.voz_director?.musicianName;
   const activeVideoUrl = activeSong ? getYouTubeEmbedUrl(activeSong.youtubeUrl) : null;
   const toolLinks = activeSong ? getExternalMusicToolLinks(activeSong.title, activeSong.key) : null;
+
+  const hasChords = Boolean(activeSong?.chordChart && activeSong.chordChart.trim());
+  const hasLyrics = Boolean(activeSong?.lyrics && activeSong.lyrics.trim());
+
+  // Cifrado transpuesto dinámico
+  const rawChordChart = activeSong?.chordChart || '';
+  const transposedChartText = transposeDelta !== 0 
+    ? transposeChordChartText(rawChordChart, transposeDelta)
+    : rawChordChart;
+  const parsedSections = parseChordChart(transposedChartText);
+
+  // Tono transpuesto mostrado
+  const displayedKey = activeSong?.key && transposeDelta !== 0
+    ? transposeChord(activeSong.key.split(' ')[0], transposeDelta)
+    : activeSong?.key;
 
   const handleCopyLink = async () => {
     try {
@@ -268,18 +291,60 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       )}
                     </div>
 
-                    {/* Badge de Tonalidad Grande */}
-                    <div className="flex items-center gap-2 self-start sm:self-auto flex-shrink-0">
+                    {/* Badge de Tonalidad Grande y Controles de Transposición */}
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start sm:self-auto flex-shrink-0">
+                      
+                      {/* Control de Transposición en Vivo (+1 / -1 Semitonos) */}
+                      {hasChords && (
+                        <div className="flex items-center gap-1.5 p-1.5 bg-slate-100 border border-slate-200 rounded-2xl">
+                          <span className="text-[10px] font-bold text-slate-500 uppercase px-1.5">
+                            Tono:
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setTransposeDelta(prev => prev - 1)}
+                            className="w-7 h-7 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-black text-xs flex items-center justify-center border border-slate-200 shadow-2xs active:scale-95 transition-all"
+                            title="Bajar 1 semitono (-1)"
+                          >
+                            -1
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setTransposeDelta(0)}
+                            className={`px-2.5 h-7 rounded-xl font-mono text-xs font-bold flex items-center justify-center border transition-all ${
+                              transposeDelta !== 0
+                                ? 'bg-amber-100 text-amber-900 border-amber-300 font-black'
+                                : 'bg-white text-slate-700 border-slate-200'
+                            }`}
+                            title="Restablecer al tono oficial original"
+                          >
+                            {displayedKey || (transposeDelta > 0 ? `+${transposeDelta}` : transposeDelta === 0 ? '0' : `${transposeDelta}`)}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => setTransposeDelta(prev => prev + 1)}
+                            className="w-7 h-7 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-black text-xs flex items-center justify-center border border-slate-200 shadow-2xs active:scale-95 transition-all"
+                            title="Subir 1 semitono (+1)"
+                          >
+                            +1
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Badge Tono Oficial */}
                       {activeSong.key && (
                         <div className="px-4 py-2 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-center shadow-2xs">
                           <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
                             Tono Oficial
                           </span>
                           <span className="text-lg font-black font-display text-emerald-950">
-                            {activeSong.key}
+                            {displayedKey || activeSong.key}
                           </span>
                         </div>
                       )}
+
                       {activeSong.originalKey && (
                         <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-center">
                           <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">
@@ -293,7 +358,184 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     </div>
                   </div>
 
-                  {/* Botones de Herramientas Musicales */}
+                  {/* Selector de Pestañas: Cifrado & Compases / Letra / Partitura Externa */}
+                  {(hasChords || hasLyrics || activeSong.chordsUrl) && (
+                    <div className="pt-2 border-t border-slate-100">
+                      <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-md">
+                        {hasChords && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('chords')}
+                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                              activeTab === 'chords'
+                                ? 'bg-white text-emerald-950 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <Music className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Cifrado & Compases</span>
+                          </button>
+                        )}
+
+                        {hasLyrics && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('lyrics')}
+                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                              activeTab === 'lyrics'
+                                ? 'bg-white text-emerald-950 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <FileText className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Letra</span>
+                          </button>
+                        )}
+
+                        {activeSong.chordsUrl && (
+                          <a
+                            href={activeSong.chordsUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 py-1.5 px-3 rounded-xl text-xs font-bold text-indigo-700 hover:bg-white transition-all flex items-center justify-center gap-1.5"
+                          >
+                            <FileCheck className="w-3.5 h-3.5" />
+                            <span>PDF / Cifrado</span>
+                            <ExternalLink className="w-3 h-3" />
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CONTENIDO 1: VISOR DE CIFRADO ARMÓNICO Y COMPASES CON TRANSPOSE */}
+                  {activeTab === 'chords' && hasChords && (
+                    <div className="p-4 sm:p-5 bg-slate-900 text-white rounded-2xl shadow-inner space-y-4">
+                      <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
+                            Estructura de Compases & Acordes
+                          </span>
+                          {transposeDelta !== 0 && (
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                              Transpuesto ({transposeDelta > 0 ? `+${transposeDelta}` : transposeDelta} semitonos)
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-[11px] text-slate-400">
+                          <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1.5 align-middle"></span>
+                          <span>(Nota de Paso)</span>
+                        </div>
+                      </div>
+
+                      {/* Renderizado de Bloques por Sección y Grilla de Compases */}
+                      <div className="space-y-4">
+                        {parsedSections.map((sec, secIdx) => (
+                          <div key={secIdx} className="space-y-2">
+                            <div className="flex items-center gap-2">
+                              <span className="px-2.5 py-0.5 bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 rounded-lg text-xs font-black uppercase tracking-wider">
+                                {sec.title}
+                              </span>
+                              {sec.notes && (
+                                <span className="text-xs text-slate-400 italic">
+                                  {sec.notes}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Filas de Compases */}
+                            <div className="space-y-2">
+                              {sec.measures.map((row, rowIdx) => (
+                                <div 
+                                  key={rowIdx}
+                                  className="grid grid-cols-2 sm:grid-cols-4 gap-2"
+                                >
+                                  {row.map((measure, mIdx) => (
+                                    <div 
+                                      key={mIdx}
+                                      className={`p-2.5 rounded-xl border relative transition-all ${
+                                        measure.isRepeatStart || measure.isRepeatEnd
+                                          ? 'border-emerald-500/80 bg-slate-800/90'
+                                          : 'border-slate-800 bg-slate-800/50 hover:border-slate-700'
+                                      }`}
+                                    >
+                                      {/* Marcador de Repetición */}
+                                      {measure.isRepeatStart && (
+                                        <span className="absolute left-1.5 top-1.5 text-xs font-black text-emerald-400 font-mono">
+                                          |:
+                                        </span>
+                                      )}
+                                      {measure.isRepeatEnd && (
+                                        <span className="absolute right-1.5 top-1.5 text-xs font-black text-emerald-400 font-mono">
+                                          :|
+                                        </span>
+                                      )}
+
+                                      {/* Acordes Principales */}
+                                      <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
+                                        {measure.chords.map((chord, cIdx) => (
+                                          <span 
+                                            key={cIdx} 
+                                            className="text-base sm:text-lg font-black font-mono text-emerald-300 tracking-wide"
+                                          >
+                                            {chord}
+                                          </span>
+                                        ))}
+
+                                        {/* Notas de Paso resaltadas en Ámbar */}
+                                        {measure.passingChords.map((pch, pIdx) => (
+                                          <span 
+                                            key={pIdx} 
+                                            className="text-xs font-black font-mono px-1.5 py-0.5 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded-md"
+                                            title="Nota de Paso"
+                                          >
+                                            ({pch})
+                                          </span>
+                                        ))}
+                                      </div>
+
+                                      {/* Anotaciones / Cortes */}
+                                      {measure.annotations.length > 0 && (
+                                        <div className="text-center mt-1">
+                                          {measure.annotations.map((ann, aIdx) => (
+                                            <span 
+                                              key={aIdx}
+                                              className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block ${
+                                                ann.toLowerCase().includes('corte') || ann.toLowerCase().includes('stop')
+                                                  ? 'bg-rose-500/30 text-rose-300 border border-rose-500/40'
+                                                  : 'text-slate-400'
+                                              }`}
+                                            >
+                                              {ann}
+                                            </span>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ))}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CONTENIDO 2: LETRA */}
+                  {activeTab === 'lyrics' && hasLyrics && (
+                    <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl">
+                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Letra de la Canción</span>
+                      </h4>
+                      <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
+                        {activeSong.lyrics}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Botones de Herramientas Musicales (Sin Moises) */}
                   <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
                     {activeSong.youtubeUrl && (
                       <a
@@ -307,6 +549,18 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       </a>
                     )}
 
+                    {activeSong.chordsUrl && (
+                      <a
+                        href={activeSong.chordsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
+                      >
+                        <FileCheck className="w-3.5 h-3.5" />
+                        <span>Partitura / Cifrado Oficial</span>
+                      </a>
+                    )}
+
                     {toolLinks && (
                       <>
                         <a
@@ -317,18 +571,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           title="Extensión de Chrome para cambiar el tono de YouTube en vivo"
                         >
                           <Sliders className="w-3.5 h-3.5" />
-                          <span>Cambiar Tono (Transpose)</span>
-                        </a>
-
-                        <a
-                          href={toolLinks.moisesWeb}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3.5 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
-                          title="Separador de pistas y afinador Moises"
-                        >
-                          <Headphones className="w-3.5 h-3.5" />
-                          <span>Moises App</span>
+                          <span>Extensión Transpose</span>
                         </a>
 
                         <a
@@ -337,7 +580,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           rel="noopener noreferrer"
                           className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
                         >
-                          Ver Acordes (LaCuerda)
+                          Ver en LaCuerda
                         </a>
                       </>
                     )}
@@ -363,6 +606,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       key={song.id}
                       onClick={() => {
                         setActiveSongIndex(index);
+                        setTransposeDelta(0);
                         window.scrollTo({ top: 120, behavior: 'smooth' });
                       }}
                       className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 ${
@@ -408,6 +652,16 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           {song.bpm && (
                             <span className="text-[10px] text-slate-400 font-mono">
                               {song.bpm} bpm
+                            </span>
+                          )}
+                          {song.chordChart && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
+                              🎸 Cifrado
+                            </span>
+                          )}
+                          {song.lyrics && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200">
+                              🎤 Letra
                             </span>
                           )}
                         </div>
