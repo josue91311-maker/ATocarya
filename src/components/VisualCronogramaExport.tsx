@@ -131,20 +131,50 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
     lines.push(`📅 *ALABANZA: ${dateStr.toUpperCase()}*`);
     lines.push(`⏰ Culto: ${service.time}${service.rehearsalTime ? ` | Ensayo: ${service.rehearsalTime}` : ''}`);
     lines.push(`📖 *${service.title}*`);
+
+    // 1. Director al comienzo
+    const director = service.slots?.voz_director?.musicianName;
+    if (director) {
+      lines.push(`🎤 *Director de Alabanza:* ${director}`);
+    }
     lines.push('──────────────────────────────');
 
-    const slotsList = (Object.values(service.slots) as SlotConfig[]).filter(slot => slot.enabled !== false);
-    slotsList.forEach(slot => {
-      const status = slot.musicianId ? `✅ *${slot.musicianName}*` : '⚪ _Vacante_';
-      lines.push(`• ${slot.label}: ${status}`);
-    });
+    // 2. Músicos confirmados: si no hay vacante no colocar para copiar (solo confirmados)
+    const confirmedSlots = (Object.values(service.slots) as SlotConfig[])
+      .filter(slot => slot.enabled !== false && Boolean(slot.musicianId));
 
-    if (service.notes) {
-      lines.push('');
-      lines.push(`📝 *Notas/Repertorio:* ${service.notes}`);
+    if (confirmedSlots.length > 0) {
+      lines.push('*Equipo Confirmado:*');
+      confirmedSlots.forEach(slot => {
+        lines.push(`• ${slot.label}: ✅ *${slot.musicianName}*`);
+      });
+      lines.push('──────────────────────────────');
     }
 
-    lines.push('──────────────────────────────');
+    // 3. Canciones configuradas en modo canciones con sus URLs y tonalidades
+    const songs = service.songs || [];
+    if (songs.length > 0) {
+      lines.push('🎵 *REPERTORIO DE CANCIONES:*');
+      songs.forEach((song, idx) => {
+        const keyStr = song.key ? ` [Tono: *${song.key}*]` : '';
+        lines.push(`${idx + 1}. *${song.title}*${keyStr}`);
+        if (song.youtubeUrl) {
+          lines.push(`   ▶️ ${song.youtubeUrl}`);
+        }
+        if (song.notes) {
+          lines.push(`   💬 _${song.notes}_`);
+        }
+      });
+      lines.push('');
+      const origin = window.location.origin || 'https://atocarya.vercel.app';
+      lines.push(`👉 *Escuchar canciones y ver acordes aquí (sin clave):*`);
+      lines.push(`${origin}/#/repertorio/${service.id}`);
+      lines.push('──────────────────────────────');
+    } else if (service.notes) {
+      lines.push(`📝 *Notas:* ${service.notes}`);
+      lines.push('──────────────────────────────');
+    }
+
     lines.push('Coordinado mediante AtocarYa 🎸');
     return lines.join('\n');
   };

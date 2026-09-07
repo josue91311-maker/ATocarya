@@ -40,7 +40,10 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const [copiedLink, setCopiedLink] = useState(false);
   const [activePreviewSongId, setActivePreviewSongId] = useState<string | null>(null);
 
-  // Formulario nueva canción
+  // Estado de edición de canción existente
+  const [editingSongId, setEditingSongId] = useState<string | null>(null);
+
+  // Formulario nueva/edición canción
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
   const [newKey, setNewKey] = useState('G');
@@ -81,26 +84,67 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const origin = window.location.origin || 'https://atocarya.vercel.app';
   const publicRepertoireUrl = `${origin}/#/repertorio/${service.id}`;
 
-  const handleAddSong = (e: React.FormEvent) => {
+  const handleStartEdit = (song: SongItem) => {
+    setEditingSongId(song.id);
+    setNewTitle(song.title);
+    setNewUrl(song.youtubeUrl || '');
+    setNewKey(song.key || 'G');
+    setNewOriginalKey(song.originalKey || '');
+    setNewBpm(song.bpm ? String(song.bpm) : '');
+    setNewNotes(song.notes || '');
+    setErrorMsg(null);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSongId(null);
+    setNewTitle('');
+    setNewUrl('');
+    setNewKey('G');
+    setNewOriginalKey('');
+    setNewBpm('');
+    setNewNotes('');
+    setErrorMsg(null);
+  };
+
+  const handleAddOrUpdateSong = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTitle.trim()) {
       setErrorMsg('Por favor ingresa el título de la canción.');
       return;
     }
 
-    const song: SongItem = {
-      id: `song_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
-      title: newTitle.trim(),
-      youtubeUrl: newUrl.trim() || undefined,
-      key: newKey.trim() || undefined,
-      originalKey: newOriginalKey.trim() || undefined,
-      bpm: newBpm ? Number(newBpm) : undefined,
-      notes: newNotes.trim() || undefined,
-    };
+    if (editingSongId) {
+      // Actualizar canción existente
+      setSongs(prev => prev.map(s => {
+        if (s.id !== editingSongId) return s;
+        return {
+          ...s,
+          title: newTitle.trim(),
+          youtubeUrl: newUrl.trim() || undefined,
+          key: newKey.trim() || undefined,
+          originalKey: newOriginalKey.trim() || undefined,
+          bpm: newBpm ? Number(newBpm) : undefined,
+          notes: newNotes.trim() || undefined,
+        };
+      }));
+      setEditingSongId(null);
+    } else {
+      // Agregar nueva canción
+      const song: SongItem = {
+        id: `song_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
+        title: newTitle.trim(),
+        youtubeUrl: newUrl.trim() || undefined,
+        key: newKey.trim() || undefined,
+        originalKey: newOriginalKey.trim() || undefined,
+        bpm: newBpm ? Number(newBpm) : undefined,
+        notes: newNotes.trim() || undefined,
+      };
+      setSongs(prev => [...prev, song]);
+    }
 
-    setSongs(prev => [...prev, song]);
     setNewTitle('');
     setNewUrl('');
+    setNewKey('G');
     setNewOriginalKey('');
     setNewBpm('');
     setNewNotes('');
@@ -110,6 +154,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const handleRemoveSong = (id: string) => {
     setSongs(prev => prev.filter(s => s.id !== id));
     if (activePreviewSongId === id) setActivePreviewSongId(null);
+    if (editingSongId === id) handleCancelEdit();
   };
 
   const handleMoveSong = (index: number, direction: 'up' | 'down') => {
@@ -141,18 +186,63 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2500);
     } catch {
-      // Fallback
       prompt('Copia este enlace oficial para compartir:', publicRepertoireUrl);
     }
   };
 
+  const generateWhatsAppMessage = () => {
+    const lines: string[] = [];
+    lines.push('🎵 *REPERTORIO OFICIAL DE ALABANZA*');
+    lines.push(`📅 *${service.title}* (${service.date} - ${service.time})`);
+    if (service.rehearsalTime) {
+      lines.push(`⏰ Ensayo: ${service.rehearsalTime}`);
+    }
+
+    // 1. Director al comienzo
+    const director = service.slots?.voz_director?.musicianName;
+    if (director) {
+      lines.push(`🎤 *Director de Alabanza:* ${director}`);
+    }
+    lines.push('──────────────────────────────');
+
+    // 2. Músicos confirmados (sin vacantes)
+    const confirmedMusicians = (Object.values(service.slots || {}) as any[])
+      .filter(slot => slot && slot.enabled !== false && Boolean(slot.musicianId));
+
+    if (confirmedMusicians.length > 0) {
+      lines.push('*Equipo Confirmado:*');
+      confirmedMusicians.forEach(slot => {
+        lines.push(`• ${slot.label}: ✅ *${slot.musicianName}*`);
+      });
+      lines.push('──────────────────────────────');
+    }
+
+    // 3. Canciones con tono y URL
+    if (songs.length > 0) {
+      lines.push('*Canciones & Tonalidades:*');
+      songs.forEach((s, idx) => {
+        const keyStr = s.key ? ` [Tono: *${s.key}*]` : '';
+        lines.push(`${idx + 1}. *${s.title}*${keyStr}`);
+        if (s.youtubeUrl) {
+          lines.push(`   ▶️ ${s.youtubeUrl}`);
+        }
+        if (s.notes) {
+          lines.push(`   💬 _${s.notes}_`);
+        }
+      });
+    } else {
+      lines.push('*(Canciones en preparación por el Director)*');
+    }
+
+    lines.push('──────────────────────────────');
+    lines.push('👉 *Escuchar canciones, ver videos y notas aquí (sin clave):*');
+    lines.push(publicRepertoireUrl);
+
+    return lines.join('\n');
+  };
+
   const handleShareWhatsApp = () => {
-    const songListText = songs
-      .map((s, idx) => `${idx + 1}. *${s.title}* ${s.key ? `[Tono: ${s.key}]` : ''}`)
-      .join('\n');
-
-    const message = `🎵 *REPERTORIO DE ALABANZA*\n📅 *${service.title}* (${service.date} a las ${service.time})\n\n${songListText || 'Canciones en preparación'}\n\n👉 *Ver videos y ensayar aquí (sin clave):*\n${publicRepertoireUrl}`;
-
+    const message = generateWhatsAppMessage();
     window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -318,6 +408,20 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
                         {/* Acciones */}
                         <div className="flex items-center gap-1 flex-shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => handleStartEdit(song)}
+                            className={`p-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition-colors ${
+                              editingSongId === song.id
+                                ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                                : 'text-slate-600 hover:text-emerald-700 hover:bg-emerald-50'
+                            }`}
+                            title="Editar canción (cambiar tono, link o título)"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+                            <span className="hidden sm:inline">Editar</span>
+                          </button>
+
                           {embedUrl && (
                             <button
                               type="button"
@@ -396,12 +500,39 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
             )}
           </div>
 
-          {/* Formulario Agregar Canción */}
-          <form onSubmit={handleAddSong} className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
-            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
-              <Plus className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Agregar Nueva Canción</span>
-            </h4>
+          {/* Formulario Agregar / Editar Canción */}
+          <form 
+            onSubmit={handleAddOrUpdateSong} 
+            className={`p-4 sm:p-5 border rounded-2xl space-y-3 transition-colors ${
+              editingSongId 
+                ? 'bg-amber-50/70 border-amber-300 ring-2 ring-amber-300/50' 
+                : 'bg-slate-50 border-slate-200'
+            }`}
+          >
+            <div className="flex items-center justify-between">
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                {editingSongId ? (
+                  <>
+                    <Sparkles className="w-4 h-4 text-amber-600" />
+                    <span className="text-amber-900">Modificar Canción Seleccionada</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Agregar Nueva Canción</span>
+                  </>
+                )}
+              </h4>
+              {editingSongId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="text-xs font-bold text-slate-600 hover:text-slate-900 px-2 py-1 rounded-md hover:bg-amber-100 transition-colors"
+                >
+                  ✕ Cancelar Edición
+                </button>
+              )}
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
@@ -484,13 +615,37 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               />
             </div>
 
-            <button
-              type="submit"
-              className="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-sm"
-            >
-              <Plus className="w-3.5 h-3.5" />
-              <span>Añadir Canción a la Lista</span>
-            </button>
+            <div className="flex items-center gap-2">
+              {editingSongId && (
+                <button
+                  type="button"
+                  onClick={handleCancelEdit}
+                  className="w-1/3 py-2.5 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold rounded-xl transition-colors"
+                >
+                  Cancelar
+                </button>
+              )}
+              <button
+                type="submit"
+                className={`py-2.5 text-white text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 transition-colors shadow-sm ${
+                  editingSongId
+                    ? 'w-2/3 bg-amber-600 hover:bg-amber-700'
+                    : 'w-full bg-slate-900 hover:bg-slate-800'
+                }`}
+              >
+                {editingSongId ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 stroke-[3]" />
+                    <span>Guardar Cambios de Canción</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Añadir Canción a la Lista</span>
+                  </>
+                )}
+              </button>
+            </div>
           </form>
 
           {errorMsg && (

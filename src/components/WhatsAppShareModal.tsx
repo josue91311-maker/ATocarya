@@ -39,37 +39,52 @@ export const WhatsAppShareModal: React.FC<Props> = ({ isOpen, onClose }) => {
 
       lines.push(`📅 *${dateStr.toUpperCase()}*`);
       lines.push(`⏰ Culto: ${service.time}${service.rehearsalTime ? ` | Ensayo: ${service.rehearsalTime}` : ''}`);
-      lines.push(`📖 ${service.title}`);
+      lines.push(`📖 *${service.title}*`);
+
+      // 1. Director al comienzo
+      const director = service.slots?.voz_director?.musicianName;
+      if (director) {
+        lines.push(`🎤 *Director de Alabanza:* ${director}`);
+      }
       lines.push('');
 
-      const slotsList = Object.values(service.slots) as SlotConfig[];
-      const categories: Record<string, SlotConfig[]> = {};
-      slotsList.forEach(slot => {
-        if (!categories[slot.category]) categories[slot.category] = [];
-        categories[slot.category].push(slot);
-      });
+      // 2. Músicos confirmados (sin vacantes)
+      const confirmedSlots = (Object.values(service.slots) as SlotConfig[])
+        .filter(slot => slot.enabled !== false && Boolean(slot.musicianId));
 
-      Object.entries(categories).forEach(([cat, slots]) => {
-        lines.push(`*${cat}:*`);
-        slots.forEach(slot => {
-          const status = slot.musicianId
-            ? `✅ ${slot.musicianName}`
-            : '⚪ _(Vacante)_';
-          lines.push(`  • ${slot.label}: ${status}`);
+      if (confirmedSlots.length > 0) {
+        lines.push('*Equipo Confirmado:*');
+        confirmedSlots.forEach(slot => {
+          lines.push(`  • ${slot.label}: ✅ ${slot.musicianName}`);
         });
-      });
-
-      if (service.notes) {
         lines.push('');
-        lines.push(`📝 *Notas:* ${service.notes}`);
       }
 
-      lines.push('');
+      // 3. Canciones con sus URLs
+      const songs = service.songs || [];
+      if (songs.length > 0) {
+        lines.push('🎵 *Canciones:*');
+        songs.forEach((song, idx) => {
+          const keyStr = song.key ? ` [Tono: *${song.key}*]` : '';
+          lines.push(`  ${idx + 1}. *${song.title}*${keyStr}`);
+          if (song.youtubeUrl) {
+            lines.push(`     ▶️ ${song.youtubeUrl}`);
+          }
+        });
+        lines.push('');
+        const origin = window.location.origin || 'https://atocarya.vercel.app';
+        lines.push(`  👉 *Ver repertorio y acordes:* ${origin}/#/repertorio/${service.id}`);
+        lines.push('');
+      } else if (service.notes) {
+        lines.push(`📝 *Notas:* ${service.notes}`);
+        lines.push('');
+      }
+
       lines.push('──────────────────────────────');
       lines.push('');
     });
 
-    lines.push('Inicia sesión en AtocarYa con tu PIN para confirmar o consultar tu fecha.');
+    lines.push('Coordinado mediante AtocarYa 🎸');
     return lines.join('\n');
   };
 

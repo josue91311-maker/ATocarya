@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { ServiceDate, SongItem } from '../types';
+import { ServiceDate, SongItem, SlotConfig } from '../types';
 import { 
   Music, 
   Play, 
@@ -85,12 +85,49 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   };
 
   const handleShareWhatsApp = () => {
-    const songListText = songs
-      .map((s, idx) => `${idx + 1}. *${s.title}* ${s.key ? `[Tono: ${s.key}]` : ''}`)
-      .join('\n');
+    const lines: string[] = [];
+    lines.push('🎵 *REPERTORIO OFICIAL DE ALABANZA*');
+    lines.push(`📅 *${service.title}* (${fullDateStr})`);
+    lines.push(`⏰ Culto: ${service.time} ${service.rehearsalTime ? `· Ensayo: ${service.rehearsalTime}` : ''}`);
 
-    const msg = `🎵 *REPERTORIO OFICIAL DE ALABANZA*\n📅 *${service.title}* (${fullDateStr})\n⏰ Culto: ${service.time} ${service.rehearsalTime ? `· Ensayo: ${service.rehearsalTime}` : ''}\n${directorName ? `🎤 Director: *${directorName}*\n` : ''}\n${songListText}\n\n👉 *Escuchar canciones y ver acordes aquí:*\n${window.location.href}`;
+    // 1. Director al comienzo
+    if (directorName) {
+      lines.push(`🎤 *Director de Alabanza:* ${directorName}`);
+    }
+    lines.push('──────────────────────────────');
 
+    // 2. Músicos confirmados (sin vacantes)
+    const confirmedSlots = (Object.values(service.slots || {}) as SlotConfig[])
+      .filter(slot => slot.enabled !== false && Boolean(slot.musicianId));
+
+    if (confirmedSlots.length > 0) {
+      lines.push('*Equipo Confirmado:*');
+      confirmedSlots.forEach(slot => {
+        lines.push(`• ${slot.label}: ✅ *${slot.musicianName}*`);
+      });
+      lines.push('──────────────────────────────');
+    }
+
+    // 3. Canciones con tono y URL
+    if (songs.length > 0) {
+      lines.push('🎵 *Canciones & Tonalidades:*');
+      songs.forEach((s, idx) => {
+        const keyStr = s.key ? ` [Tono: *${s.key}*]` : '';
+        lines.push(`${idx + 1}. *${s.title}*${keyStr}`);
+        if (s.youtubeUrl) {
+          lines.push(`   ▶️ ${s.youtubeUrl}`);
+        }
+        if (s.notes) {
+          lines.push(`   💬 _${s.notes}_`);
+        }
+      });
+      lines.push('──────────────────────────────');
+    }
+
+    lines.push('👉 *Escuchar canciones, ver videos y acordes aquí:*');
+    lines.push(window.location.href);
+
+    const msg = lines.join('\n');
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
