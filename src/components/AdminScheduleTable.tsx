@@ -15,7 +15,8 @@ import {
   Camera,
   Sliders,
   Copy,
-  Sparkles
+  Sparkles,
+  Music
 } from 'lucide-react';
 
 import { ConfirmModal, ConfirmDialogOptions } from './ConfirmModal';
@@ -29,6 +30,7 @@ interface Props {
   onOpenShareModal: () => void;
   onGoToVisualBoard?: () => void;
   onEditService?: (service: ServiceDate) => void;
+  onOpenSetlist?: (service: ServiceDate) => void;
 }
 
 export const AdminScheduleTable: React.FC<Props> = ({
@@ -37,6 +39,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
   onOpenShareModal,
   onGoToVisualBoard,
   onEditService,
+  onOpenSetlist,
 }) => {
   const [confirmDialog, setConfirmDialog] = React.useState<ConfirmDialogOptions | null>(null);
   const [duplicatingService, setDuplicatingService] = React.useState<ServiceDate | null>(null);
@@ -369,6 +372,19 @@ export const AdminScheduleTable: React.FC<Props> = ({
                           >
                             <Edit3 className="w-3.5 h-3.5" />
                           </button>
+                          {onOpenSetlist && (
+                            <button
+                              onClick={() => onOpenSetlist(service)}
+                              title="Gestionar repertorio de canciones (Setlist)"
+                              className={`p-1.5 rounded-lg transition-colors ${
+                                service.songs && service.songs.length > 0
+                                  ? 'text-emerald-700 hover:text-emerald-900 bg-emerald-50'
+                                  : 'text-slate-400 hover:text-emerald-700 hover:bg-emerald-50'
+                              }`}
+                            >
+                              <Music className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                           <button
                             onClick={() => {
                               setConfirmDialog({

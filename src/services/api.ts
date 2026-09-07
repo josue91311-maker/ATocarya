@@ -1,4 +1,4 @@
-import { Musician, ServiceDate, SlotKey, SlotConfig } from '../types';
+import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem } from '../types';
 import {
   tursoGetMusicians,
   tursoCreateMusician,
@@ -8,6 +8,7 @@ import {
   tursoSaveService,
   tursoDeleteService,
   tursoUpdateSlots,
+  tursoUpdateServiceSongs,
 } from './tursoDirect';
 
 const API_BASE = '/api';
@@ -286,3 +287,12 @@ export const apiToggleServiceOpen = async (serviceId: string): Promise<boolean> 
 
   return true;
 };
+
+export const apiUpdateServiceSongs = async (
+  serviceId: string,
+  songs: SongItem[],
+  isPublished: boolean
+): Promise<boolean> => {
+  return await tursoUpdateServiceSongs(serviceId, songs, isPublished);
+};
+

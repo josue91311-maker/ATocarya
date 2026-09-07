@@ -45,6 +45,16 @@ export interface SlotConfig {
   enabled?: boolean; // Whether this instrument is active for this specific date
 }
 
+export interface SongItem {
+  id: string;
+  title: string;
+  youtubeUrl?: string;
+  key?: string; // Tonalidad oficial para el culto (ej: "Sol (G)", "Re (D)", "Mi menor (Em)")
+  originalKey?: string; // Tonalidad original del tema
+  bpm?: number;
+  notes?: string; // Dinámica, estructura o acordes clave
+}
+
 export interface ServiceDate {
   id: string;
   date: string; // YYYY-MM-DD
@@ -55,6 +65,8 @@ export interface ServiceDate {
   isOpen: boolean; // Admin can toggle if registrations are open
   registrationDeadline?: string; // YYYY-MM-DD - Fecha de expiración de inscripciones
   slots: Record<SlotKey, SlotConfig>;
+  songs?: SongItem[]; // Repertorio oficial de canciones
+  isSongsPublished?: boolean; // Solo publicado es visible en el link oficial
   createdAt: string;
 }
 

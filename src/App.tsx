@@ -14,8 +14,22 @@ import { MusicianDirectory } from './components/MusicianDirectory';
 import { AdminCreateServiceModal } from './components/AdminCreateServiceModal';
 import { AdminEditServiceModal } from './components/AdminEditServiceModal';
 import { WhatsAppShareModal } from './components/WhatsAppShareModal';
+import { PublicSetlistView } from './components/PublicSetlistView';
+import { ServiceSetlistModal } from './components/ServiceSetlistModal';
 
 type PortalType = 'musician' | 'admin';
+
+const getPublicRepertoireServiceId = (): string | null => {
+  const hash = window.location.hash;
+  const match = hash.match(/#\/(?:repertorio|canciones|setlist)\/([a-zA-Z0-9_-]+)/i);
+  if (match && match[1]) return match[1];
+
+  const params = new URLSearchParams(window.location.search);
+  const fromParam = params.get('repertorio') || params.get('canciones') || params.get('setlist');
+  if (fromParam) return fromParam;
+
+  return null;
+};
 
 const MainRouter: React.FC = () => {
   const { 
@@ -23,6 +37,8 @@ const MainRouter: React.FC = () => {
     isAdminAuthenticated, 
     services 
   } = useApp();
+
+  const [publicServiceId, setPublicServiceId] = useState<string | null>(getPublicRepertoireServiceId);
 
   const getInitialPortal = (): PortalType => {
     const hash = window.location.hash.toLowerCase();
@@ -39,11 +55,15 @@ const MainRouter: React.FC = () => {
 
   const [selectedService, setSelectedService] = useState<ServiceDate | null>(null);
   const [editingService, setEditingService] = useState<ServiceDate | null>(null);
+  const [setlistModalService, setSetlistModalService] = useState<ServiceDate | null>(null);
   const [createServiceOpen, setCreateServiceOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     const handleLocationChange = () => {
+      const pubId = getPublicRepertoireServiceId();
+      setPublicServiceId(pubId);
+
       const hash = window.location.hash.toLowerCase();
       const path = window.location.pathname.toLowerCase();
       if (hash.includes('admin') || path.includes('/admin')) {
@@ -74,6 +94,19 @@ const MainRouter: React.FC = () => {
     ? services.find(s => s.id === selectedService.id) || null
     : null;
 
+  // --- 0. RUTA PÚBLICA OFICIAL DE REPERTORIO (SIN USUARIO NI CONTRASEÑA) ---
+  if (publicServiceId) {
+    return (
+      <PublicSetlistView
+        serviceId={publicServiceId}
+        onGoToPortal={() => {
+          window.location.hash = '#/';
+          setPublicServiceId(null);
+        }}
+      />
+    );
+  }
+
   // --- 1. PORTAL DE MÚSICOS (LINK INDEPENDIENTE) ---
   if (portal === 'musician') {
     if (!musicianUser) {
@@ -101,7 +134,10 @@ const MainRouter: React.FC = () => {
 
         <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
           {musicianTab === 'calendar' && (
-            <CalendarView onSelectService={(s) => setSelectedService(s)} />
+            <CalendarView 
+              onSelectService={(s) => setSelectedService(s)} 
+              onOpenSetlist={(s) => setSetlistModalService(s)}
+            />
           )}
 
           {musicianTab === 'my-services' && (
@@ -120,6 +156,15 @@ const MainRouter: React.FC = () => {
             service={activeSelectedService}
             onClose={() => setSelectedService(null)}
             isMusicianView={true}
+            onOpenSetlist={(s) => setSetlistModalService(s)}
+          />
+        )}
+
+        {setlistModalService && (
+          <ServiceSetlistModal
+            service={services.find(s => s.id === setlistModalService.id) || setlistModalService}
+            isOpen={Boolean(setlistModalService)}
+            onClose={() => setSetlistModalService(null)}
           />
         )}
       </div>
@@ -173,6 +218,7 @@ const MainRouter: React.FC = () => {
             onOpenShareModal={() => setShareOpen(true)}
             onGoToVisualBoard={() => setAdminTab('visual-board')}
             onEditService={(s) => setEditingService(s)}
+            onOpenSetlist={(s) => setSetlistModalService(s)}
           />
         )}
 
@@ -193,6 +239,7 @@ const MainRouter: React.FC = () => {
           service={activeSelectedService}
           onClose={() => setSelectedService(null)}
           isMusicianView={false}
+          onOpenSetlist={(s) => setSetlistModalService(s)}
         />
       )}
 
@@ -208,6 +255,14 @@ const MainRouter: React.FC = () => {
           service={services.find(s => s.id === editingService.id) || editingService}
           isOpen={Boolean(editingService)}
           onClose={() => setEditingService(null)}
+        />
+      )}
+
+      {setlistModalService && (
+        <ServiceSetlistModal
+          service={services.find(s => s.id === setlistModalService.id) || setlistModalService}
+          isOpen={Boolean(setlistModalService)}
+          onClose={() => setSetlistModalService(null)}
         />
       )}
 

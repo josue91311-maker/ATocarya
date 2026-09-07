@@ -15,7 +15,8 @@ import {
   ChevronLeft,
   Check,
   AlertCircle,
-  Filter
+  Filter,
+  Music
 } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 import { 
@@ -28,10 +29,11 @@ import { getBestMatchingSlot } from '../utils/instrumentMatcher';
 
 interface Props {
   onSelectService: (service: ServiceDate) => void;
+  onOpenSetlist?: (service: ServiceDate) => void;
 }
 
-export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
-  const { services, musicianUser, claimSlot } = useApp();
+export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }) => {
+  const { services, musicianUser, isAdminAuthenticated, claimSlot } = useApp();
   const [filterType, setFilterType] = useState<'all' | 'available' | 'mine'>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
@@ -162,12 +164,35 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                   </h3>
                 </div>
               </div>
-              <button
-                onClick={() => onSelectService(nextService)}
-                className="w-full sm:w-auto px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition-all shadow-2xs text-center"
-              >
-                Ver servicio completo
-              </button>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
+                {onOpenSetlist && (isAdminAuthenticated || musicianUser?.id === nextService.slots?.voz_director?.musicianId) && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenSetlist(nextService)}
+                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+                  >
+                    <Music className="w-3.5 h-3.5" />
+                    <span>Gestionar Canciones</span>
+                  </button>
+                )}
+                {nextService.isSongsPublished && nextService.songs && nextService.songs.length > 0 && (
+                  <a
+                    href={`/#/repertorio/${nextService.id}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
+                  >
+                    <Music className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Ver Canciones ({nextService.songs.length})</span>
+                  </a>
+                )}
+                <button
+                  onClick={() => onSelectService(nextService)}
+                  className="px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition-all shadow-2xs text-center"
+                >
+                  Ver servicio completo
+                </button>
+              </div>
             </div>
           ) : recommendedSlotInNext ? (
             <div className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white rounded-3xl p-5 sm:p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -682,6 +707,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService }) => {
                 key={service.id}
                 service={service}
                 onSelect={onSelectService}
+                onOpenSetlist={onOpenSetlist}
               />
             ))}
           </div>

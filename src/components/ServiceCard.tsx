@@ -1,7 +1,7 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
 import { ServiceDate, SlotConfig } from '../types';
-import { Clock, ChevronRight, Check, Sparkles, AlertCircle, Lock } from 'lucide-react';
+import { Clock, ChevronRight, Check, Sparkles, AlertCircle, Lock, Music } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 import { isServiceExpired } from '../utils/dateUtils';
 import { getBestMatchingSlot } from '../utils/instrumentMatcher';
@@ -9,10 +9,11 @@ import { getBestMatchingSlot } from '../utils/instrumentMatcher';
 interface Props {
   service: ServiceDate;
   onSelect: (service: ServiceDate) => void;
+  onOpenSetlist?: (service: ServiceDate) => void;
 }
 
-export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
-  const { musicianUser, claimSlot } = useApp();
+export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist }) => {
+  const { musicianUser, isAdminAuthenticated, claimSlot } = useApp();
 
   const [year, month, day] = service.date.split('-');
   const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
@@ -133,6 +134,66 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect }) => {
             style={{ width: `${(occupiedCount / totalSlots) * 100}%` }}
           />
         </div>
+
+        {/* Setlist Indicator / Direct Link */}
+        {(() => {
+          const isDirector = Boolean(musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id);
+          const canManage = isAdminAuthenticated || isDirector;
+          const songsCount = service.songs?.length || 0;
+          const isPublished = Boolean(service.isSongsPublished && songsCount > 0);
+
+          if (canManage) {
+            return (
+              <div 
+                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-1.5 text-slate-700 font-bold">
+                  <Music className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Repertorio: {songsCount > 0 ? `${songsCount} alabanzas` : 'Sin canciones'}</span>
+                  <span className={`text-[9px] px-1.5 py-0.2 rounded font-black uppercase ${
+                    service.isSongsPublished ? 'bg-emerald-100 text-emerald-900' : 'bg-amber-100 text-amber-900'
+                  }`}>
+                    {service.isSongsPublished ? 'Publicado' : 'Borrador'}
+                  </span>
+                </div>
+                {onOpenSetlist && (
+                  <button
+                    type="button"
+                    onClick={() => onOpenSetlist(service)}
+                    className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+                  >
+                    <span>Editar Canciones</span>
+                  </button>
+                )}
+              </div>
+            );
+          }
+
+          if (isPublished) {
+            return (
+              <div 
+                className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center gap-1.5 text-emerald-900 font-bold">
+                  <Music className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>🎵 {songsCount} canciones con videos y tonos</span>
+                </div>
+                <a
+                  href={`/#/repertorio/${service.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 shadow-2xs"
+                >
+                  <span>Ver Repertorio</span>
+                </a>
+              </div>
+            );
+          }
+
+          return null;
+        })()}
       </div>
 
       {/* Acceso Rápido de 1-Toque para el músico en Móvil */}

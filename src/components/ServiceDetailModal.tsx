@@ -11,7 +11,10 @@ import {
   Info,
   Sparkles,
   CheckCircle2,
-  Lock
+  Lock,
+  Music,
+  Share2,
+  ExternalLink
 } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 import { ConfirmModal, ConfirmDialogOptions } from './ConfirmModal';
@@ -22,9 +25,15 @@ interface Props {
   service: ServiceDate | null;
   onClose: () => void;
   isMusicianView?: boolean;
+  onOpenSetlist?: (service: ServiceDate) => void;
 }
 
-export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusicianView = false }) => {
+export const ServiceDetailModal: React.FC<Props> = ({ 
+  service, 
+  onClose, 
+  isMusicianView = false,
+  onOpenSetlist 
+}) => {
   const { 
     musicianUser, 
     isAdminAuthenticated, 
@@ -272,6 +281,100 @@ export const ServiceDetailModal: React.FC<Props> = ({ service, onClose, isMusici
             <span>{successMsg}</span>
           </div>
         )}
+
+        {/* Sección de Repertorio de Canciones (Setlist) */}
+        {(() => {
+          const isDirector = Boolean(musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id);
+          const canManageSetlist = isAdminAuthenticated || isDirector;
+          const songs = service.songs || [];
+          const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
+          const publicUrl = `/#/repertorio/${service.id}`;
+
+          if (canManageSetlist) {
+            return (
+              <div className="mx-5 sm:mx-6 mt-3 p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
+                    <Music className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900">
+                        Repertorio de Canciones (Setlist)
+                      </span>
+                      <span className={`text-[10px] font-black uppercase px-2 py-0.2 rounded-md ${
+                        service.isSongsPublished
+                          ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
+                          : 'bg-amber-100 text-amber-900 border border-amber-300'
+                      }`}>
+                        {service.isSongsPublished ? '✓ Publicado' : 'Borrador'}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-600 mt-0.5">
+                      {songs.length > 0
+                        ? `${songs.length} alabanza(s) configurada(s) con videos y tonos.`
+                        : 'Aún no has agregado canciones a este culto.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-end sm:self-auto">
+                  {onOpenSetlist && (
+                    <button
+                      type="button"
+                      onClick={() => onOpenSetlist(service)}
+                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center gap-1.5"
+                    >
+                      <Music className="w-3.5 h-3.5" />
+                      <span>Gestionar Canciones</span>
+                    </button>
+                  )}
+                  <a
+                    href={publicUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition-colors"
+                    title="Ver link público oficial"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                  </a>
+                </div>
+              </div>
+            );
+          }
+
+          if (isPublished) {
+            return (
+              <div className="mx-5 sm:mx-6 mt-3 p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
+                    <Music className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                      <span>🎵 Repertorio Oficial Publicado</span>
+                    </h4>
+                    <p className="text-[11px] text-emerald-800 mt-0.5">
+                      {songs.length} alabanza(s) listas para ensayar con videos de YouTube y tonos.
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={publicUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-1.5 self-end sm:self-auto"
+                >
+                  <span>Ver Canciones & Tonos</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              </div>
+            );
+          }
+
+          return null;
+        })()}
 
         {/* Slots Content Area */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">

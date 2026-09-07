@@ -1,5 +1,5 @@
 import { createClient, Client } from '@libsql/client/web';
-import { Musician, ServiceDate, SlotKey, SlotConfig } from '../types';
+import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem } from '../types';
 
 const TURSO_URL = (import.meta as any).env?.VITE_TURSO_DATABASE_URL || 'libsql://atocarya-db-jothejmaster.aws-us-west-2.turso.io';
 const TURSO_TOKEN = (import.meta as any).env?.VITE_TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg0NjA4MTMsImlkIjoiMDFhMDY4OTEtZjkwMS03MWE0LWI5YzYtZDE2Mzc1MjNiZTFiIiwia2lkIjoiWVEybHJTYVROWk9hU3BRYUtrM0UtN3BqWnBXbkExa045SVdXSTQ5N0hPVSIsInJpZCI6IjQzOGRhODNjLWQzMTYtNDI0Yi1iMzk3LTcxMzZlZGU1NDkzMiJ9.ThZ8YS1HyVPIZJNT9jdwQxlmUcpj4PnBDBsOiq3OzIDU58cbW8V43j_u2i5SVdkH7aedbVJuM-X5C5lbVBKdDw';
@@ -126,6 +126,14 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
         parsed = JSON.parse(String(r.slots || '{}'));
       } catch (e) {}
 
+      let parsedSongs: SongItem[] = [];
+      if (r.songs) {
+        try {
+          const s = JSON.parse(String(r.songs));
+          if (Array.isArray(s)) parsedSongs = s;
+        } catch (e) {}
+      }
+
       return {
         id: String(r.id),
         date: String(r.date),
@@ -136,6 +144,8 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
         isOpen: Boolean(r.is_open),
         registrationDeadline: r.registration_deadline ? String(r.registration_deadline) : undefined,
         slots: normalizeServiceSlots(parsed),
+        songs: parsedSongs,
+        isSongsPublished: Boolean(r.is_songs_published),
         createdAt: String(r.created_at),
       };
     });
@@ -157,8 +167,8 @@ export const tursoSaveService = async (service: ServiceDate): Promise<boolean> =
     const targetId = existing.rows.length > 0 ? String(existing.rows[0].id) : service.id;
 
     await db.execute({
-      sql: `INSERT OR REPLACE INTO services (id, date, time, title, rehearsal_time, notes, is_open, registration_deadline, slots, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      sql: `INSERT OR REPLACE INTO services (id, date, time, title, rehearsal_time, notes, is_open, registration_deadline, slots, songs, is_songs_published, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         targetId,
         service.date,
@@ -169,12 +179,32 @@ export const tursoSaveService = async (service: ServiceDate): Promise<boolean> =
         service.isOpen ? 1 : 0,
         service.registrationDeadline || null,
         JSON.stringify(service.slots),
+        JSON.stringify(service.songs || []),
+        service.isSongsPublished ? 1 : 0,
         service.createdAt,
       ],
     });
     return true;
   } catch (err) {
     console.warn('Error al guardar servicio en Turso:', err);
+    return false;
+  }
+};
+
+export const tursoUpdateServiceSongs = async (
+  serviceId: string,
+  songs: SongItem[],
+  isPublished: boolean
+): Promise<boolean> => {
+  try {
+    const db = getTursoClient();
+    await db.execute({
+      sql: 'UPDATE services SET songs = ?, is_songs_published = ? WHERE id = ?',
+      args: [JSON.stringify(songs || []), isPublished ? 1 : 0, serviceId],
+    });
+    return true;
+  } catch (err) {
+    console.warn('Error al actualizar repertorio en Turso:', err);
     return false;
   }
 };

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Musician, ServiceDate, CurrentUser, SlotKey, SlotConfig, PrimaryInstrument } from '../types';
+import { Musician, ServiceDate, CurrentUser, SlotKey, SlotConfig, PrimaryInstrument, SongItem } from '../types';
 import { INITIAL_MUSICIANS, generateInitialServices, createEmptySlots } from '../data/initialData';
 import { isServiceExpired } from '../utils/dateUtils';
 import { 
@@ -16,7 +16,8 @@ import {
   apiAdminAssignSlot, 
   apiAdminClearSlot, 
   apiToggleServiceOpen,
-  apiSaveWholeService
+  apiSaveWholeService,
+  apiUpdateServiceSongs
 } from '../services/api';
 
 interface AppContextType {
@@ -56,6 +57,9 @@ interface AppContextType {
   updateServiceConfig: (serviceId: string, updates: { date?: string; time?: string; title?: string; rehearsalTime?: string; notes?: string; enabledSlots?: Record<SlotKey, boolean>; registrationDeadline?: string }) => { success: boolean; message?: string };
   adminAssignSlot: (serviceId: string, slotKey: SlotKey, musicianId: string) => void;
   adminClearSlot: (serviceId: string, slotKey: SlotKey) => void;
+
+  // Repertorio de Canciones (Admin y Voz Director asignado)
+  updateServiceSongs: (serviceId: string, songs: SongItem[], isPublished: boolean) => Promise<{ success: boolean; message?: string }>;
   
   // Database backup
   resetAllData: () => void;
@@ -757,6 +761,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const updateServiceSongs = async (
+    serviceId: string,
+    songs: SongItem[],
+    isPublished: boolean
+  ): Promise<{ success: boolean; message?: string }> => {
+    const service = services.find(s => s.id === serviceId);
+    if (!service) {
+      return { success: false, message: 'Servicio no encontrado.' };
+    }
+
+    // Validación de permisos estricta: Administrador o Voz Director asignado en esta fecha
+    const isDirectorAssigned = Boolean(
+      musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+    );
+
+    if (!isAdminAuthenticated && !isDirectorAssigned) {
+      return {
+        success: false,
+        message: 'Solo el Administrador o el Director de Alabanza asignado pueden gestionar las canciones de este culto.',
+      };
+    }
+
+    setServices(prev =>
+      prev.map(s => {
+        if (s.id !== serviceId) return s;
+        return {
+          ...s,
+          songs,
+          isSongsPublished: isPublished,
+        };
+      })
+    );
+
+    try {
+      await apiUpdateServiceSongs(serviceId, songs, isPublished);
+    } catch (err) {
+      console.warn('Error al persistir canciones en Turso:', err);
+    }
+
+    return { success: true };
+  };
+
   const resetAllData = () => {
     setMusicians(INITIAL_MUSICIANS);
     setServices(generateInitialServices());
@@ -819,6 +865,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateServiceConfig,
         adminAssignSlot,
         adminClearSlot,
+        updateServiceSongs,
         resetAllData,
         exportDatabaseJSON,
         importDatabaseJSON,
