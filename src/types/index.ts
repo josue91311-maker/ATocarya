@@ -49,6 +49,7 @@ export interface SongItem {
   id: string;
   title: string;
   youtubeUrl?: string;
+  audioUrl?: string; // URL de audio / MP3 / Google Drive / pista
   key?: string; // Tonalidad oficial para el culto (ej: "Sol (G)", "Re (D)", "Mi menor (Em)")
   originalKey?: string; // Tonalidad original del tema
   bpm?: number;
@@ -66,6 +67,7 @@ export interface BankSong {
   originalKey?: string;
   bpm?: number;
   youtubeUrl?: string;
+  audioUrl?: string; // URL de audio / MP3 / Google Drive / pista
   chordsUrl?: string; // URL de PDF o partitura
   chordChart?: string;
   lyrics?: string;

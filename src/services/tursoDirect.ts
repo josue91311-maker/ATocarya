@@ -251,6 +251,7 @@ export const tursoGetSongBank = async (): Promise<BankSong[] | null> => {
       originalKey: r.original_key ? String(r.original_key) : undefined,
       bpm: r.bpm ? Number(r.bpm) : undefined,
       youtubeUrl: r.youtube_url ? String(r.youtube_url) : undefined,
+      audioUrl: r.audio_url ? String(r.audio_url) : undefined,
       chordsUrl: r.chords_url ? String(r.chords_url) : undefined,
       chordChart: r.chord_chart ? String(r.chord_chart) : undefined,
       lyrics: r.lyrics ? String(r.lyrics) : undefined,
@@ -269,8 +270,8 @@ export const tursoSaveBankSong = async (song: BankSong): Promise<boolean> => {
     await db.execute({
       sql: `INSERT OR REPLACE INTO song_bank (
               id, title, artist, default_key, original_key, bpm,
-              youtube_url, chords_url, chord_chart, lyrics, notes, created_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              youtube_url, audio_url, chords_url, chord_chart, lyrics, notes, created_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       args: [
         song.id,
         song.title.trim(),
@@ -279,6 +280,7 @@ export const tursoSaveBankSong = async (song: BankSong): Promise<boolean> => {
         song.originalKey?.trim() || null,
         song.bpm || null,
         song.youtubeUrl?.trim() || null,
+        song.audioUrl?.trim() || null,
         song.chordsUrl?.trim() || null,
         song.chordChart?.trim() || null,
         song.lyrics?.trim() || null,

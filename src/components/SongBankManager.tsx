@@ -35,6 +35,7 @@ export const SongBankManager: React.FC = () => {
   const [originalKey, setOriginalKey] = useState('');
   const [bpm, setBpm] = useState('');
   const [youtubeUrl, setYoutubeUrl] = useState('');
+  const [audioUrl, setAudioUrl] = useState('');
   const [chordsUrl, setChordsUrl] = useState('');
   const [chordChart, setChordChart] = useState('');
   const [lyrics, setLyrics] = useState('');
@@ -50,6 +51,7 @@ export const SongBankManager: React.FC = () => {
     setOriginalKey('');
     setBpm('');
     setYoutubeUrl('');
+    setAudioUrl('');
     setChordsUrl('');
     setChordChart('');
     setLyrics('');
@@ -66,6 +68,7 @@ export const SongBankManager: React.FC = () => {
     setOriginalKey(song.originalKey || '');
     setBpm(song.bpm ? String(song.bpm) : '');
     setYoutubeUrl(song.youtubeUrl || '');
+    setAudioUrl(song.audioUrl || '');
     setChordsUrl(song.chordsUrl || '');
     setChordChart(song.chordChart || '');
     setLyrics(song.lyrics || '');
@@ -89,6 +92,7 @@ export const SongBankManager: React.FC = () => {
       originalKey: originalKey.trim() || undefined,
       bpm: bpm ? Number(bpm) : undefined,
       youtubeUrl: youtubeUrl.trim() || undefined,
+      audioUrl: audioUrl.trim() || undefined,
       chordsUrl: chordsUrl.trim() || undefined,
       chordChart: chordChart.trim() || undefined,
       lyrics: lyrics.trim() || undefined,
@@ -245,8 +249,8 @@ export const SongBankManager: React.FC = () => {
             </div>
           </div>
 
-          {/* URLs YouTube y PDF */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {/* URLs YouTube, Audio MP3 y PDF */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="block text-[11px] font-bold text-slate-700 mb-1">
                 Enlace de YouTube (URL de referencia)
@@ -261,8 +265,22 @@ export const SongBankManager: React.FC = () => {
             </div>
 
             <div>
+              <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                <span>Audio / Pista MP3 (Google Drive)</span>
+                <span className="text-[10px] text-emerald-600 font-normal">Con afinador</span>
+              </label>
+              <input
+                type="url"
+                placeholder="https://drive.google.com/file/d/... o .mp3"
+                value={audioUrl}
+                onChange={(e) => setAudioUrl(e.target.value)}
+                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-emerald-500"
+              />
+            </div>
+
+            <div>
               <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                URL de Partitura / Cifrado (Google Drive, PDF, etc.)
+                URL de Partitura / Cifrado (PDF / Drive)
               </label>
               <input
                 type="url"
@@ -438,6 +456,11 @@ export const SongBankManager: React.FC = () => {
                       {song.bpm} BPM
                     </span>
                   )}
+                  {song.audioUrl && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md flex items-center gap-1">
+                      🎧 Audio
+                    </span>
+                  )}
                   {song.chordsUrl && (
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 rounded-md flex items-center gap-1">
                       <FileCheck className="w-3 h-3" />
@@ -470,7 +493,19 @@ export const SongBankManager: React.FC = () => {
 
               {/* Botones de acción */}
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {song.audioUrl && (
+                    <a
+                      href={song.audioUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-700 hover:text-emerald-900 text-[11px] font-bold flex items-center gap-1"
+                      title="Abrir pista de audio"
+                    >
+                      <span>🎧 Audio</span>
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                  )}
                   {song.chordsUrl && (
                     <a
                       href={song.chordsUrl}

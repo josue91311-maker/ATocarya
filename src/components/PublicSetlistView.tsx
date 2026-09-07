@@ -17,9 +17,11 @@ import {
   Check,
   Sliders,
   FileText,
-  FileCheck
+  FileCheck,
+  Headphones
 } from 'lucide-react';
 import { Logo } from './Logo';
+import { AudioTransposerPlayer } from './AudioTransposerPlayer';
 import { 
   extractYouTubeId, 
   getYouTubeEmbedUrl, 
@@ -43,7 +45,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf'>('chords');
+  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf' | 'audio'>('chords');
   const [transposeDelta, setTransposeDelta] = useState<number>(0);
 
   if (!service) {
@@ -84,6 +86,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const hasChords = Boolean(activeSong?.chordChart && activeSong.chordChart.trim());
   const hasLyrics = Boolean(activeSong?.lyrics && activeSong.lyrics.trim());
+  const hasAudio = Boolean(activeSong?.audioUrl && activeSong.audioUrl.trim());
 
   // Cifrado transpuesto dinámico
   const rawChordChart = activeSong?.chordChart || '';
@@ -358,15 +361,15 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     </div>
                   </div>
 
-                  {/* Selector de Pestañas: Cifrado & Compases / Letra / Partitura Externa */}
-                  {(hasChords || hasLyrics || activeSong.chordsUrl) && (
+                  {/* Selector de Pestañas: Cifrado & Compases / Audio & Pista / Letra / Partitura Externa */}
+                  {(hasChords || hasAudio || hasLyrics || activeSong.chordsUrl) && (
                     <div className="pt-2 border-t border-slate-100">
-                      <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-md">
+                      <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-lg flex-wrap">
                         {hasChords && (
                           <button
                             type="button"
                             onClick={() => setActiveTab('chords')}
-                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                               activeTab === 'chords'
                                 ? 'bg-white text-emerald-950 shadow-xs'
                                 : 'text-slate-600 hover:text-slate-900'
@@ -377,11 +380,26 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           </button>
                         )}
 
+                        {hasAudio && (
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab('audio')}
+                            className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                              activeTab === 'audio'
+                                ? 'bg-white text-emerald-950 shadow-xs'
+                                : 'text-slate-600 hover:text-slate-900'
+                            }`}
+                          >
+                            <Headphones className="w-3.5 h-3.5 text-teal-600" />
+                            <span>🎧 Pista & Tono</span>
+                          </button>
+                        )}
+
                         {hasLyrics && (
                           <button
                             type="button"
                             onClick={() => setActiveTab('lyrics')}
-                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                               activeTab === 'lyrics'
                                 ? 'bg-white text-emerald-950 shadow-xs'
                                 : 'text-slate-600 hover:text-slate-900'
@@ -396,7 +414,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           <button
                             type="button"
                             onClick={() => setActiveTab('pdf')}
-                            className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                            className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                               activeTab === 'pdf'
                                 ? 'bg-white text-emerald-950 shadow-xs'
                                 : 'text-slate-600 hover:text-slate-900'
@@ -576,6 +594,15 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     </div>
                   )}
 
+                  {/* CONTENIDO 4: REPRODUCTOR DE PISTA DE AUDIO CON TRANSPOSICIÓN EN VIVO */}
+                  {activeTab === 'audio' && activeSong.audioUrl && (
+                    <AudioTransposerPlayer
+                      audioUrl={activeSong.audioUrl}
+                      songTitle={activeSong.title}
+                      baseKey={activeSong.key}
+                    />
+                  )}
+
                   {/* Botones de Herramientas Musicales (Sin Moises) */}
                   <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
                     {activeSong.youtubeUrl && (
@@ -693,6 +720,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           {song.bpm && (
                             <span className="text-[10px] text-slate-400 font-mono">
                               {song.bpm} bpm
+                            </span>
+                          )}
+                          {song.audioUrl && (
+                            <span className="text-[9px] font-bold px-1.5 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200">
+                              🎧 Pista
                             </span>
                           )}
                           {song.chordChart && (

@@ -51,6 +51,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   // Formulario nueva/edición canción
   const [newTitle, setNewTitle] = useState('');
   const [newUrl, setNewUrl] = useState('');
+  const [newAudioUrl, setNewAudioUrl] = useState('');
   const [newKey, setNewKey] = useState('G');
   const [newOriginalKey, setNewOriginalKey] = useState('');
   const [newBpm, setNewBpm] = useState<string>('');
@@ -97,6 +98,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setEditingSongId(song.id);
     setNewTitle(song.title);
     setNewUrl(song.youtubeUrl || '');
+    setNewAudioUrl(song.audioUrl || '');
     setNewKey(song.key || 'G');
     setNewOriginalKey(song.originalKey || '');
     setNewBpm(song.bpm ? String(song.bpm) : '');
@@ -113,6 +115,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setSaveToBankChecked(false);
     setNewTitle('');
     setNewUrl('');
+    setNewAudioUrl('');
     setNewKey('G');
     setNewOriginalKey('');
     setNewBpm('');
@@ -127,6 +130,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setSelectedBankSongId(bankSong.id);
     setNewTitle(bankSong.title);
     if (bankSong.youtubeUrl) setNewUrl(bankSong.youtubeUrl);
+    if (bankSong.audioUrl) setNewAudioUrl(bankSong.audioUrl);
     if (bankSong.defaultKey) setNewKey(bankSong.defaultKey);
     if (bankSong.originalKey) setNewOriginalKey(bankSong.originalKey);
     if (bankSong.bpm) setNewBpm(String(bankSong.bpm));
@@ -150,6 +154,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       id: editingSongId || `song_${Date.now()}_${Math.random().toString(36).substr(2, 4)}`,
       title: newTitle.trim(),
       youtubeUrl: newUrl.trim() || undefined,
+      audioUrl: newAudioUrl.trim() || undefined,
       key: newKey.trim() || undefined,
       originalKey: newOriginalKey.trim() || undefined,
       bpm: newBpm ? Number(newBpm) : undefined,
@@ -177,6 +182,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
         originalKey: songData.originalKey,
         bpm: songData.bpm,
         youtubeUrl: songData.youtubeUrl,
+        audioUrl: songData.audioUrl,
         chordsUrl: songData.chordsUrl,
         chordChart: songData.chordChart,
         lyrics: songData.lyrics,
@@ -189,6 +195,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
     setSaveToBankChecked(false);
     setNewTitle('');
     setNewUrl('');
+    setNewAudioUrl('');
     setNewKey('G');
     setNewOriginalKey('');
     setNewBpm('');
@@ -444,6 +451,11 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                                   {song.bpm} BPM
                                 </span>
                               )}
+                              {song.audioUrl && (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 bg-teal-50 text-teal-700 border border-teal-200 rounded">
+                                  🎧 Pista
+                                </span>
+                              )}
                             </div>
 
                             {song.notes && (
@@ -582,7 +594,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="relative">
                 <div className="flex items-center justify-between mb-1">
                   <label className="block text-[11px] font-bold text-slate-700">
@@ -641,6 +653,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                               <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
                                 {item.defaultKey && <span className="font-semibold text-emerald-800">Tono: {item.defaultKey}</span>}
                                 {item.artist && <span>· {item.artist}</span>}
+                                {item.audioUrl && <span>· 🎧 Audio</span>}
                                 {item.chordsUrl && <span>· 📄 PDF</span>}
                                 {item.chordChart && <span>· 🎸 Cifrado</span>}
                               </div>
@@ -665,6 +678,20 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                   placeholder="https://youtu.be/... o https://youtube.com/watch?v=..."
                   value={newUrl}
                   onChange={(e) => setNewUrl(e.target.value)}
+                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Audio / Pista MP3 (Drive)</span>
+                  <span className="text-[10px] text-emerald-600 font-normal">Con afinador</span>
+                </label>
+                <input
+                  type="url"
+                  placeholder="https://drive.google.com/file/d/... o .mp3"
+                  value={newAudioUrl}
+                  onChange={(e) => setNewAudioUrl(e.target.value)}
                   className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
                 />
               </div>
