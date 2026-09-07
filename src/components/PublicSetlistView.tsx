@@ -40,7 +40,7 @@ interface Props {
 }
 
 export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) => {
-  const { services } = useApp();
+  const { services, songBank } = useApp();
   const service = services.find(s => s.id === serviceId) || null;
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
@@ -80,16 +80,26 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
   const activeSong: SongItem | undefined = songs[activeSongIndex] || songs[0];
 
+  // Buscar coincidencia en el Banco de Canciones para heredar audio o recursos si faltan en el culto
+  const bankMatch = activeSong 
+    ? songBank.find(b => b.title.trim().toLowerCase() === activeSong.title.trim().toLowerCase()) 
+    : undefined;
+
+  const effectiveAudioUrl = activeSong?.audioUrl || bankMatch?.audioUrl;
+  const effectiveChordsUrl = activeSong?.chordsUrl || bankMatch?.chordsUrl;
+  const effectiveChordChart = activeSong?.chordChart || bankMatch?.chordChart;
+  const effectiveLyrics = activeSong?.lyrics || bankMatch?.lyrics;
+
   const directorName = service.slots?.voz_director?.musicianName;
-  const activeVideoUrl = activeSong ? getYouTubeEmbedUrl(activeSong.youtubeUrl) : null;
+  const activeVideoUrl = activeSong ? getYouTubeEmbedUrl(activeSong.youtubeUrl || bankMatch?.youtubeUrl) : null;
   const toolLinks = activeSong ? getExternalMusicToolLinks(activeSong.title, activeSong.key) : null;
 
-  const hasChords = Boolean(activeSong?.chordChart && activeSong.chordChart.trim());
-  const hasLyrics = Boolean(activeSong?.lyrics && activeSong.lyrics.trim());
-  const hasAudio = Boolean(activeSong?.audioUrl && activeSong.audioUrl.trim());
+  const hasChords = Boolean(effectiveChordChart && effectiveChordChart.trim());
+  const hasLyrics = Boolean(effectiveLyrics && effectiveLyrics.trim());
+  const hasAudio = Boolean(effectiveAudioUrl && effectiveAudioUrl.trim());
 
   // Cifrado transpuesto dinámico
-  const rawChordChart = activeSong?.chordChart || '';
+  const rawChordChart = effectiveChordChart || '';
   const transposedChartText = transposeDelta !== 0 
     ? transposeChordChartText(rawChordChart, transposeDelta)
     : rawChordChart;
@@ -552,7 +562,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   )}
 
                   {/* CONTENIDO 3: VISOR INTEGRADO DE PDF / PARTITURA */}
-                  {activeTab === 'pdf' && activeSong.chordsUrl && (
+                  {activeTab === 'pdf' && effectiveChordsUrl && (
                     <div className="p-4 sm:p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
                       <div className="flex items-center justify-between text-white border-b border-slate-800 pb-2">
                         <div className="flex items-center gap-2">
@@ -562,7 +572,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           </span>
                         </div>
                         <a
-                          href={activeSong.chordsUrl}
+                          href={effectiveChordsUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
@@ -576,11 +586,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       <div className="w-full h-[550px] sm:h-[650px] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative">
                         <iframe
                           src={
-                            activeSong.chordsUrl.includes('drive.google.com')
-                              ? activeSong.chordsUrl.replace('/view', '/preview')
-                              : activeSong.chordsUrl.endsWith('.pdf')
-                              ? `https://docs.google.com/viewer?url=${encodeURIComponent(activeSong.chordsUrl)}&embedded=true`
-                              : activeSong.chordsUrl
+                            effectiveChordsUrl.includes('drive.google.com')
+                              ? effectiveChordsUrl.replace('/view', '/preview')
+                              : effectiveChordsUrl.endsWith('.pdf')
+                              ? `https://docs.google.com/viewer?url=${encodeURIComponent(effectiveChordsUrl)}&embedded=true`
+                              : effectiveChordsUrl
                           }
                           title="Visor de PDF"
                           className="w-full h-full border-0 bg-white"
@@ -592,9 +602,9 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
                   {/* CONTENIDO 4: REPRODUCTOR DE PISTA DE AUDIO CON TRANSPOSICIÓN EN VIVO */}
                   {activeTab === 'audio' && (
-                    activeSong.audioUrl ? (
+                    effectiveAudioUrl ? (
                       <AudioTransposerPlayer
-                        audioUrl={activeSong.audioUrl}
+                        audioUrl={effectiveAudioUrl}
                         songTitle={activeSong.title}
                         baseKey={activeSong.key}
                       />
@@ -738,7 +748,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                               {song.bpm} bpm
                             </span>
                           )}
-                          {song.audioUrl && (
+                          {(song.audioUrl || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.audioUrl)) && (
                             <span className="text-[9px] font-bold px-1.5 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200">
                               🎧 Pista
                             </span>
