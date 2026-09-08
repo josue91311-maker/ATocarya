@@ -20,17 +20,16 @@ interface Props {
   baseKey?: string;
 }
 
-// Cálculo óptimo de tamaño de ventana de correlación acústica:
-// - Para frecuencias graves (bajar tono, delta < 0), se requiere una ventana más amplia (0.20s - 0.24s) para no picar las ondas del bajo y bombo, eliminando el sonido metálico y robótico.
-// - Para frecuencias agudas (subir tono, delta > 0), una ventana de 0.15s - 0.18s preserva transitorios limpios.
+// Cálculo óptimo de tamaño de ventana de correlación acústica (optimizado para baja latencia):
+// - Ventanas más pequeñas = menos latencia en la batería/ritmo (latencia ≈ windowSize / 2)
+// - ±1 semitono: ventana corta (~0.10s = 50ms latencia) — cambio pequeño, no necesita buffer amplio
+// - ±2 semitonos: ventana media (~0.13s = 65ms latencia)
+// - ±3 semitonos: ventana más amplia (~0.16s = 80ms latencia) — necesita más muestras para no distorsionar graves
 const getOptimalWindowSize = (delta: number): number => {
-  if (delta < 0) {
-    return Math.min(0.24, 0.18 + Math.abs(delta) * 0.02);
-  }
-  if (delta > 0) {
-    return Math.max(0.14, 0.18 - delta * 0.015);
-  }
-  return 0.18;
+  if (delta === 0) return 0.1;
+  const absDelta = Math.abs(delta);
+  // Base 0.08 + escala 0.03 por semitono: ±1→0.11, ±2→0.14, ±3→0.17
+  return 0.08 + absDelta * 0.03;
 };
 
 // Calibración acústica exacta de pitch shifting (corrige el defecto interno de Tone.js en intervalos negativos)
@@ -60,6 +59,9 @@ const setCalibratedPitch = (pitchShift: Tone.PitchShift, st: number, windowSize:
     if (ps._frequency) {
       ps._frequency.value = exactFreq;
     }
+    // Forzar latencia interna de los delay lines a 0 para eliminar retardo extra
+    if (ps._delayA) ps._delayA.delayTime.value = 0;
+    if (ps._delayB) ps._delayB.delayTime.value = 0;
     ps._pitch = st;
   } else {
     if (ps._lfoA && ps._lfoB) {
@@ -72,6 +74,9 @@ const setCalibratedPitch = (pitchShift: Tone.PitchShift, st: number, windowSize:
     if (ps._frequency) {
       ps._frequency.value = exactFreq;
     }
+    // Forzar latencia interna de los delay lines a 0 para eliminar retardo extra
+    if (ps._delayA) ps._delayA.delayTime.value = 0;
+    if (ps._delayB) ps._delayB.delayTime.value = 0;
     ps._pitch = st;
   }
 };
