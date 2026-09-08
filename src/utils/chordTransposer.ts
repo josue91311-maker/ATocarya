@@ -132,6 +132,7 @@ export interface SectionBlock {
   title: string; // ej. "INTRO", "VERSO 1", "CORO"
   measures: MeasureCell[][]; // Filas de compases
   notes?: string;
+  timeSignature?: string; // ej. "4/4", "3/4", "6/8", "12/8"
 }
 
 /**
@@ -143,10 +144,23 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
   const lines = rawText.split('\n');
   const sections: SectionBlock[] = [];
   let currentSection: SectionBlock = { title: 'ESTRUCTURA', measures: [] };
+  let globalTimeSignature: string | undefined = undefined;
+
+  const TIME_SIG_REGEX = /\b(4\/4|3\/4|6\/8|12\/8|2\/4|9\/8)\b/;
 
   lines.forEach(line => {
-    const trimmed = line.trim();
+    let trimmed = line.trim();
     if (!trimmed) return;
+
+    // Detectar métrica global si está en una línea suelta ej. [4/4] o 4/4 o Compás: 4/4
+    const standaloneSig = trimmed.match(/^\[?(4\/4|3\/4|6\/8|12\/8|2\/4)\]?$/);
+    if (standaloneSig) {
+      globalTimeSignature = standaloneSig[1];
+      if (!currentSection.timeSignature) {
+        currentSection.timeSignature = globalTimeSignature;
+      }
+      return;
+    }
 
     // Detectar encabezado de sección: [INTRO], [VERSO 1], [CORO], [PUENTE], etc.
     const sectionMatch = trimmed.match(/^\[([^\]]+)\](.*)$/);
@@ -154,10 +168,27 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
       if (currentSection.measures.length > 0 || currentSection.title !== 'ESTRUCTURA') {
         sections.push(currentSection);
       }
+      
+      let secTitle = sectionMatch[1].trim();
+      let secNotes = sectionMatch[2] ? sectionMatch[2].trim() : undefined;
+      let secTimeSig = globalTimeSignature;
+
+      // Buscar si la sección incluye la métrica: ej. [INTRO] [4/4] o [CORO] (6/8)
+      const sigInTitle = secTitle.match(TIME_SIG_REGEX);
+      const sigInNotes = secNotes ? secNotes.match(TIME_SIG_REGEX) : null;
+      if (sigInTitle) {
+        secTimeSig = sigInTitle[1];
+        secTitle = secTitle.replace(TIME_SIG_REGEX, '').trim();
+      } else if (sigInNotes) {
+        secTimeSig = sigInNotes[1];
+        secNotes = secNotes?.replace(TIME_SIG_REGEX, '').replace(/[()]/g, '').trim() || undefined;
+      }
+
       currentSection = {
-        title: sectionMatch[1].trim(),
+        title: secTitle || 'SECCIÓN',
         measures: [],
-        notes: sectionMatch[2] ? sectionMatch[2].trim() : undefined,
+        notes: secNotes,
+        timeSignature: secTimeSig,
       };
       return;
     }

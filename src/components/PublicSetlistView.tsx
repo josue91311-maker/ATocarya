@@ -484,10 +484,16 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       <div className="space-y-4">
                         {parsedSections.map((sec, secIdx) => (
                           <div key={secIdx} className="space-y-2">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <span className="px-2.5 py-0.5 bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 rounded-lg text-xs font-black uppercase tracking-wider">
                                 {sec.title}
                               </span>
+                              {sec.timeSignature && (
+                                <span className="px-2 py-0.5 bg-indigo-950/90 text-indigo-300 border border-indigo-700/70 rounded-lg text-xs font-mono font-black shadow-xs flex items-center gap-1" title="Métrica de compás">
+                                  <span>⏱️</span>
+                                  <span>{sec.timeSignature}</span>
+                                </span>
+                              )}
                               {sec.notes && (
                                 <span className="text-xs text-slate-400 italic">
                                   {sec.notes}
@@ -523,16 +529,35 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                         </span>
                                       )}
 
-                                      {/* Acordes Principales */}
+                                      {/* Acordes Principales (con soporte visual destacado para notas con bajo) */}
                                       <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
-                                        {measure.chords.map((chord, cIdx) => (
-                                          <span 
-                                            key={cIdx} 
-                                            className="text-base sm:text-lg font-black font-mono text-emerald-300 tracking-wide"
-                                          >
-                                            {chord}
-                                          </span>
-                                        ))}
+                                        {measure.chords.map((chord, cIdx) => {
+                                          if (chord.includes('/')) {
+                                            const [root, bass] = chord.split('/');
+                                            return (
+                                              <span 
+                                                key={cIdx} 
+                                                className="text-base sm:text-lg font-black font-mono text-emerald-300 tracking-wide inline-flex items-baseline gap-0.5"
+                                                title={`Acorde ${root} con bajo en ${bass}`}
+                                              >
+                                                <span>{root}</span>
+                                                <span className="text-emerald-500/70 text-xs">/</span>
+                                                <span className="text-amber-300 text-xs sm:text-sm font-black bg-amber-400/15 px-1 py-0.2 rounded border border-amber-400/40">
+                                                  {bass}
+                                                </span>
+                                              </span>
+                                            );
+                                          }
+
+                                          return (
+                                            <span 
+                                              key={cIdx} 
+                                              className="text-base sm:text-lg font-black font-mono text-emerald-300 tracking-wide"
+                                            >
+                                              {chord}
+                                            </span>
+                                          );
+                                        })}
 
                                         {/* Notas de Paso resaltadas en Ámbar */}
                                         {measure.passingChords.map((pch, pIdx) => (

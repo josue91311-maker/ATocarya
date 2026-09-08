@@ -19,6 +19,8 @@ import {
   Info
 } from 'lucide-react';
 import { extractYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl, getExternalMusicToolLinks } from '../utils/youtubeUtils';
+import { ChordChartEditor } from './ChordChartEditor';
+
 
 interface Props {
   service: ServiceDate;
@@ -828,105 +830,11 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                     </span>
                   </div>
 
-                  {/* Barra de botones rápidos para escribir compases y notas de paso */}
-                  <div className="flex flex-wrap items-center gap-1 p-2 bg-slate-100 rounded-xl border border-slate-200">
-                    <span className="text-[10px] font-bold text-slate-500 mr-1">Insertar:</span>
-                    
-                    {/* Secciones */}
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[INTRO]\n| ')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
-                    >
-                      [INTRO]
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[VERSO]\n| ')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
-                    >
-                      [VERSO]
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[CORO]\n|: ')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
-                    >
-                      [CORO]
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + (prev ? '\n\n' : '') + '[PUENTE]\n| ')}
-                      className="px-2 py-0.5 bg-white hover:bg-slate-50 border border-slate-200 rounded text-[11px] font-bold text-slate-700"
-                    >
-                      [PUENTE]
-                    </button>
-
-                    <span className="text-slate-300">|</span>
-
-                    {/* Barras de compás */}
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + ' | ')}
-                      className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[11px] font-black font-mono"
-                      title="Barra de compás"
-                    >
-                      |
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + '|: ')}
-                      className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[11px] font-black font-mono"
-                      title="Inicio de repetición"
-                    >
-                      |:
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + ' :| (x2)')}
-                      className="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded text-[11px] font-black font-mono"
-                      title="Fin de repetición"
-                    >
-                      :| (x2)
-                    </button>
-
-                    <span className="text-slate-300">|</span>
-
-                    {/* NOTAS DE PASO Y CORTES */}
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + ' (D#dim paso) ')}
-                      className="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded text-[11px] font-black"
-                      title="Insertar Nota de Paso entre paréntesis"
-                    >
-                      + (Nota de Paso)
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + ' -> [CORTE] ')}
-                      className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded text-[11px] font-black"
-                    >
-                      ✂️ CORTE
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setNewChordChart(prev => prev + ' -> [STOP] ')}
-                      className="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-800 border border-rose-200 rounded text-[11px] font-black"
-                    >
-                      🛑 STOP
-                    </button>
-                  </div>
-
-                  <textarea
-                    rows={6}
-                    placeholder={`Ejemplo:\n[INTRO]\n|: G | Em7 | C2 | D4 :| (x2)\n\n[VERSO 1]\n| G | Em7 | C2 | (D#dim paso) | Em7 | -> CORTE en 4to tiempo\n\n[CORO]\n|: G | D/F# | Em7 | C2 :|`}
+                  <ChordChartEditor
                     value={newChordChart}
-                    onChange={(e) => setNewChordChart(e.target.value)}
-                    className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500 leading-relaxed"
+                    onChange={setNewChordChart}
+                    rows={6}
                   />
-                  <p className="text-[10px] text-slate-500">
-                    💡 <strong>Tip para Músicos:</strong> Las notas entre paréntesis como <code className="bg-slate-100 px-1 py-0.5 rounded text-amber-800 font-bold">(D#dim)</code> se reconocen automáticamente como <strong>notas de paso</strong> y se trasladan solas si cambias de tono.
-                  </p>
                 </div>
               )}
 

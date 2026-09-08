@@ -14,6 +14,8 @@ import {
   FileCheck,
   Sparkles
 } from 'lucide-react';
+import { ChordChartEditor } from './ChordChartEditor';
+
 
 const COMMON_KEYS = [
   'C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B',
@@ -328,15 +330,11 @@ export const SongBankManager: React.FC = () => {
             </div>
 
             {activeTab === 'chords' ? (
-              <div>
-                <textarea
-                  rows={5}
-                  placeholder="[INTRO]&#10;|: G | Em7 | C2 | D :|&#10;&#10;[VERSO]&#10;| G | Em7 | C2 | (D#dim paso) | Em7 |"
-                  value={chordChart}
-                  onChange={(e) => setChordChart(e.target.value)}
-                  className="w-full px-3 py-2 text-xs font-mono border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
+              <ChordChartEditor
+                value={chordChart}
+                onChange={setChordChart}
+                rows={7}
+              />
             ) : (
               <div>
                 <textarea
