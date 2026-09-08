@@ -20,6 +20,19 @@ interface Props {
   baseKey?: string;
 }
 
+// Cálculo óptimo de tamaño de ventana de correlación acústica:
+// - Para frecuencias graves (bajar tono, delta < 0), se requiere una ventana más amplia (0.20s - 0.24s) para no picar las ondas del bajo y bombo, eliminando el sonido metálico y robótico.
+// - Para frecuencias agudas (subir tono, delta > 0), una ventana de 0.15s - 0.18s preserva transitorios limpios.
+const getOptimalWindowSize = (delta: number): number => {
+  if (delta < 0) {
+    return Math.min(0.24, 0.18 + Math.abs(delta) * 0.02);
+  }
+  if (delta > 0) {
+    return Math.max(0.14, 0.18 - delta * 0.015);
+  }
+  return 0.18;
+};
+
 export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, baseKey }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -151,16 +164,17 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
       }
 
       // Construir o reusar la cadena de efectos Tone:
-      // Player -> PitchShift (mantiene velocidad) -> Volume -> Destination
+      // Player -> PitchShift (alta fidelidad acústica) -> Volume -> Destination
       if (!pitchShiftRef.current) {
         pitchShiftRef.current = new Tone.PitchShift({
           pitch: semitones,
-          windowSize: 0.08,
+          windowSize: getOptimalWindowSize(semitones),
           delayTime: 0,
           feedback: 0
         });
       } else {
         pitchShiftRef.current.pitch = semitones;
+        pitchShiftRef.current.windowSize = getOptimalWindowSize(semitones);
       }
 
       if (!volumeNodeRef.current) {
@@ -251,6 +265,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
     setSemitones(delta);
     if (pitchShiftRef.current && volumeNodeRef.current) {
       pitchShiftRef.current.pitch = delta;
+      pitchShiftRef.current.windowSize = getOptimalWindowSize(delta);
 
       // Si el reproductor está activo, conmutar la ruta de señal en caliente
       if (playerRef.current) {
@@ -259,7 +274,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
           // Retorno a Original: Bypass directo a Volume (audio 100% puro original sin procesamiento)
           playerRef.current.connect(volumeNodeRef.current);
         } else {
-          // Con transposición activa: enrutar a través de PitchShift
+          // Con transposición activa: enrutar a través de PitchShift de alta fidelidad
           playerRef.current.connect(pitchShiftRef.current);
         }
       }
