@@ -33,6 +33,49 @@ const getOptimalWindowSize = (delta: number): number => {
   return 0.18;
 };
 
+// Calibración acústica exacta de pitch shifting (corrige el defecto interno de Tone.js en intervalos negativos)
+// Aplica la fórmula física real del modulador Doppler (Miller Puckette):
+// - Semitono negativo (-1, -2, -3): ratio = 2^(st/12), f = (1 - ratio) / W
+// - Semitono positivo (+1, +2, +3): ratio = 2^(st/12), f = (ratio - 1) / W
+const setCalibratedPitch = (pitchShift: Tone.PitchShift, st: number, windowSize: number) => {
+  const ps = pitchShift as any;
+  if (!ps) return;
+
+  if (st === 0) {
+    pitchShift.pitch = 0;
+    return;
+  }
+
+  const ratio = Math.pow(2, st / 12);
+  const w = windowSize || 0.18;
+
+  if (st < 0) {
+    if (ps._lfoA && ps._lfoB) {
+      ps._lfoA.min = 0;
+      ps._lfoA.max = w;
+      ps._lfoB.min = 0;
+      ps._lfoB.max = w;
+    }
+    const exactFreq = (1 - ratio) / w;
+    if (ps._frequency) {
+      ps._frequency.value = exactFreq;
+    }
+    ps._pitch = st;
+  } else {
+    if (ps._lfoA && ps._lfoB) {
+      ps._lfoA.min = w;
+      ps._lfoA.max = 0;
+      ps._lfoB.min = w;
+      ps._lfoB.max = 0;
+    }
+    const exactFreq = (ratio - 1) / w;
+    if (ps._frequency) {
+      ps._frequency.value = exactFreq;
+    }
+    ps._pitch = st;
+  }
+};
+
 export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, baseKey }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -164,18 +207,19 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
       }
 
       // Construir o reusar la cadena de efectos Tone:
-      // Player -> PitchShift (alta fidelidad acústica) -> Volume -> Destination
+      // Player -> PitchShift (alta fidelidad acústica calibrada) -> Volume -> Destination
+      const wSize = getOptimalWindowSize(semitones);
       if (!pitchShiftRef.current) {
         pitchShiftRef.current = new Tone.PitchShift({
           pitch: semitones,
-          windowSize: getOptimalWindowSize(semitones),
+          windowSize: wSize,
           delayTime: 0,
           feedback: 0
         });
       } else {
-        pitchShiftRef.current.pitch = semitones;
-        pitchShiftRef.current.windowSize = getOptimalWindowSize(semitones);
+        pitchShiftRef.current.windowSize = wSize;
       }
+      setCalibratedPitch(pitchShiftRef.current, semitones, wSize);
 
       if (!volumeNodeRef.current) {
         volumeNodeRef.current = new Tone.Volume(volume <= 0 ? -100 : Tone.gainToDb(volume));
@@ -264,8 +308,9 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   const handleSemitoneChange = (delta: number) => {
     setSemitones(delta);
     if (pitchShiftRef.current && volumeNodeRef.current) {
-      pitchShiftRef.current.pitch = delta;
-      pitchShiftRef.current.windowSize = getOptimalWindowSize(delta);
+      const wSize = getOptimalWindowSize(delta);
+      pitchShiftRef.current.windowSize = wSize;
+      setCalibratedPitch(pitchShiftRef.current, delta, wSize);
 
       // Si el reproductor está activo, conmutar la ruta de señal en caliente
       if (playerRef.current) {
@@ -274,7 +319,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
           // Retorno a Original: Bypass directo a Volume (audio 100% puro original sin procesamiento)
           playerRef.current.connect(volumeNodeRef.current);
         } else {
-          // Con transposición activa: enrutar a través de PitchShift de alta fidelidad
+          // Con transposición activa: enrutar a través de PitchShift de alta fidelidad calibrado
           playerRef.current.connect(pitchShiftRef.current);
         }
       }
