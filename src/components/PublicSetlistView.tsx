@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { ServiceDate, SongItem, SlotConfig } from '../types';
 import { 
@@ -80,15 +80,23 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
   const activeSong: SongItem | undefined = songs[activeSongIndex] || songs[0];
 
-  // Buscar coincidencia en el Banco de Canciones para heredar audio o recursos si faltan en el culto
+  // Buscar coincidencia en el Banco de Canciones para heredar cifrado, letra, compases, audio o enlaces si faltan en el culto
   const bankMatch = activeSong 
     ? songBank.find(b => b.title.trim().toLowerCase() === activeSong.title.trim().toLowerCase()) 
     : undefined;
 
   const effectiveAudioUrl = activeSong?.audioUrl || bankMatch?.audioUrl;
   const effectiveChordsUrl = activeSong?.chordsUrl || bankMatch?.chordsUrl;
-  const effectiveChordChart = activeSong?.chordChart || bankMatch?.chordChart;
-  const effectiveLyrics = activeSong?.lyrics || bankMatch?.lyrics;
+  const effectiveChordChart = (activeSong?.chordChart && activeSong.chordChart.trim()) 
+    ? activeSong.chordChart 
+    : (bankMatch?.chordChart && bankMatch.chordChart.trim()) 
+    ? bankMatch.chordChart 
+    : undefined;
+  const effectiveLyrics = (activeSong?.lyrics && activeSong.lyrics.trim()) 
+    ? activeSong.lyrics 
+    : (bankMatch?.lyrics && bankMatch.lyrics.trim()) 
+    ? bankMatch.lyrics 
+    : undefined;
 
   const directorName = service.slots?.voz_director?.musicianName;
   const activeVideoUrl = activeSong ? getYouTubeEmbedUrl(activeSong.youtubeUrl || bankMatch?.youtubeUrl) : null;
@@ -97,6 +105,24 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const hasChords = Boolean(effectiveChordChart && effectiveChordChart.trim());
   const hasLyrics = Boolean(effectiveLyrics && effectiveLyrics.trim());
   const hasAudio = Boolean(effectiveAudioUrl && effectiveAudioUrl.trim());
+  const hasPdf = Boolean(effectiveChordsUrl && effectiveChordsUrl.trim());
+
+  // Ajustar la pestaña activa automáticamente si la pestaña actual no tiene contenido para la canción seleccionada
+  useEffect(() => {
+    if (activeTab === 'chords' && !hasChords) {
+      if (hasAudio) setActiveTab('audio');
+      else if (hasLyrics) setActiveTab('lyrics');
+      else if (hasPdf) setActiveTab('pdf');
+    } else if (activeTab === 'lyrics' && !hasLyrics) {
+      if (hasChords) setActiveTab('chords');
+      else if (hasAudio) setActiveTab('audio');
+      else if (hasPdf) setActiveTab('pdf');
+    } else if (activeTab === 'pdf' && !hasPdf) {
+      if (hasChords) setActiveTab('chords');
+      else if (hasAudio) setActiveTab('audio');
+      else if (hasLyrics) setActiveTab('lyrics');
+    }
+  }, [activeSongIndex, hasChords, hasAudio, hasLyrics, hasPdf]);
 
   // Cifrado transpuesto dinámico
   const rawChordChart = effectiveChordChart || '';
@@ -556,7 +582,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         <span>Letra de la Canción</span>
                       </h4>
                       <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
-                        {activeSong.lyrics}
+                        {effectiveLyrics}
                       </div>
                     </div>
                   )}
@@ -753,12 +779,12 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                               🎧 Pista
                             </span>
                           )}
-                          {song.chordChart && (
+                          {(song.chordChart || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.chordChart)) && (
                             <span className="text-[9px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
                               🎸 Cifrado
                             </span>
                           )}
-                          {song.lyrics && (
+                          {(song.lyrics || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.lyrics)) && (
                             <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200">
                               🎤 Letra
                             </span>
