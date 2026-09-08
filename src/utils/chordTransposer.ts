@@ -418,10 +418,10 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
       const sigInNotes = secNotes ? secNotes.match(TIME_SIG_REGEX) : null;
       if (sigInTitle) {
         secTimeSig = sigInTitle[1];
-        secTitle = secTitle.replace(TIME_SIG_REGEX, '').trim();
+        secTitle = secTitle.replace(TIME_SIG_REGEX, '').replace(/[()[\]]/g, '').trim();
       } else if (sigInNotes) {
         secTimeSig = sigInNotes[1];
-        secNotes = secNotes?.replace(TIME_SIG_REGEX, '').replace(/[()]/g, '').trim() || undefined;
+        secNotes = secNotes?.replace(TIME_SIG_REGEX, '').replace(/[()[\]]/g, '').trim() || undefined;
       }
 
       currentSection = {

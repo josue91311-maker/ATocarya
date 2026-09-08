@@ -54,6 +54,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const [transposeDelta, setTransposeDelta] = useState<number>(0);
   const [inspectedChord, setInspectedChord] = useState<string | null>(null);
   const [chordProMode, setChordProMode] = useState<'with-chords' | 'lyrics-only'>('with-chords');
+  const [showChordNotesAlways, setShowChordNotesAlways] = useState<boolean>(false);
 
   if (!service) {
     return (
@@ -502,11 +503,23 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-3 text-[11px] text-slate-400">
-                          <span className="hidden sm:inline text-slate-500">💡 Clic en un acorde para ver sus notas</span>
-                          <div>
-                            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1.5 align-middle"></span>
-                            <span>(Nota de Paso)</span>
+                        <div className="flex items-center gap-2 text-[11px] text-slate-400 flex-wrap">
+                          <button
+                            type="button"
+                            onClick={() => setShowChordNotesAlways(!showChordNotesAlways)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                              showChordNotesAlways
+                                ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-xs'
+                                : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white hover:bg-slate-700/70'
+                            }`}
+                            title="Alternar vista de notas musicales debajo de cada acorde"
+                          >
+                            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>{showChordNotesAlways ? 'Ocultar Notas' : 'Ver Notas de Acordes'}</span>
+                          </button>
+                          <div className="hidden sm:flex items-center gap-1">
+                            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1"></span>
+                            <span>Nota de Paso</span>
                           </div>
                         </div>
                       </div>
@@ -614,6 +627,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                       <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
                                         {measure.chords.map((chord, cIdx) => {
                                           const isInspected = inspectedChord === chord;
+                                          const chordDetails = showChordNotesAlways ? getChordDetails(chord) : null;
+
                                           if (chord.includes('/')) {
                                             const [root, bass] = chord.split('/');
                                             return (
@@ -621,18 +636,25 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                                 type="button"
                                                 key={cIdx} 
                                                 onClick={() => setInspectedChord(isInspected ? null : chord)}
-                                                className={`text-base sm:text-lg font-black font-mono tracking-wide inline-flex items-baseline gap-0.5 transition-all rounded px-1 -mx-1 cursor-pointer ${
+                                                className={`text-center tracking-wide transition-all rounded px-1.5 py-0.5 cursor-pointer ${
                                                   isInspected
                                                     ? 'bg-emerald-500/25 ring-1 ring-emerald-400 text-white scale-105'
                                                     : 'text-emerald-300 hover:text-white hover:bg-slate-700/50'
                                                 }`}
                                                 title={`Clic para ver notas de ${chord}`}
                                               >
-                                                <span>{root}</span>
-                                                <span className="text-emerald-500/70 text-xs">/</span>
-                                                <span className="text-amber-300 text-xs sm:text-sm font-black bg-amber-400/15 px-1 py-0.2 rounded border border-amber-400/40">
-                                                  {bass}
-                                                </span>
+                                                <div className="text-base sm:text-lg font-black font-mono inline-flex items-baseline gap-0.5">
+                                                  <span>{root}</span>
+                                                  <span className="text-emerald-500/70 text-xs">/</span>
+                                                  <span className="text-amber-300 text-xs sm:text-sm font-black bg-amber-400/15 px-1 py-0.2 rounded border border-amber-400/40">
+                                                    {bass}
+                                                  </span>
+                                                </div>
+                                                {chordDetails && chordDetails.notes.length > 0 && (
+                                                  <div className="text-[9px] font-mono text-emerald-400/80 font-normal mt-0.5">
+                                                    {chordDetails.notes.map(n => n.replace(' (Bajo)', '')).join('·')}
+                                                  </div>
+                                                )}
                                               </button>
                                             );
                                           }
@@ -642,14 +664,21 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                               type="button"
                                               key={cIdx} 
                                               onClick={() => setInspectedChord(isInspected ? null : chord)}
-                                              className={`text-base sm:text-lg font-black font-mono tracking-wide transition-all rounded px-1 -mx-1 cursor-pointer ${
+                                              className={`text-center tracking-wide transition-all rounded px-1.5 py-0.5 cursor-pointer ${
                                                 isInspected
                                                   ? 'bg-emerald-500/25 ring-1 ring-emerald-400 text-white scale-105'
                                                   : 'text-emerald-300 hover:text-white hover:bg-slate-700/50'
                                               }`}
                                               title={`Clic para ver notas de ${chord}`}
                                             >
-                                              {chord}
+                                              <div className="text-base sm:text-lg font-black font-mono">
+                                                {chord}
+                                              </div>
+                                              {chordDetails && chordDetails.notes.length > 0 && (
+                                                <div className="text-[9px] font-mono text-emerald-400/80 font-normal mt-0.5">
+                                                  {chordDetails.notes.map(n => n.replace(' (Bajo)', '')).join('·')}
+                                                </div>
+                                              )}
                                             </button>
                                           );
                                         })}
@@ -674,6 +703,27 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                           );
                                         })}
                                       </div>
+
+                                      {/* Subdivisión de Pulsos del Compás para Músicos */}
+                                      {measure.chords.length === 1 && measure.passingChords.length === 0 && (
+                                        <div className="flex items-center justify-center gap-1 mt-0.5 text-[8px] font-mono text-slate-500 select-none">
+                                          <span className="text-emerald-400">●</span>
+                                          <span className="text-slate-600">●</span>
+                                          <span className="text-slate-600">●</span>
+                                          <span className="text-slate-600">●</span>
+                                          <span className="text-[7px] uppercase font-bold text-slate-500 ml-0.5">4t</span>
+                                        </div>
+                                      )}
+                                      {measure.chords.length === 2 && measure.passingChords.length === 0 && (
+                                        <div className="flex items-center justify-center gap-1 mt-0.5 text-[8px] font-mono text-slate-500 select-none">
+                                          <span className="text-emerald-400">●</span>
+                                          <span className="text-slate-600">●</span>
+                                          <span className="text-slate-700 font-bold px-0.5">|</span>
+                                          <span className="text-emerald-400">●</span>
+                                          <span className="text-slate-600">●</span>
+                                          <span className="text-[7px] uppercase font-bold text-slate-500 ml-0.5">2t c/u</span>
+                                        </div>
+                                      )}
 
                                       {/* Anotaciones / Cortes */}
                                       {measure.annotations.length > 0 && (
