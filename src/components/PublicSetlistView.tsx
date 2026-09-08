@@ -10,17 +10,18 @@ import {
   Clock, 
   Users, 
   ChevronRight, 
+  ChevronLeft,
   Sparkles, 
   CheckCircle2, 
-  AlertCircle,
-  Copy,
-  Check,
-  Sliders,
-  FileText,
-  FileCheck,
-  Headphones,
-  X,
-  Info
+  AlertCircle, 
+  Copy, 
+  Check, 
+  Sliders, 
+  FileText, 
+  FileCheck, 
+  Headphones, 
+  X, 
+  Info 
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { AudioTransposerPlayer } from './AudioTransposerPlayer';
@@ -314,8 +315,205 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
             </p>
           </div>
         ) : (
-          /* Si está publicado: Reproductor + Lista */
+          /* Si está publicado: Selector Superior + Reproductor */
           <div className="space-y-6">
+
+            {/* SELECTOR SUPERIOR DE CANCIONES (Adaptado a Desktop y Mobile) */}
+            <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                    <Music className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Repertorio ({songs.length} Alabanzas)</span>
+                  </h3>
+                </div>
+
+                {/* En Mobile: Navegación Rápida Anterior / Siguiente */}
+                <div className="flex sm:hidden items-center gap-1.5">
+                  <button
+                    type="button"
+                    disabled={activeSongIndex === 0}
+                    onClick={() => {
+                      setActiveSongIndex(Math.max(0, activeSongIndex - 1));
+                      setTransposeDelta(0);
+                    }}
+                    className="p-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
+                    title="Alabanza anterior"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                  </button>
+
+                  <span className="text-xs font-black text-emerald-900 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-300">
+                    {activeSongIndex + 1}/{songs.length}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={activeSongIndex === songs.length - 1}
+                    onClick={() => {
+                      setActiveSongIndex(Math.min(songs.length - 1, activeSongIndex + 1));
+                      setTransposeDelta(0);
+                    }}
+                    className="p-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
+                    title="Alabanza siguiente"
+                  >
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              {/* VISTA MOBILE: Carrusel Horizontal Deslizable con Snap y Touch Fluido */}
+              <div className="flex sm:hidden gap-2.5 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar snap-x">
+                {songs.map((song, index) => {
+                  const isActive = index === activeSongIndex;
+                  const thumb = getYouTubeThumbnailUrl(song.youtubeUrl);
+
+                  return (
+                    <button
+                      key={song.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveSongIndex(index);
+                        setTransposeDelta(0);
+                      }}
+                      className={`w-[78vw] max-w-[290px] flex-shrink-0 snap-start p-3 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
+                        isActive
+                          ? 'border-emerald-500 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20'
+                          : 'border-slate-200 bg-white hover:border-slate-300'
+                      }`}
+                    >
+                      {/* Mini Thumbnail / Icono */}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
+                        {thumb ? (
+                          <img src={thumb} alt={song.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <Music className="w-5 h-5 text-slate-400" />
+                        )}
+                        <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-emerald-600/40' : 'bg-black/15'}`}>
+                          <Play className="w-3.5 h-3.5 text-white fill-white" />
+                        </div>
+                      </div>
+
+                      {/* Info Compacta */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-md ${
+                            isActive ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            #{index + 1}
+                          </span>
+                          <h4 className="text-xs font-bold text-slate-900 truncate leading-tight">
+                            {song.title}
+                          </h4>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          {song.key && (
+                            <span className="text-[10px] font-black px-1.5 py-0.2 bg-emerald-100 text-emerald-900 rounded border border-emerald-300">
+                              {song.key}
+                            </span>
+                          )}
+                          {song.originalKey && (
+                            <span className="text-[9px] text-slate-400">
+                              orig: {song.originalKey}
+                            </span>
+                          )}
+                          {(song.audioUrl || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.audioUrl)) && (
+                            <span className="text-[8px] font-bold px-1 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200">
+                              🎧
+                            </span>
+                          )}
+                          {(song.chordChart || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.chordChart)) && (
+                            <span className="text-[8px] font-bold px-1 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
+                              🎸
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* VISTA TABLET / DESKTOP: Grilla Visual Elegante */}
+              <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                {songs.map((song, index) => {
+                  const isActive = index === activeSongIndex;
+                  const thumb = getYouTubeThumbnailUrl(song.youtubeUrl);
+
+                  return (
+                    <button
+                      key={song.id}
+                      type="button"
+                      onClick={() => {
+                        setActiveSongIndex(index);
+                        setTransposeDelta(0);
+                      }}
+                      className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
+                        isActive
+                          ? 'border-emerald-500 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20 scale-[1.01]'
+                          : 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-2xs'
+                      }`}
+                    >
+                      {/* Thumbnail or Icon */}
+                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
+                        {thumb ? (
+                          <img src={thumb} alt={song.title} className="w-full h-full object-cover" />
+                        ) : (
+                          <Music className="w-5 h-5 text-slate-400" />
+                        )}
+                        <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-emerald-600/40' : 'bg-black/15'}`}>
+                          <Play className="w-3.5 h-3.5 text-white fill-white" />
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-md ${
+                            isActive ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
+                          }`}>
+                            #{index + 1}
+                          </span>
+                          <h4 className="text-xs font-bold text-slate-900 truncate leading-tight">
+                            {song.title}
+                          </h4>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                          {song.key && (
+                            <span className="text-[10px] font-black px-1.5 py-0.2 bg-emerald-100 text-emerald-900 rounded border border-emerald-300">
+                              {song.key}
+                            </span>
+                          )}
+                          {song.originalKey && (
+                            <span className="text-[9px] text-slate-400">
+                              orig: {song.originalKey}
+                            </span>
+                          )}
+                          {(song.audioUrl || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.audioUrl)) && (
+                            <span className="text-[8px] font-bold px-1.5 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200" title="Audio / Pista disponible">
+                              🎧
+                            </span>
+                          )}
+                          {(song.chordChart || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.chordChart)) && (
+                            <span className="text-[8px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200" title="Cifrado disponible">
+                              🎸
+                            </span>
+                          )}
+                          {(song.lyrics || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.lyrics)) && (
+                            <span className="text-[8px] font-bold px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200" title="Letra disponible">
+                              🎤
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
 
             {/* Reproductor Embebido de la Alabanza Activa */}
             {activeSong && (
@@ -1015,95 +1213,6 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
               </div>
             )}
-
-            {/* Playlist / Lista Completa de Alabanzas */}
-            <div>
-              <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 mb-3">
-                Lista de Alabanzas del Culto ({songs.length})
-              </h3>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {songs.map((song, index) => {
-                  const isActive = index === activeSongIndex;
-                  const thumb = getYouTubeThumbnailUrl(song.youtubeUrl);
-
-                  return (
-                    <div
-                      key={song.id}
-                      onClick={() => {
-                        setActiveSongIndex(index);
-                        setTransposeDelta(0);
-                        window.scrollTo({ top: 120, behavior: 'smooth' });
-                      }}
-                      className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex items-center gap-3.5 ${
-                        isActive
-                          ? 'border-emerald-500 bg-emerald-50/50 shadow-sm scale-[1.01]'
-                          : 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-2xs'
-                      }`}
-                    >
-                      {/* Thumbnail or Icon */}
-                      <div className="w-14 h-14 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
-                        {thumb ? (
-                          <img src={thumb} alt={song.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <Music className="w-6 h-6 text-slate-400" />
-                        )}
-                        <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-emerald-600/40' : 'bg-black/20'}`}>
-                          <Play className="w-4 h-4 text-white fill-white" />
-                        </div>
-                      </div>
-
-                      {/* Info */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold text-slate-400">
-                            #{index + 1}
-                          </span>
-                          <h4 className="text-sm font-bold text-slate-900 truncate leading-tight">
-                            {song.title}
-                          </h4>
-                        </div>
-
-                        <div className="flex items-center gap-2 mt-1 flex-wrap">
-                          {song.key && (
-                            <span className="text-[10px] font-black px-2 py-0.2 bg-emerald-100 text-emerald-900 rounded-md">
-                              {song.key}
-                            </span>
-                          )}
-                          {song.originalKey && (
-                            <span className="text-[10px] text-slate-400">
-                              orig: {song.originalKey}
-                            </span>
-                          )}
-                          {song.bpm && (
-                            <span className="text-[10px] text-slate-400 font-mono">
-                              {song.bpm} bpm
-                            </span>
-                          )}
-                          {(song.audioUrl || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.audioUrl)) && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200">
-                              🎧 Pista
-                            </span>
-                          )}
-                          {(song.chordChart || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.chordChart)) && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
-                              🎸 Cifrado
-                            </span>
-                          )}
-                          {(song.lyrics || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.lyrics)) && (
-                            <span className="text-[9px] font-bold px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200">
-                              🎤 Letra
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      <ChevronRight className={`w-4 h-4 flex-shrink-0 ${isActive ? 'text-emerald-600' : 'text-slate-300'}`} />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
 
             {/* Integrantes Confirmados en este Culto */}
             <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-2xs">
