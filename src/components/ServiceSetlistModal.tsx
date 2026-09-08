@@ -95,17 +95,22 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const publicRepertoireUrl = `${origin}/#/repertorio/${service.id}`;
 
   const handleStartEdit = (song: SongItem) => {
+    const bankMatch = songBank.find(
+      b => b.id === song.id || b.title.trim().toLowerCase() === song.title.trim().toLowerCase()
+    );
     setEditingSongId(song.id);
+    setSelectedBankSongId(bankMatch?.id || null);
     setNewTitle(song.title);
-    setNewUrl(song.youtubeUrl || '');
-    setNewAudioUrl(song.audioUrl || '');
-    setNewKey(song.key || 'G');
-    setNewOriginalKey(song.originalKey || '');
-    setNewBpm(song.bpm ? String(song.bpm) : '');
-    setNewNotes(song.notes || '');
-    setNewChordChart(song.chordChart || '');
-    setNewLyrics(song.lyrics || '');
-    setNewChordsUrl(song.chordsUrl || '');
+    setNewUrl(song.youtubeUrl || bankMatch?.youtubeUrl || '');
+    setNewAudioUrl(song.audioUrl || bankMatch?.audioUrl || '');
+    setNewKey(song.key || bankMatch?.defaultKey || 'G');
+    setNewOriginalKey(song.originalKey || bankMatch?.originalKey || '');
+    setNewBpm(song.bpm ? String(song.bpm) : (bankMatch?.bpm ? String(bankMatch.bpm) : ''));
+    setNewNotes(song.notes || bankMatch?.notes || '');
+    setNewChordChart(song.chordChart || bankMatch?.chordChart || '');
+    setNewLyrics(song.lyrics || bankMatch?.lyrics || '');
+    setNewChordsUrl(song.chordsUrl || bankMatch?.chordsUrl || '');
+    setSaveToBankChecked(true);
     setErrorMsg(null);
   };
 
@@ -184,8 +189,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
         youtubeUrl: songData.youtubeUrl,
         audioUrl: songData.audioUrl,
         chordsUrl: songData.chordsUrl,
-        chordChart: songData.chordChart,
-        lyrics: songData.lyrics,
+        chordChart: songData.chordChart || '',
+        lyrics: songData.lyrics || '',
         notes: songData.notes,
       }).catch(err => console.warn('Error al sincronizar con banco de canciones:', err));
     }

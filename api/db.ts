@@ -54,4 +54,23 @@ export const initDb = async () => {
       value TEXT NOT NULL
     )
   `);
+
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS song_bank (
+      id TEXT PRIMARY KEY,
+      title TEXT NOT NULL,
+      artist TEXT,
+      default_key TEXT,
+      original_key TEXT,
+      bpm INTEGER,
+      youtube_url TEXT,
+      audio_url TEXT,
+      chords_url TEXT,
+      chord_chart TEXT,
+      lyrics TEXT,
+      notes TEXT,
+      created_at TEXT NOT NULL
+    )
+  `);
 };
+

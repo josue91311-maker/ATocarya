@@ -95,14 +95,18 @@ const deduplicateSongBank = (songs: BankSong[]): BankSong[] => {
     } else {
       const prev = seen.get(key)!;
       seen.set(key, {
-        ...s,
         ...prev,
-        artist: prev.artist || s.artist,
-        youtubeUrl: prev.youtubeUrl || s.youtubeUrl,
-        audioUrl: prev.audioUrl || s.audioUrl,
-        chordsUrl: prev.chordsUrl || s.chordsUrl,
-        chordChart: prev.chordChart || s.chordChart,
-        lyrics: prev.lyrics || s.lyrics,
+        ...s,
+        artist: s.artist || prev.artist,
+        defaultKey: s.defaultKey || prev.defaultKey,
+        originalKey: s.originalKey || prev.originalKey,
+        bpm: s.bpm || prev.bpm,
+        youtubeUrl: s.youtubeUrl || prev.youtubeUrl,
+        audioUrl: s.audioUrl || prev.audioUrl,
+        chordsUrl: s.chordsUrl || prev.chordsUrl,
+        chordChart: s.chordChart !== undefined ? s.chordChart : prev.chordChart,
+        lyrics: s.lyrics !== undefined ? s.lyrics : prev.lyrics,
+        notes: s.notes || prev.notes,
       });
     }
   }
@@ -874,16 +878,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     const fullSong: BankSong = {
       id: finalId,
       title: trimmedTitle,
-      artist: songData.artist !== undefined ? (songData.artist?.trim() || undefined) : existing?.artist,
-      defaultKey: songData.defaultKey !== undefined ? (songData.defaultKey?.trim() || undefined) : existing?.defaultKey,
-      originalKey: songData.originalKey !== undefined ? (songData.originalKey?.trim() || undefined) : existing?.originalKey,
+      artist: songData.artist !== undefined ? (songData.artist ? songData.artist.trim() : undefined) : existing?.artist,
+      defaultKey: songData.defaultKey !== undefined ? (songData.defaultKey ? songData.defaultKey.trim() : undefined) : existing?.defaultKey,
+      originalKey: songData.originalKey !== undefined ? (songData.originalKey ? songData.originalKey.trim() : undefined) : existing?.originalKey,
       bpm: songData.bpm !== undefined ? (songData.bpm ? Number(songData.bpm) : undefined) : existing?.bpm,
-      youtubeUrl: songData.youtubeUrl !== undefined ? (songData.youtubeUrl?.trim() || undefined) : existing?.youtubeUrl,
-      audioUrl: songData.audioUrl !== undefined ? (songData.audioUrl?.trim() || undefined) : existing?.audioUrl,
-      chordsUrl: songData.chordsUrl !== undefined ? (songData.chordsUrl?.trim() || undefined) : existing?.chordsUrl,
-      chordChart: songData.chordChart !== undefined ? (songData.chordChart?.trim() || undefined) : existing?.chordChart,
-      lyrics: songData.lyrics !== undefined ? (songData.lyrics?.trim() || undefined) : existing?.lyrics,
-      notes: songData.notes !== undefined ? (songData.notes?.trim() || undefined) : existing?.notes,
+      youtubeUrl: songData.youtubeUrl !== undefined ? (songData.youtubeUrl ? songData.youtubeUrl.trim() : undefined) : existing?.youtubeUrl,
+      audioUrl: songData.audioUrl !== undefined ? (songData.audioUrl ? songData.audioUrl.trim() : undefined) : existing?.audioUrl,
+      chordsUrl: songData.chordsUrl !== undefined ? (songData.chordsUrl ? songData.chordsUrl.trim() : undefined) : existing?.chordsUrl,
+      chordChart: songData.chordChart !== undefined ? (songData.chordChart ? songData.chordChart.trim() : undefined) : existing?.chordChart,
+      lyrics: songData.lyrics !== undefined ? (songData.lyrics ? songData.lyrics.trim() : undefined) : existing?.lyrics,
+      notes: songData.notes !== undefined ? (songData.notes ? songData.notes.trim() : undefined) : existing?.notes,
       createdAt: existing?.createdAt || songData.createdAt || new Date().toISOString(),
     };
 
@@ -899,11 +903,45 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return [...prev, fullSong].sort((a, b) => a.title.localeCompare(b.title));
     });
 
+    // Guardar en Turso / Serverless endpoint
     try {
       await apiSaveBankSong(fullSong);
     } catch (err) {
       console.warn('Error al guardar en Turso song_bank:', err);
     }
+
+    // Propagar cambios automáticamente a cultos existentes que contengan esta canción
+    setServices(prevServices => {
+      let anyChanged = false;
+      const updatedServices = prevServices.map(srv => {
+        if (!srv.songs || srv.songs.length === 0) return srv;
+        let srvChanged = false;
+        const nextSongs = srv.songs.map(songItem => {
+          const isMatch = (fullSong.id && songItem.id === fullSong.id) ||
+            songItem.title.trim().toLowerCase() === fullSong.title.trim().toLowerCase();
+          if (isMatch) {
+            srvChanged = true;
+            return {
+              ...songItem,
+              audioUrl: fullSong.audioUrl || songItem.audioUrl,
+              youtubeUrl: fullSong.youtubeUrl || songItem.youtubeUrl,
+              chordsUrl: fullSong.chordsUrl || songItem.chordsUrl,
+              chordChart: fullSong.chordChart !== undefined ? fullSong.chordChart : songItem.chordChart,
+              lyrics: fullSong.lyrics !== undefined ? fullSong.lyrics : songItem.lyrics,
+              bpm: fullSong.bpm || songItem.bpm,
+            };
+          }
+          return songItem;
+        });
+        if (srvChanged) {
+          anyChanged = true;
+          apiUpdateServiceSongs(srv.id, nextSongs, Boolean(srv.isSongsPublished)).catch(() => {});
+          return { ...srv, songs: nextSongs };
+        }
+        return srv;
+      });
+      return anyChanged ? updatedServices : prevServices;
+    });
 
     return { success: true, song: fullSong };
   };

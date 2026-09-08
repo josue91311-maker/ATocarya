@@ -42,6 +42,7 @@ export const SongBankManager: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'external'>('chords');
   const [statusMsg, setStatusMsg] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const resetForm = () => {
     setEditingId(null);
@@ -58,6 +59,7 @@ export const SongBankManager: React.FC = () => {
     setNotes('');
     setIsFormOpen(false);
     setStatusMsg(null);
+    setIsSaving(false);
   };
 
   const handleEdit = (song: BankSong) => {
@@ -75,6 +77,7 @@ export const SongBankManager: React.FC = () => {
     setNotes(song.notes || '');
     setIsFormOpen(true);
     setStatusMsg(null);
+    setIsSaving(false);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,25 +87,34 @@ export const SongBankManager: React.FC = () => {
       return;
     }
 
-    const res = await saveBankSong({
-      id: editingId || undefined,
-      title: title.trim(),
-      artist: artist.trim() || undefined,
-      defaultKey: defaultKey.trim() || undefined,
-      originalKey: originalKey.trim() || undefined,
-      bpm: bpm ? Number(bpm) : undefined,
-      youtubeUrl: youtubeUrl.trim() || undefined,
-      audioUrl: audioUrl.trim() || undefined,
-      chordsUrl: chordsUrl.trim() || undefined,
-      chordChart: chordChart.trim() || undefined,
-      lyrics: lyrics.trim() || undefined,
-      notes: notes.trim() || undefined,
-    });
+    setIsSaving(true);
+    setStatusMsg(null);
 
-    if (res.success) {
-      resetForm();
-    } else {
-      setStatusMsg(res.message || 'Error al guardar canción.');
+    try {
+      const res = await saveBankSong({
+        id: editingId || undefined,
+        title: title.trim(),
+        artist: artist.trim(),
+        defaultKey: defaultKey.trim(),
+        originalKey: originalKey.trim(),
+        bpm: bpm ? Number(bpm) : undefined,
+        youtubeUrl: youtubeUrl.trim(),
+        audioUrl: audioUrl.trim(),
+        chordsUrl: chordsUrl.trim(),
+        chordChart: chordChart.trim(),
+        lyrics: lyrics.trim(),
+        notes: notes.trim(),
+      });
+
+      if (res.success) {
+        resetForm();
+      } else {
+        setStatusMsg(res.message || 'Error al guardar canción.');
+      }
+    } catch (err: any) {
+      setStatusMsg(err.message || 'Error al guardar en el servidor.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -366,10 +378,11 @@ export const SongBankManager: React.FC = () => {
             </button>
             <button
               type="submit"
-              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
+              disabled={isSaving}
+              className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 shadow-sm"
             >
               <Check className="w-4 h-4 stroke-[3]" />
-              <span>{editingId ? 'Guardar Cambios' : 'Registrar en Banco'}</span>
+              <span>{isSaving ? 'Guardando...' : (editingId ? 'Guardar Cambios' : 'Registrar en Banco')}</span>
             </button>
           </div>
         </form>

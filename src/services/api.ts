@@ -302,14 +302,65 @@ export const apiUpdateServiceSongs = async (
 // --- Banco de Canciones ---
 
 export const apiGetSongBank = async (): Promise<BankSong[] | null> => {
-  return await tursoGetSongBank();
+  // 1. Intentar conexión directa a Turso SQLite
+  const direct = await tursoGetSongBank();
+  if (direct && direct.length > 0) {
+    return direct;
+  }
+
+  // 2. Fallback a endpoint serverless /api/song_bank
+  try {
+    const res = await fetch(`${API_BASE}/song_bank`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    // Silencioso si no hay red
+  }
+
+  return direct;
 };
 
 export const apiSaveBankSong = async (song: BankSong): Promise<boolean> => {
-  return await tursoSaveBankSong(song);
+  let success = false;
+  // 1. Intentar conexión directa a Turso SQLite
+  try {
+    const ok = await tursoSaveBankSong(song);
+    if (ok) success = true;
+  } catch (err) {
+    console.warn('Error en tursoSaveBankSong directo:', err);
+  }
+
+  // 2. Sincronizar o fallback con serverless /api/song_bank
+  try {
+    const res = await fetch(`${API_BASE}/song_bank`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(song),
+    });
+    if (res.ok) success = true;
+  } catch (err) {
+    console.warn('Error en /api/song_bank serverless:', err);
+  }
+
+  return success;
 };
 
 export const apiDeleteBankSong = async (songId: string): Promise<boolean> => {
-  return await tursoDeleteBankSong(songId);
+  let success = false;
+  try {
+    const ok = await tursoDeleteBankSong(songId);
+    if (ok) success = true;
+  } catch {}
+
+  try {
+    const res = await fetch(`${API_BASE}/song_bank?id=${encodeURIComponent(songId)}`, {
+      method: 'DELETE',
+    });
+    if (res.ok) success = true;
+  } catch {}
+
+  return success;
 };
+
 
