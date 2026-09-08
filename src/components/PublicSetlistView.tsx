@@ -519,14 +519,21 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                     >
                                       {/* Marcador de Repetición */}
                                       {measure.isRepeatStart && (
-                                        <span className="absolute left-1.5 top-1.5 text-xs font-black text-emerald-400 font-mono">
+                                        <span className="absolute left-2 top-1.5 text-xs font-black text-emerald-400 font-mono">
                                           |:
                                         </span>
                                       )}
                                       {measure.isRepeatEnd && (
-                                        <span className="absolute right-1.5 top-1.5 text-xs font-black text-emerald-400 font-mono">
-                                          :|
-                                        </span>
+                                        <div className="absolute right-2 top-1.5 flex items-center gap-1">
+                                          {measure.repeatCount && (
+                                            <span className="text-[10px] font-black px-1.5 py-0.2 bg-emerald-400/20 text-emerald-300 border border-emerald-400/50 rounded-md">
+                                              {measure.repeatCount}
+                                            </span>
+                                          )}
+                                          <span className="text-xs font-black text-emerald-400 font-mono">
+                                            :|
+                                          </span>
+                                        </div>
                                       )}
 
                                       {/* Acordes Principales (con soporte visual destacado para notas con bajo) */}

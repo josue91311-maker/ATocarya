@@ -125,6 +125,7 @@ export interface MeasureCell {
   annotations: string[]; // Anotaciones (ej. "Corte", "Stop", "2da vuelta")
   isRepeatStart?: boolean; // |:
   isRepeatEnd?: boolean; // :|
+  repeatCount?: string; // ej. "x2", "(x2)", "x4"
   rawText?: string;
 }
 
@@ -196,6 +197,16 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
     // Si la línea contiene barras de compás '|'
     if (trimmed.includes('|')) {
       const rowMeasures: MeasureCell[] = [];
+
+      // Detectar si la línea termina con repetición tipo :| (x2) o :| x2 o :| ×2
+      let lineRepeatCount: string | undefined = undefined;
+      const endRepeatMatch = trimmed.match(/:\|\s*(\(?\s*[xX×]\s*\d+\s*\)?|\(?\s*\d+\s*veces?\s*\)?)\s*$/);
+      if (endRepeatMatch) {
+        lineRepeatCount = endRepeatMatch[1].trim();
+        // Quitar el sufijo de repetición después de :| para no generar un segmento huérfano
+        trimmed = trimmed.replace(endRepeatMatch[0], ':|');
+      }
+
       // Separar por barras de compás
       const rawSegments = trimmed.split('|');
 
@@ -206,8 +217,18 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
           return;
         }
 
-        const isRepeatStart = segTrim.startsWith(':') || trimmed.includes('|:');
-        const isRepeatEnd = segTrim.endsWith(':') || trimmed.includes(':|');
+        // Si este segmento es puramente un indicador de repetición huérfano como (x2) o x2 o ×2
+        if (/^(\(?\s*[xX×]\s*\d+\s*\)?|\(?\s*\d+\s*veces?\s*\)?)$/.test(segTrim)) {
+          if (rowMeasures.length > 0) {
+            const last = rowMeasures[rowMeasures.length - 1];
+            last.isRepeatEnd = true;
+            last.repeatCount = segTrim;
+          }
+          return;
+        }
+
+        const isRepeatStart = segTrim.startsWith(':');
+        const isRepeatEnd = segTrim.endsWith(':');
 
         const cleanTokens = segTrim.replace(/^:/, '').replace(/:$/, '').trim().split(/\s+/);
         const chords: string[] = [];
@@ -217,6 +238,11 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
         cleanTokens.forEach(tok => {
           if (!tok) return;
           if (tok.startsWith('(') && tok.endsWith(')')) {
+            // Si es un conteo de repetición (x2), no es nota de paso
+            if (/^\(\s*[xX×]\s*\d+\s*\)$/.test(tok)) {
+              annotations.push(tok);
+              return;
+            }
             // Nota de paso: (D#dim)
             const noteContent = tok.slice(1, -1).trim();
             passingChords.push(noteContent);
@@ -238,6 +264,13 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
           });
         }
       });
+
+      // Si la línea tenía un lineRepeatCount al final, asignarlo al último compás con isRepeatEnd
+      if (lineRepeatCount && rowMeasures.length > 0) {
+        const lastRepeatMeasure = [...rowMeasures].reverse().find(m => m.isRepeatEnd) || rowMeasures[rowMeasures.length - 1];
+        lastRepeatMeasure.isRepeatEnd = true;
+        lastRepeatMeasure.repeatCount = lineRepeatCount;
+      }
 
       if (rowMeasures.length > 0) {
         currentSection.measures.push(rowMeasures);
