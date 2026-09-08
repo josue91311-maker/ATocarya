@@ -176,7 +176,14 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
       // Crear nuevo Player con el buffer cargado
       const player = new Tone.Player(toneBufferRef.current);
       player.playbackRate = playbackSpeed;
-      player.connect(pitchShiftRef.current);
+
+      // BYPASS TOTAL si el tono es 0 (Original):
+      // Conectar directamente Player -> Volume evitando cualquier artefacto de fase o modulación granular
+      if (semitones === 0) {
+        player.connect(volumeNodeRef.current);
+      } else {
+        player.connect(pitchShiftRef.current);
+      }
 
       const safeOffset = Math.max(0, Math.min(offset, toneBufferRef.current.duration));
       player.start(0, safeOffset);
@@ -242,9 +249,20 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   // Cambio de Tono en Semitonos (Pitch Shift sin alterar la velocidad)
   const handleSemitoneChange = (delta: number) => {
     setSemitones(delta);
-    if (pitchShiftRef.current) {
-      // Modifica la frecuencia y los formantes sin tocar playbackRate ni el tempo de la canción
+    if (pitchShiftRef.current && volumeNodeRef.current) {
       pitchShiftRef.current.pitch = delta;
+
+      // Si el reproductor está activo, conmutar la ruta de señal en caliente
+      if (playerRef.current) {
+        playerRef.current.disconnect();
+        if (delta === 0) {
+          // Retorno a Original: Bypass directo a Volume (audio 100% puro original sin procesamiento)
+          playerRef.current.connect(volumeNodeRef.current);
+        } else {
+          // Con transposición activa: enrutar a través de PitchShift
+          playerRef.current.connect(pitchShiftRef.current);
+        }
+      }
     }
   };
 
