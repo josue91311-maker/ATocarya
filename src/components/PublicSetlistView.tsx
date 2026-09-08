@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { ServiceDate, SongItem, SlotConfig } from '../types';
 import { 
@@ -18,7 +18,9 @@ import {
   Sliders,
   FileText,
   FileCheck,
-  Headphones
+  Headphones,
+  X,
+  Info
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { AudioTransposerPlayer } from './AudioTransposerPlayer';
@@ -31,7 +33,10 @@ import {
 import { 
   transposeChordChartText, 
   transposeChord, 
-  parseChordChart 
+  parseChordChart,
+  getChordDetails,
+  hasChordProNotation,
+  parseChordPro
 } from '../utils/chordTransposer';
 
 interface Props {
@@ -47,6 +52,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const [copiedLink, setCopiedLink] = useState(false);
   const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf' | 'audio'>('chords');
   const [transposeDelta, setTransposeDelta] = useState<number>(0);
+  const [inspectedChord, setInspectedChord] = useState<string | null>(null);
+  const [chordProMode, setChordProMode] = useState<'with-chords' | 'lyrics-only'>('with-chords');
 
   if (!service) {
     return (
@@ -124,6 +131,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
     }
   }, [activeSongIndex, hasChords, hasAudio, hasLyrics, hasPdf]);
 
+  // Limpiar acorde inspeccionado al cambiar de alabanza
+  useEffect(() => {
+    setInspectedChord(null);
+  }, [activeSongIndex]);
+
   // Cifrado transpuesto dinámico
   const rawChordChart = effectiveChordChart || '';
   const transposedChartText = transposeDelta !== 0 
@@ -131,10 +143,26 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
     : rawChordChart;
   const parsedSections = parseChordChart(transposedChartText);
 
-  // Tono transpuesto mostrado
+  // Tono transpuesto mostrado (usando Tonal)
   const displayedKey = activeSong?.key && transposeDelta !== 0
     ? transposeChord(activeSong.key.split(' ')[0], transposeDelta)
     : activeSong?.key;
+
+  // Desglose armónico inteligente del acorde seleccionado (Tonal.js)
+  const inspectedChordDetails = useMemo(() => {
+    if (!inspectedChord) return null;
+    return getChordDetails(inspectedChord);
+  }, [inspectedChord]);
+
+  // Detección y parseo de formato ChordPro
+  const isChordPro = useMemo(() => {
+    return hasChordProNotation(effectiveLyrics || '');
+  }, [effectiveLyrics]);
+
+  const parsedChordPro = useMemo(() => {
+    if (!isChordPro || !effectiveLyrics) return null;
+    return parseChordPro(effectiveLyrics, transposeDelta);
+  }, [isChordPro, effectiveLyrics, transposeDelta]);
 
   const handleCopyLink = async () => {
     try {
@@ -474,11 +502,57 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                             </span>
                           )}
                         </div>
-                        <div className="text-[11px] text-slate-400">
-                          <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1.5 align-middle"></span>
-                          <span>(Nota de Paso)</span>
+                        <div className="flex items-center gap-3 text-[11px] text-slate-400">
+                          <span className="hidden sm:inline text-slate-500">💡 Clic en un acorde para ver sus notas</span>
+                          <div>
+                            <span className="inline-block w-2.5 h-2.5 rounded-full bg-amber-400 mr-1.5 align-middle"></span>
+                            <span>(Nota de Paso)</span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Banner de Inspector Armónico Inteligente (Tonal.js) */}
+                      {inspectedChordDetails && (
+                        <div className="bg-emerald-950/95 border border-emerald-500/60 rounded-xl p-3 flex items-center justify-between text-xs text-emerald-200 shadow-lg">
+                          <div className="flex items-center gap-3 flex-wrap">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-mono font-black text-base text-emerald-300 px-2.5 py-0.5 bg-emerald-900/90 rounded-lg border border-emerald-400/50">
+                                {inspectedChordDetails.symbol}
+                              </span>
+                              {inspectedChordDetails.name && inspectedChordDetails.name !== inspectedChordDetails.symbol && (
+                                <span className="text-slate-300 font-medium capitalize">
+                                  ({inspectedChordDetails.name})
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-wrap">
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
+                                <Sparkles className="w-3 h-3 text-emerald-400" />
+                                <span>Notas del acorde:</span>
+                              </span>
+                              {inspectedChordDetails.notes.map((note, nIdx) => (
+                                <span 
+                                  key={nIdx}
+                                  className={`font-mono font-black px-1.5 py-0.5 rounded text-xs ${
+                                    note.includes('Bajo')
+                                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/50'
+                                      : 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30'
+                                  }`}
+                                >
+                                  {note}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => setInspectedChord(null)}
+                            className="p-1 hover:bg-emerald-900/80 rounded-lg text-emerald-400 hover:text-white transition-colors ml-2"
+                            title="Cerrar inspector"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
 
                       {/* Renderizado de Bloques por Sección y Grilla de Compases */}
                       <div className="space-y-4">
@@ -536,46 +610,69 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                                         </div>
                                       )}
 
-                                      {/* Acordes Principales (con soporte visual destacado para notas con bajo) */}
+                                      {/* Acordes Principales (con soporte visual destacado para notas con bajo e inspección) */}
                                       <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
                                         {measure.chords.map((chord, cIdx) => {
+                                          const isInspected = inspectedChord === chord;
                                           if (chord.includes('/')) {
                                             const [root, bass] = chord.split('/');
                                             return (
-                                              <span 
+                                              <button 
+                                                type="button"
                                                 key={cIdx} 
-                                                className="text-base sm:text-lg font-black font-mono text-emerald-300 tracking-wide inline-flex items-baseline gap-0.5"
-                                                title={`Acorde ${root} con bajo en ${bass}`}
+                                                onClick={() => setInspectedChord(isInspected ? null : chord)}
+                                                className={`text-base sm:text-lg font-black font-mono tracking-wide inline-flex items-baseline gap-0.5 transition-all rounded px-1 -mx-1 cursor-pointer ${
+                                                  isInspected
+                                                    ? 'bg-emerald-500/25 ring-1 ring-emerald-400 text-white scale-105'
+                                                    : 'text-emerald-300 hover:text-white hover:bg-slate-700/50'
+                                                }`}
+                                                title={`Clic para ver notas de ${chord}`}
                                               >
                                                 <span>{root}</span>
                                                 <span className="text-emerald-500/70 text-xs">/</span>
                                                 <span className="text-amber-300 text-xs sm:text-sm font-black bg-amber-400/15 px-1 py-0.2 rounded border border-amber-400/40">
                                                   {bass}
                                                 </span>
-                                              </span>
+                                              </button>
                                             );
                                           }
 
                                           return (
-                                            <span 
+                                            <button 
+                                              type="button"
                                               key={cIdx} 
-                                              className="text-base sm:text-lg font-black font-mono text-emerald-300 tracking-wide"
+                                              onClick={() => setInspectedChord(isInspected ? null : chord)}
+                                              className={`text-base sm:text-lg font-black font-mono tracking-wide transition-all rounded px-1 -mx-1 cursor-pointer ${
+                                                isInspected
+                                                  ? 'bg-emerald-500/25 ring-1 ring-emerald-400 text-white scale-105'
+                                                  : 'text-emerald-300 hover:text-white hover:bg-slate-700/50'
+                                              }`}
+                                              title={`Clic para ver notas de ${chord}`}
                                             >
                                               {chord}
-                                            </span>
+                                            </button>
                                           );
                                         })}
 
                                         {/* Notas de Paso resaltadas en Ámbar */}
-                                        {measure.passingChords.map((pch, pIdx) => (
-                                          <span 
-                                            key={pIdx} 
-                                            className="text-xs font-black font-mono px-1.5 py-0.5 bg-amber-400/20 text-amber-300 border border-amber-400/40 rounded-md"
-                                            title="Nota de Paso"
-                                          >
-                                            ({pch})
-                                          </span>
-                                        ))}
+                                        {measure.passingChords.map((pch, pIdx) => {
+                                          const isInspected = inspectedChord === pch;
+                                          return (
+                                            <button 
+                                              type="button"
+                                              key={pIdx} 
+                                              onClick={() => setInspectedChord(isInspected ? null : pch)}
+                                              className={`text-xs font-black font-mono px-1.5 py-0.5 rounded-md border transition-all cursor-pointer ${
+                                                isInspected
+                                                  ? 'bg-amber-400/35 text-amber-200 border-amber-300 ring-1 ring-amber-400'
+                                                  : 'bg-amber-400/20 text-amber-300 border-amber-400/40 hover:bg-amber-400/30'
+                                              }`}
+                                              title={`Nota de Paso (clic para ver notas de ${pch})`}
+                                            >
+                                              ({pch})
+                                            </button>
+                                          );
+                                        })}
                                       </div>
 
                                       {/* Anotaciones / Cortes */}
@@ -606,16 +703,143 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     </div>
                   )}
 
-                  {/* CONTENIDO 2: LETRA */}
+                  {/* CONTENIDO 2: LETRA (CON SOPORTE CHORDPRO INTELIGENTE) */}
                   {activeTab === 'lyrics' && hasLyrics && (
-                    <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl">
-                      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Letra de la Canción</span>
-                      </h4>
-                      <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
-                        {effectiveLyrics}
+                    <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                            <FileText className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Letra {isChordPro && '& Cifrado ChordPro'}</span>
+                          </h4>
+                          {isChordPro && transposeDelta !== 0 && (
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                              Transpuesto ({transposeDelta > 0 ? `+${transposeDelta}` : transposeDelta} st)
+                            </span>
+                          )}
+                        </div>
+
+                        {isChordPro && (
+                          <div className="flex items-center gap-1 bg-slate-200/80 p-0.5 rounded-xl text-xs font-bold">
+                            <button
+                              type="button"
+                              onClick={() => setChordProMode('with-chords')}
+                              className={`px-2.5 py-1 rounded-lg transition-all ${
+                                chordProMode === 'with-chords'
+                                  ? 'bg-white text-emerald-950 shadow-xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Con Acordes
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setChordProMode('lyrics-only')}
+                              className={`px-2.5 py-1 rounded-lg transition-all ${
+                                chordProMode === 'lyrics-only'
+                                  ? 'bg-white text-emerald-950 shadow-xs'
+                                  : 'text-slate-600 hover:text-slate-900'
+                              }`}
+                            >
+                              Solo Letra
+                            </button>
+                          </div>
+                        )}
                       </div>
+
+                      {/* Inspector flotante en letra si se hace clic en un acorde */}
+                      {inspectedChordDetails && (
+                        <div className="bg-emerald-950 text-white rounded-xl p-3 flex items-center justify-between text-xs shadow-md">
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            <span className="font-mono font-black text-sm text-emerald-300 px-2 py-0.5 bg-emerald-900 rounded-md border border-emerald-400/50">
+                              {inspectedChordDetails.symbol}
+                            </span>
+                            <span className="text-slate-300 font-medium">
+                              Notas:
+                            </span>
+                            {inspectedChordDetails.notes.map((note, nIdx) => (
+                              <span 
+                                key={nIdx}
+                                className={`font-mono font-bold px-1.5 py-0.5 rounded text-xs ${
+                                  note.includes('Bajo')
+                                    ? 'bg-amber-400/20 text-amber-300 border border-amber-400/50'
+                                    : 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30'
+                                }`}
+                              >
+                                {note}
+                              </span>
+                            ))}
+                          </div>
+                          <button 
+                            onClick={() => setInspectedChord(null)}
+                            className="p-1 hover:bg-emerald-900 rounded-md text-emerald-400 hover:text-white transition-colors"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Renderizado en Modo ChordPro */}
+                      {isChordPro && parsedChordPro && chordProMode === 'with-chords' ? (
+                        <div className="space-y-3 font-mono text-sm leading-relaxed overflow-x-auto pb-2">
+                          {parsedChordPro.map((line, lIdx) => {
+                            if (line.type === 'empty') {
+                              return <div key={lIdx} className="h-2" />;
+                            }
+
+                            if (line.type === 'section') {
+                              return (
+                                <div key={lIdx} className="pt-2">
+                                  <span className="text-xs font-black uppercase tracking-wider text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-lg inline-block font-sans">
+                                    {line.sectionTitle}
+                                  </span>
+                                </div>
+                              );
+                            }
+
+                            if (line.type === 'directive') {
+                              if (['key', 'tono', 'tempo', 'capo'].includes(line.directiveKey || '')) {
+                                return (
+                                  <div key={lIdx} className="text-xs font-bold text-slate-500 italic">
+                                    [{line.directiveKey?.toUpperCase()}: {line.directiveValue}]
+                                  </div>
+                                );
+                              }
+                              return null;
+                            }
+
+                            return (
+                              <div key={lIdx} className="flex flex-wrap items-end leading-none py-1 gap-x-1 gap-y-2">
+                                {line.segments?.map((seg, sIdx) => (
+                                  <span key={sIdx} className="inline-flex flex-col">
+                                    {seg.chord ? (
+                                      <button 
+                                        type="button"
+                                        onClick={() => setInspectedChord(inspectedChord === seg.chord ? null : (seg.chord || null))}
+                                        className="text-xs font-black font-mono text-emerald-700 select-none pb-0.5 tracking-tight hover:text-emerald-950 text-left transition-colors cursor-pointer"
+                                        title={`Clic para ver notas de ${seg.chord}`}
+                                      >
+                                        {seg.chord}
+                                      </button>
+                                    ) : (
+                                      <span className="text-xs invisible select-none pb-0.5">_</span>
+                                    )}
+                                    <span className="text-sm font-sans font-medium text-slate-800 whitespace-pre">
+                                      {seg.text || ' '}
+                                    </span>
+                                  </span>
+                                ))}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ) : (
+                        <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
+                          {isChordPro && chordProMode === 'lyrics-only'
+                            ? effectiveLyrics?.replace(/\[[A-G](?:#|b)?[^\]]*\]/g, '').replace(/\{[^}]*\}/g, '').trim()
+                            : effectiveLyrics}
+                        </div>
+                      )}
                     </div>
                   )}
 

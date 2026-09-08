@@ -1,8 +1,11 @@
+import { Note, Chord, Interval } from '@tonaljs/tonal';
+
 /**
  * Utilidades de Teoría Musical y Transposición para Cifrado Armónico
+ * Potenciado con @tonaljs/tonal y soporte estándar ChordPro
  */
 
-// Escalas cromáticas con sostenidos y bemoles
+// Escalas cromáticas con sostenidos y bemoles (usadas como fallback o referencia)
 const CHROMATIC_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 const CHROMATIC_FLAT = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
@@ -26,9 +29,33 @@ const NOTE_ALIASES: Record<string, number> = {
 export const CHORD_REGEX = /^[A-G](?:#|b)?(?:m|maj|min|aug|dim|sus|add|\d|\+|-)*(\/[A-G](?:#|b)?)?$/i;
 
 /**
- * Transpone una nota raíz individual por N semitonos
+ * Transpone una nota raíz individual por N semitonos utilizando teoría musical de Tonal.js
  */
 export const transposeRootNote = (note: string, semitones: number, preferFlats = false): string => {
+  if (!note || semitones === 0) return note;
+
+  try {
+    const interval = Interval.fromSemitones(semitones);
+    if (interval) {
+      const transposed = Note.transpose(note, interval);
+      let simplified = Note.simplify(transposed);
+      if (!simplified) simplified = transposed;
+
+      if (preferFlats && simplified.includes('#')) {
+        const enh = Note.enharmonic(simplified);
+        if (enh.includes('b')) simplified = enh;
+      } else if (!preferFlats && simplified.includes('b')) {
+        const enh = Note.enharmonic(simplified);
+        if (enh.includes('#')) simplified = enh;
+      }
+
+      if (simplified) return simplified;
+    }
+  } catch {
+    // Continuar a fallback
+  }
+
+  // Fallback seguro a escala cromática
   const upper = note.toUpperCase();
   const index = NOTE_ALIASES[upper];
   if (index === undefined) return note;
@@ -41,12 +68,12 @@ export const transposeRootNote = (note: string, semitones: number, preferFlats =
 };
 
 /**
- * Transpone un acorde completo (incluyendo bajo invertido /Bass)
+ * Transpone un acorde completo (incluyendo bajo invertido /Bass y extensiones complejas)
  * Ej: "D/F#" + 2 semitonos => "E/G#"
  * Ej: "Em7" + 1 semitono => "Fm7"
  */
 export const transposeChord = (chord: string, semitones: number, preferFlats = false): string => {
-  if (semitones === 0) return chord;
+  if (!chord || semitones === 0) return chord;
 
   // Si tiene bajo invertido (ej. D/F# o C2/E)
   if (chord.includes('/')) {
@@ -56,7 +83,18 @@ export const transposeChord = (chord: string, semitones: number, preferFlats = f
     return `${transposedMain}/${transposedBass}`;
   }
 
-  // Extraer la nota raíz (ej. "C#", "Bb", "G")
+  // Tokenizar raíz y modificador armónico con Tonal
+  try {
+    const [root, modifier] = Chord.tokenize(chord);
+    if (root) {
+      const transposedRoot = transposeRootNote(root, semitones, preferFlats);
+      return `${transposedRoot}${modifier || ''}`;
+    }
+  } catch {
+    // Continuar a fallback
+  }
+
+  // Fallback con Regex
   const rootMatch = chord.match(/^([A-G](?:#|b)?)(.*)$/i);
   if (!rootMatch) return chord;
 
@@ -66,12 +104,78 @@ export const transposeChord = (chord: string, semitones: number, preferFlats = f
 };
 
 /**
+ * Detalles de un acorde para el músico (notas que lo componen, intervalos y bajo)
+ */
+export interface ChordDetails {
+  symbol: string;
+  name: string;
+  notes: string[];
+  bass?: string;
+  quality?: string;
+}
+
+/**
+ * Obtiene el desglose armónico de un acorde para visualización en tooltip o panel
+ */
+export const getChordDetails = (chordStr: string): ChordDetails | null => {
+  if (!chordStr) return null;
+  const clean = chordStr.replace(/[.,:;()\[\]]/g, '').trim();
+  if (!clean) return null;
+
+  try {
+    let mainChord = clean;
+    let bassNote: string | undefined = undefined;
+
+    if (clean.includes('/')) {
+      const parts = clean.split('/');
+      mainChord = parts[0];
+      bassNote = parts[1];
+    }
+
+    const info = Chord.get(mainChord);
+    if (!info || info.empty) {
+      const [root] = Chord.tokenize(mainChord);
+      if (root) {
+        return {
+          symbol: clean,
+          name: clean,
+          notes: bassNote ? [`${bassNote} (Bajo)`, root] : [root],
+          bass: bassNote,
+        };
+      }
+      return null;
+    }
+
+    let notes = [...info.notes];
+    if (bassNote && !notes.includes(bassNote)) {
+      notes = [`${bassNote} (Bajo)`, ...notes];
+    }
+
+    return {
+      symbol: clean,
+      name: info.name || clean,
+      notes,
+      bass: bassNote,
+      quality: info.quality,
+    };
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Verifica si un token es un acorde válido
  */
 export const isChordToken = (token: string): boolean => {
   const clean = token.replace(/[.,:;()\[\]]/g, '').trim();
   if (!clean) return false;
-  return CHORD_REGEX.test(clean);
+  if (CHORD_REGEX.test(clean)) return true;
+  try {
+    const [root] = Chord.tokenize(clean);
+    return Boolean(root && root.length > 0 && ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(root[0].toUpperCase()));
+  } catch {
+    return false;
+  }
 };
 
 /**
@@ -93,7 +197,6 @@ export const transposeChordChartText = (text: string, semitones: number, preferF
     return line.replace(/\(([^)]+)\)|([A-G](?:#|b)?(?:m|maj|min|aug|dim|sus|add|\d|\+|-)*(?:\/[A-G](?:#|b)?)?)/g, (match, passingGroup, normalChord) => {
       // Si era una nota de paso entre paréntesis: (D#dim) o (D/F# paso)
       if (passingGroup !== undefined) {
-        // Puede contener palabras como "(G#dim paso)"
         const parts = passingGroup.split(' ');
         const transposedParts = parts.map((part: string) => {
           if (isChordToken(part)) {
@@ -114,6 +217,142 @@ export const transposeChordChartText = (text: string, semitones: number, preferF
   });
 
   return transposedLines.join('\n');
+};
+
+/**
+ * Soporte ChordPro estándar
+ */
+export interface ChordProSegment {
+  chord?: string;
+  text: string;
+}
+
+export interface ChordProLine {
+  type: 'directive' | 'section' | 'lyric' | 'empty';
+  directiveKey?: string;
+  directiveValue?: string;
+  sectionTitle?: string;
+  segments?: ChordProSegment[];
+  rawText: string;
+}
+
+/**
+ * Comprueba si un texto tiene sintaxis ChordPro:
+ * - Directivas tipo {title: ...}, {key: ...}
+ * - O acordes entre corchetes intercalados con letra: "Cuan [G]grande es [D/F#]Él"
+ */
+export const hasChordProNotation = (text: string): boolean => {
+  if (!text) return false;
+  if (/\{[a-zA-Z_-]+:[^}]*\}/.test(text)) return true;
+  // Letra con acordes entre corchetes ej: [G] o [D/F#] seguido o precedido de texto de letra
+  return /\[[A-G](?:#|b)?[^\]]*\][a-zA-ZáéíóúÁÉÍÓÚñÑ]/.test(text) ||
+         /[a-zA-ZáéíóúÁÉÍÓÚñÑ]\s*\[[A-G](?:#|b)?[^\]]*\]/.test(text);
+};
+
+/**
+ * Transpone el texto en formato ChordPro
+ */
+export const transposeChordProText = (text: string, semitones: number, preferFlats = false): string => {
+  if (!text || semitones === 0) return text;
+
+  // Reemplaza directivas {key: X}
+  let result = text.replace(/\{(?:key|tono):\s*([A-G](?:#|b)?m?)\}/gi, (_match, keyVal) => {
+    return `{key: ${transposeChord(keyVal, semitones, preferFlats)}}`;
+  });
+
+  // Reemplaza acordes entre corchetes [C], [D/F#], etc.
+  result = result.replace(/\[([A-G](?:#|b)?(?:m|maj|min|aug|dim|sus|add|\d|\+|-)*(?:\/[A-G](?:#|b)?)?)\]/g, (match, chordToken) => {
+    if (isChordToken(chordToken)) {
+      return `[${transposeChord(chordToken, semitones, preferFlats)}]`;
+    }
+    return match;
+  });
+
+  return result;
+};
+
+/**
+ * Parsea un texto ChordPro en líneas estructuradas con segmentos (acorde encima de letra)
+ */
+export const parseChordPro = (text: string, semitones = 0, preferFlats = false): ChordProLine[] => {
+  if (!text) return [];
+
+  const transposedText = semitones !== 0 ? transposeChordProText(text, semitones, preferFlats) : text;
+  const lines = transposedText.split('\n');
+
+  return lines.map(line => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      return { type: 'empty', rawText: line };
+    }
+
+    // Directiva {directive: value}
+    const directiveMatch = trimmed.match(/^\{([a-zA-Z_-]+)(?::\s*([^}]*))?\}$/);
+    if (directiveMatch) {
+      return {
+        type: 'directive',
+        directiveKey: directiveMatch[1].toLowerCase(),
+        directiveValue: directiveMatch[2] ? directiveMatch[2].trim() : '',
+        rawText: line,
+      };
+    }
+
+    // Encabezado de sección [VERSO 1], [CORO], [INTRO], etc.
+    const sectionMatch = trimmed.match(/^\[([A-Z0-9\s/]+)\]$/i);
+    if (sectionMatch && !isChordToken(sectionMatch[1])) {
+      return {
+        type: 'section',
+        sectionTitle: sectionMatch[1].trim(),
+        rawText: line,
+      };
+    }
+
+    // Línea de letra con acordes intercalados: dividir por tokens [Acorde]
+    const segments: ChordProSegment[] = [];
+    const regex = /\[([^\]]+)\]/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = regex.exec(line)) !== null) {
+      const matchIndex = match.index;
+      const textBefore = line.slice(lastIndex, matchIndex);
+      const chordCandidate = match[1].trim();
+
+      if (segments.length === 0 && textBefore.length > 0) {
+        segments.push({ text: textBefore });
+      } else if (segments.length > 0 && textBefore.length > 0) {
+        segments[segments.length - 1].text += textBefore;
+      }
+
+      if (isChordToken(chordCandidate)) {
+        segments.push({ chord: chordCandidate, text: '' });
+      } else {
+        const fallbackText = `[${match[1]}]`;
+        if (segments.length > 0) {
+          segments[segments.length - 1].text += fallbackText;
+        } else {
+          segments.push({ text: fallbackText });
+        }
+      }
+
+      lastIndex = regex.lastIndex;
+    }
+
+    const remainingText = line.slice(lastIndex);
+    if (remainingText) {
+      if (segments.length > 0) {
+        segments[segments.length - 1].text += remainingText;
+      } else {
+        segments.push({ text: remainingText });
+      }
+    }
+
+    return {
+      type: 'lyric',
+      segments,
+      rawText: line,
+    };
+  });
 };
 
 /**
