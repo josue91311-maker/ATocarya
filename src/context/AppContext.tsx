@@ -829,11 +829,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, message: 'Servicio no encontrado.' };
     }
 
-    // Validación de permisos estricta: Administrador o Voz Director (por rol o asignado en el culto)
+    // Validación de permisos estricta: Administrador o Voz Director programado ese día
+    const isScheduledInThisService = Boolean(
+      musicianUser && Object.values(service.slots || {}).some(
+        slot => slot && slot.musicianId === musicianUser.id
+      )
+    );
     const isDirectorAssigned = Boolean(
       musicianUser && (
-        musicianUser.primaryInstrument === 'Voz Director' ||
-        service.slots?.voz_director?.musicianId === musicianUser.id
+        service.slots?.voz_director?.musicianId === musicianUser.id ||
+        (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
       )
     );
 
