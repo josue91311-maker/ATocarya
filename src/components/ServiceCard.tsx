@@ -137,7 +137,10 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
 
         {/* Setlist Indicator / Direct Link */}
         {(() => {
-          const canManage = isAdminAuthenticated;
+          const isVozDirector = Boolean(
+            musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+          );
+          const canManage = isAdminAuthenticated || isVozDirector;
           const songsCount = service.songs?.length || 0;
           const isPublished = Boolean(service.isSongsPublished && songsCount > 0);
 

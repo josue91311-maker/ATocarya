@@ -143,6 +143,7 @@ const MainRouter: React.FC = () => {
                 {mobileMusicianView === 'home' ? (
                   <MusicianMobileHome 
                     onSelectService={(s) => setSelectedService(s)}
+                    onOpenSetlist={(s) => setSetlistModalService(s)}
                     onGoToFullCalendar={() => setMobileMusicianView('full-calendar')}
                   />
                 ) : (
@@ -156,6 +157,7 @@ const MainRouter: React.FC = () => {
                     </button>
                     <CalendarView 
                       onSelectService={(s) => setSelectedService(s)} 
+                      onOpenSetlist={(s) => setSetlistModalService(s)}
                     />
                   </div>
                 )}
@@ -165,6 +167,7 @@ const MainRouter: React.FC = () => {
               <div className="hidden md:block">
                 <CalendarView 
                   onSelectService={(s) => setSelectedService(s)} 
+                  onOpenSetlist={(s) => setSetlistModalService(s)}
                 />
               </div>
             </>
@@ -186,6 +189,7 @@ const MainRouter: React.FC = () => {
             service={activeSelectedService}
             onClose={() => setSelectedService(null)}
             isMusicianView={true}
+            onOpenSetlist={(s) => setSetlistModalService(s)}
           />
         )}
 

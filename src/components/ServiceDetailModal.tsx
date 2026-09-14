@@ -284,7 +284,10 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
         {/* Sección de Repertorio de Canciones (Setlist) */}
         {(() => {
-          const canManageSetlist = isAdminAuthenticated;
+          const isVozDirector = Boolean(
+            musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+          );
+          const canManageSetlist = isAdminAuthenticated || isVozDirector;
           const songs = service.songs || [];
           const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
           const publicUrl = `/#/repertorio/${service.id}`;

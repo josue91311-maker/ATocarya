@@ -25,6 +25,7 @@ interface Props {
 
 export const MusicianMobileHome: React.FC<Props> = ({ 
   onSelectService, 
+  onOpenSetlist,
   onGoToFullCalendar 
 }) => {
   const { musicianUser, services, claimSlot, releaseSlot } = useApp();
@@ -195,6 +196,8 @@ export const MusicianMobileHome: React.FC<Props> = ({
               const hasSongs = Boolean(service.songs && songsCount > 0);
               const isPublished = Boolean(service.isSongsPublished && hasSongs);
 
+              const isVozDirector = Boolean(service.slots?.voz_director?.musicianId === musicianUser.id);
+
               return (
                 <div 
                   key={service.id}
@@ -249,7 +252,18 @@ export const MusicianMobileHome: React.FC<Props> = ({
                   {/* =========================================================== */}
                   {/* BOTÓN ESTRELLA: ENLACE DIRECTO A CANCIONES (REPERTORIO) */}
                   {/* =========================================================== */}
-                  <div className="pt-2 border-t border-slate-100">
+                  <div className="pt-2 border-t border-slate-100 space-y-2">
+                    {/* Botón rápido exclusivo para Voz Director */}
+                    {isVozDirector && onOpenSetlist && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenSetlist(service)}
+                        className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm shadow-amber-600/20 transition-all active:scale-[0.98]"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-100" />
+                        <span>🎵 Gestionar / Elegir Canciones (Voz Director)</span>
+                      </button>
+                    )}
                     {isPublished ? (
                       <a
                         href={`/#/repertorio/${service.id}`}
