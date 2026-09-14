@@ -285,9 +285,13 @@ export const ServiceDetailModal: React.FC<Props> = ({
         {/* Sección de Repertorio de Canciones (Setlist) */}
         {(() => {
           const isVozDirector = Boolean(
-            musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+            musicianUser && (
+              musicianUser.primaryInstrument === 'Voz Director' ||
+              service.slots?.voz_director?.musicianId === musicianUser.id
+            )
           );
-          const canManageSetlist = isAdminAuthenticated || isVozDirector;
+          // OJO: En la vista del músico (isMusicianView), ÚNICAMENTE si dice Voz Director puede gestionar canciones
+          const canManageSetlist = isMusicianView ? isVozDirector : (isAdminAuthenticated || isVozDirector);
           const songs = service.songs || [];
           const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
           const publicUrl = `/#/repertorio/${service.id}`;

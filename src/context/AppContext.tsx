@@ -223,11 +223,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
 
     setMusicianUser(musician);
+    // Limpiar sesión de administrador al usar portal de músico para evitar herencia accidental de permisos
+    setIsAdminAuthenticated(false);
     return { success: true };
   };
 
   const logoutMusician = () => {
     setMusicianUser(null);
+    setIsAdminAuthenticated(false);
   };
 
   // Admin Auth
@@ -826,9 +829,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return { success: false, message: 'Servicio no encontrado.' };
     }
 
-    // Validación de permisos estricta: Administrador o Voz Director asignado en esta fecha
+    // Validación de permisos estricta: Administrador o Voz Director (por rol o asignado en el culto)
     const isDirectorAssigned = Boolean(
-      musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+      musicianUser && (
+        musicianUser.primaryInstrument === 'Voz Director' ||
+        service.slots?.voz_director?.musicianId === musicianUser.id
+      )
     );
 
     if (!isAdminAuthenticated && !isDirectorAssigned) {

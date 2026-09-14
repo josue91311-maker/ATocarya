@@ -138,9 +138,13 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
         {/* Setlist Indicator / Direct Link */}
         {(() => {
           const isVozDirector = Boolean(
-            musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+            musicianUser && (
+              musicianUser.primaryInstrument === 'Voz Director' ||
+              service.slots?.voz_director?.musicianId === musicianUser.id
+            )
           );
-          const canManage = isAdminAuthenticated || isVozDirector;
+          // OJO: Si hay un músico en sesión, ÚNICAMENTE si dice Voz Director puede editar canciones
+          const canManage = musicianUser ? isVozDirector : isAdminAuthenticated;
           const songsCount = service.songs?.length || 0;
           const isPublished = Boolean(service.isSongsPublished && songsCount > 0);
 

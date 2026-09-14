@@ -104,11 +104,14 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
   if (!isOpen) return null;
 
-  // Permisos: Solo Admin o el músico asignado como Voz Director en este culto
+  // Permisos: Si hay un músico en sesión, ÚNICAMENTE si dice Voz Director puede gestionar canciones
   const isVozDirector = Boolean(
-    musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
+    musicianUser && (
+      musicianUser.primaryInstrument === 'Voz Director' ||
+      service.slots?.voz_director?.musicianId === musicianUser.id
+    )
   );
-  const canEdit = isAdminAuthenticated || isVozDirector;
+  const canEdit = musicianUser ? isVozDirector : isAdminAuthenticated;
 
   if (!canEdit) {
     return (

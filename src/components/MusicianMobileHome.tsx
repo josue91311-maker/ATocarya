@@ -196,7 +196,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
               const hasSongs = Boolean(service.songs && songsCount > 0);
               const isPublished = Boolean(service.isSongsPublished && hasSongs);
 
-              const isVozDirector = Boolean(service.slots?.voz_director?.musicianId === musicianUser.id);
+              const isVozDirector = Boolean(
+                musicianUser && (
+                  musicianUser.primaryInstrument === 'Voz Director' ||
+                  service.slots?.voz_director?.musicianId === musicianUser.id
+                )
+              );
 
               return (
                 <div 

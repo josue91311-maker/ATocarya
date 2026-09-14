@@ -165,7 +165,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
-                {onOpenSetlist && (isAdminAuthenticated || Boolean(musicianUser && nextService.slots?.voz_director?.musicianId === musicianUser.id)) && (
+                {onOpenSetlist && Boolean(musicianUser && (musicianUser.primaryInstrument === 'Voz Director' || nextService.slots?.voz_director?.musicianId === musicianUser.id)) && (
                   <button
                     type="button"
                     onClick={() => onOpenSetlist(nextService)}
