@@ -20,6 +20,13 @@ import {
 } from 'lucide-react';
 import { extractYouTubeId, getYouTubeEmbedUrl, getYouTubeThumbnailUrl, getExternalMusicToolLinks } from '../utils/youtubeUtils';
 import { ChordChartEditor } from './ChordChartEditor';
+import { 
+  calculateSemitoneDistance, 
+  formatSemitoneShiftDescription, 
+  transposeChordChartText, 
+  transposeChordProText, 
+  hasChordProNotation 
+} from '../utils/chordTransposer';
 
 
 interface Props {
@@ -64,13 +71,15 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const [activeFormTab, setActiveFormTab] = useState<'chords' | 'lyrics' | 'external'>('chords');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Estados para selección desde el Banco Central y transposición automática
+  const [bankSearchFilter, setBankSearchFilter] = useState('');
+  const [baseChordChart, setBaseChordChart] = useState('');
+  const [baseLyrics, setBaseLyrics] = useState('');
+
   if (!isOpen) return null;
 
-  // Verificación estricta de permisos: Admin o Voz Director asignado en esta fecha
-  const isDirector = Boolean(
-    musicianUser && service.slots?.voz_director?.musicianId === musicianUser.id
-  );
-  const canEdit = isAdminAuthenticated || isDirector;
+  // Verificación estricta de permisos: Solo el Administrador puede crear y gestionar música
+  const canEdit = isAdminAuthenticated;
 
   if (!canEdit) {
     return (
@@ -79,7 +88,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
           <Lock className="w-10 h-10 text-rose-500 mx-auto mb-3" />
           <h3 className="text-lg font-bold text-slate-900">Acceso Restringido</h3>
           <p className="text-xs text-slate-500 mt-2">
-            Solo el <strong>Administrador</strong> o el músico asignado como <strong>Voz Director</strong> para este culto pueden editar el repertorio de canciones.
+            Los músicos no pueden crear ni gestionar la música. Solo el <strong>Administrador</strong> tiene autorización para gestionar el repertorio oficial.
           </p>
           <button
             onClick={onClose}
@@ -96,29 +105,58 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const origin = window.location.origin || 'https://atocarya.vercel.app';
   const publicRepertoireUrl = `${origin}/#/repertorio/${service.id}`;
 
+  const handleKeyChange = (targetKey: string) => {
+    setNewKey(targetKey);
+    const baseKey = newOriginalKey || 'G';
+    const delta = calculateSemitoneDistance(baseKey, targetKey);
+
+    if (baseChordChart) {
+      const transposedChart = delta !== 0 
+        ? transposeChordChartText(baseChordChart, delta) 
+        : baseChordChart;
+      setNewChordChart(transposedChart);
+    }
+
+    if (baseLyrics && hasChordProNotation(baseLyrics)) {
+      const transposedL = delta !== 0 
+        ? transposeChordProText(baseLyrics, delta) 
+        : baseLyrics;
+      setNewLyrics(transposedL);
+    }
+  };
+
   const handleStartEdit = (song: SongItem) => {
     const bankMatch = songBank.find(
       b => b.id === song.id || b.title.trim().toLowerCase() === song.title.trim().toLowerCase()
     );
     setEditingSongId(song.id);
-    setSelectedBankSongId(bankMatch?.id || null);
+    setSelectedBankSongId(bankMatch?.id || song.id);
     setNewTitle(song.title);
     setNewUrl(song.youtubeUrl || bankMatch?.youtubeUrl || '');
     setNewAudioUrl(song.audioUrl || bankMatch?.audioUrl || '');
-    setNewKey(song.key || bankMatch?.defaultKey || 'G');
-    setNewOriginalKey(song.originalKey || bankMatch?.originalKey || '');
+
+    const baseChart = bankMatch?.chordChart || song.chordChart || '';
+    const baseL = bankMatch?.lyrics || song.lyrics || '';
+    setBaseChordChart(baseChart);
+    setBaseLyrics(baseL);
+
+    const baseKey = song.originalKey || bankMatch?.originalKey || bankMatch?.defaultKey || song.key || 'G';
+    setNewOriginalKey(baseKey);
+    setNewKey(song.key || baseKey);
     setNewBpm(song.bpm ? String(song.bpm) : (bankMatch?.bpm ? String(bankMatch.bpm) : ''));
     setNewNotes(song.notes || bankMatch?.notes || '');
-    setNewChordChart(song.chordChart || bankMatch?.chordChart || '');
-    setNewLyrics(song.lyrics || bankMatch?.lyrics || '');
+    setNewChordChart(song.chordChart || baseChart);
+    setNewLyrics(song.lyrics || baseL);
     setNewChordsUrl(song.chordsUrl || bankMatch?.chordsUrl || '');
-    setSaveToBankChecked(true);
+    setSaveToBankChecked(false);
     setErrorMsg(null);
   };
 
   const handleCancelEdit = () => {
     setEditingSongId(null);
     setSelectedBankSongId(null);
+    setBaseChordChart('');
+    setBaseLyrics('');
     setSaveToBankChecked(false);
     setNewTitle('');
     setNewUrl('');
@@ -136,24 +174,27 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   const handleSelectFromBank = (bankSong: BankSong) => {
     setSelectedBankSongId(bankSong.id);
     setNewTitle(bankSong.title);
+    setBaseChordChart(bankSong.chordChart || '');
+    setBaseLyrics(bankSong.lyrics || '');
+    const baseKey = bankSong.originalKey || bankSong.defaultKey || 'G';
+    setNewOriginalKey(baseKey);
+    setNewKey(baseKey);
     if (bankSong.youtubeUrl) setNewUrl(bankSong.youtubeUrl);
     if (bankSong.audioUrl) setNewAudioUrl(bankSong.audioUrl);
-    if (bankSong.defaultKey) setNewKey(bankSong.defaultKey);
-    if (bankSong.originalKey) setNewOriginalKey(bankSong.originalKey);
     if (bankSong.bpm) setNewBpm(String(bankSong.bpm));
     if (bankSong.notes) setNewNotes(bankSong.notes);
     if (bankSong.chordChart) setNewChordChart(bankSong.chordChart);
     if (bankSong.lyrics) setNewLyrics(bankSong.lyrics);
     if (bankSong.chordsUrl) setNewChordsUrl(bankSong.chordsUrl);
-    // Al cargar del banco NO debe auto-guardar nuevamente en el banco
     setSaveToBankChecked(false);
     setShowBankSuggestions(false);
+    setErrorMsg(null);
   };
 
   const handleAddOrUpdateSong = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim()) {
-      setErrorMsg('Por favor ingresa el título de la canción.');
+    if (!newTitle.trim() || (!editingSongId && !selectedBankSongId)) {
+      setErrorMsg('Debes seleccionar una canción del Banco Central de Canciones.');
       return;
     }
 
@@ -180,37 +221,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       setSongs(prev => [...prev, songData]);
     }
 
-    // Si el usuario explícitamente marcó guardar o actualizar en el banco central:
-    if (saveToBankChecked) {
-      saveBankSong({
-        id: selectedBankSongId || undefined,
-        title: songData.title,
-        defaultKey: songData.key,
-        originalKey: songData.originalKey,
-        bpm: songData.bpm,
-        youtubeUrl: songData.youtubeUrl,
-        audioUrl: songData.audioUrl,
-        chordsUrl: songData.chordsUrl,
-        chordChart: songData.chordChart || '',
-        lyrics: songData.lyrics || '',
-        notes: songData.notes,
-      }).catch(err => console.warn('Error al sincronizar con banco de canciones:', err));
-    }
-
     // Resetear formulario
-    setSelectedBankSongId(null);
-    setSaveToBankChecked(false);
-    setNewTitle('');
-    setNewUrl('');
-    setNewAudioUrl('');
-    setNewKey('G');
-    setNewOriginalKey('');
-    setNewBpm('');
-    setNewNotes('');
-    setNewChordChart('');
-    setNewLyrics('');
-    setNewChordsUrl('');
-    setErrorMsg(null);
+    handleCancelEdit();
   };
 
   const handleRemoveSong = (id: string) => {
@@ -453,6 +465,19 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                                   (Original: {song.originalKey})
                                 </span>
                               )}
+                              {song.key && song.originalKey && song.key !== song.originalKey && (() => {
+                                const diff = calculateSemitoneDistance(song.originalKey, song.key);
+                                if (diff === 0) return null;
+                                return (
+                                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${
+                                    diff < 0 
+                                      ? 'bg-amber-50 text-amber-800 border-amber-200' 
+                                      : 'bg-teal-50 text-teal-800 border-teal-200'
+                                  }`}>
+                                    {diff < 0 ? `⬇️ ${Math.abs(diff)} semitono${Math.abs(diff) > 1 ? 's' : ''} abajo` : `⬆️ +${diff} semitono${diff > 1 ? 's' : ''} arriba`}
+                                  </span>
+                                );
+                              })()}
                               {song.bpm && (
                                 <span className="text-[10px] text-slate-500 font-mono">
                                   {song.bpm} BPM
@@ -567,26 +592,23 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
             )}
           </div>
 
-          {/* Formulario Agregar / Editar Canción */}
-          <form 
-            onSubmit={handleAddOrUpdateSong} 
-            className={`p-4 sm:p-5 border rounded-2xl space-y-3 transition-colors ${
-              editingSongId 
-                ? 'bg-amber-50/70 border-amber-300 ring-2 ring-amber-300/50' 
-                : 'bg-slate-50 border-slate-200'
-            }`}
-          >
+          {/* Formulario Agregar (del Banco) / Editar Canción */}
+          <div className={`p-4 sm:p-5 border rounded-2xl space-y-4 transition-colors ${
+            editingSongId 
+              ? 'bg-amber-50/70 border-amber-300 ring-2 ring-amber-300/50' 
+              : 'bg-slate-50 border-slate-200'
+          }`}>
             <div className="flex items-center justify-between">
               <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
                 {editingSongId ? (
                   <>
                     <Sparkles className="w-4 h-4 text-amber-600" />
-                    <span className="text-amber-900">Modificar Canción Seleccionada</span>
+                    <span className="text-amber-900">Modificar Tonalidad y Datos del Culto</span>
                   </>
                 ) : (
                   <>
                     <Plus className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Agregar Nueva Canción</span>
+                    <span>Añadir Canción al Culto (Consumir del Banco Central)</span>
                   </>
                 )}
               </h4>
@@ -601,178 +623,256 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               )}
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="relative">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="block text-[11px] font-bold text-slate-700">
-                    Nombre de la Canción *
+            {/* PASO 1: SELECCIÓN EXCLUSIVA DEL BANCO DE CANCIONES (REQUISITO 3: NO CREAR AQUÍ, CONSUMIR DEL BANCO) */}
+            {!editingSongId && !selectedBankSongId ? (
+              <div className="space-y-3 bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-800">
+                    1. Selecciona la Canción del Banco Central ({songBank.length} disponibles)
                   </label>
-                  {songBank.length > 0 && (
-                    <span className="text-[10px] text-emerald-700 font-bold">
-                      💡 {songBank.length} en tu Banco
-                    </span>
+                  <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded font-bold border border-emerald-200">
+                    Consumo exclusivo del Banco
+                  </span>
+                </div>
+
+                <div className="relative">
+                  <input
+                    type="text"
+                    placeholder="Escribe para filtrar en el banco (ej. La Bendición, Cuan Grande, etc.)..."
+                    value={bankSearchFilter}
+                    onChange={(e) => setBankSearchFilter(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                {songBank.length === 0 ? (
+                  <div className="p-4 text-center border border-dashed border-amber-300 rounded-xl bg-amber-50/60 text-xs text-amber-900">
+                    <p className="font-bold">⚠️ El Banco Central de Canciones está vacío</p>
+                    <p className="text-[11px] text-amber-800 mt-1">
+                      Para añadir canciones a este culto, primero debes darlas de alta en la pestaña <strong>Banco Canciones</strong>.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="max-h-56 overflow-y-auto space-y-1.5 pr-1 divide-y divide-slate-100">
+                    {songBank
+                      .filter(b => {
+                        if (!bankSearchFilter.trim()) return true;
+                        const term = bankSearchFilter.toLowerCase();
+                        return b.title.toLowerCase().includes(term) || (b.artist && b.artist.toLowerCase().includes(term));
+                      })
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="pt-1.5 first:pt-0 flex items-center justify-between p-2.5 rounded-xl hover:bg-emerald-50/70 border border-transparent hover:border-emerald-200 transition-all gap-3"
+                        >
+                          <div className="min-w-0">
+                            <h5 className="text-xs font-bold text-slate-900 truncate">
+                              {item.title}
+                            </h5>
+                            <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-500 flex-wrap">
+                              {item.defaultKey && (
+                                <span className="font-bold text-emerald-800 bg-emerald-100/70 px-1.5 py-0.2 rounded">
+                                  Tono: {item.defaultKey}
+                                </span>
+                              )}
+                              {item.artist && <span>· {item.artist}</span>}
+                              {item.bpm && <span>· {item.bpm} BPM</span>}
+                              {item.audioUrl && <span className="text-teal-700 font-semibold">· 🎧 Audio</span>}
+                              {item.chordChart && <span className="text-indigo-700 font-semibold">· 🎸 Cifrado</span>}
+                              {item.lyrics && <span className="text-blue-700 font-semibold">· 🎤 Letra</span>}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleSelectFromBank(item)}
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl text-xs font-black flex items-center gap-1 shadow-2xs transition-all flex-shrink-0"
+                          >
+                            <Plus className="w-3.5 h-3.5 stroke-[3]" />
+                            <span>Seleccionar</span>
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* CANCIÓN SELECCIONADA Y CONFIGURACIÓN DE TONO AUTOMÁTICO */
+              <form onSubmit={handleAddOrUpdateSong} className="space-y-4">
+                {/* Banner de Canción Maestra del Banco */}
+                <div className="p-3 bg-white border border-emerald-200 rounded-2xl flex items-center justify-between gap-3 shadow-2xs">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0">
+                      <Music className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
+                        Canción del Banco Seleccionada
+                      </span>
+                      <h4 className="text-sm font-bold text-slate-900 truncate">
+                        {newTitle}
+                      </h4>
+                      <div className="flex items-center gap-2 text-[10px] text-slate-500 mt-0.5">
+                        <span>Tonalidad Original: <strong className="text-slate-800">{newOriginalKey || 'G'}</strong></span>
+                        {newBpm && <span>· {newBpm} BPM</span>}
+                      </div>
+                    </div>
+                  </div>
+
+                  {!editingSongId && (
+                    <button
+                      type="button"
+                      onClick={handleCancelEdit}
+                      className="px-2.5 py-1 text-xs text-slate-500 hover:text-rose-600 border border-slate-200 rounded-lg font-medium hover:bg-slate-50 transition-colors flex-shrink-0"
+                    >
+                      Cambiar canción
+                    </button>
                   )}
                 </div>
 
-                <input
-                  type="text"
-                  placeholder="ej. La Bendición, Way Maker, etc."
-                  value={newTitle}
-                  onFocus={() => setShowBankSuggestions(true)}
-                  onChange={(e) => {
-                    setNewTitle(e.target.value);
-                    setShowBankSuggestions(true);
-                  }}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
-                />
+                {/* PASO 2: TONALIDAD A CANTAR Y TRANSPOSICIÓN AUTOMÁTICA (REQUISITO 4) */}
+                <div className="p-3.5 bg-white border border-slate-200 rounded-2xl space-y-2.5 shadow-2xs">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-slate-900">
+                      2. Tonalidad en que se va a cantar en este culto: <strong className="text-emerald-700 text-sm font-black">{newKey || 'Sin tono'}</strong>
+                    </label>
+                    <span className="text-[10px] text-slate-500">
+                      Original: <strong>{newOriginalKey || 'G'}</strong>
+                    </span>
+                  </div>
 
-                {/* Desplegable de Autocompletado desde el Banco de Canciones */}
-                {showBankSuggestions && newTitle.trim().length > 0 && (
-                  (() => {
-                    const matches = songBank.filter(b => 
-                      b.title.toLowerCase().includes(newTitle.trim().toLowerCase())
-                    ).slice(0, 5);
+                  {/* Botones rápidos de notas */}
+                  <div className="flex flex-wrap gap-1">
+                    {COMMON_KEYS.map((k) => (
+                      <button
+                        key={k}
+                        type="button"
+                        onClick={() => handleKeyChange(k)}
+                        className={`px-2.5 py-1 rounded-xl text-xs font-black transition-all ${
+                          newKey === k
+                            ? 'bg-emerald-600 text-white shadow-xs scale-105 ring-2 ring-emerald-400/40'
+                            : 'bg-slate-50 border border-slate-200 text-slate-700 hover:border-emerald-300 hover:bg-emerald-50/50'
+                        }`}
+                      >
+                        {k}
+                      </button>
+                    ))}
+                  </div>
 
-                    if (matches.length === 0) return null;
+                  <div className="grid grid-cols-2 gap-2 pt-1">
+                    <div>
+                      <span className="text-[10px] text-slate-500 font-medium block mb-1">
+                        Escribir otro tono a cantar:
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="ej. Sol menor (Gm)"
+                        value={newKey}
+                        onChange={(e) => handleKeyChange(e.target.value)}
+                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-emerald-500 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-500 font-medium block mb-1">
+                        Tono Original del tema:
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="Tono original de la pista o tema"
+                        value={newOriginalKey}
+                        onChange={(e) => {
+                          setNewOriginalKey(e.target.value);
+                          const delta = calculateSemitoneDistance(e.target.value, newKey);
+                          if (baseChordChart) {
+                            setNewChordChart(delta !== 0 ? transposeChordChartText(baseChordChart, delta) : baseChordChart);
+                          }
+                        }}
+                        className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-xl bg-slate-50 focus:bg-white focus:outline-none focus:border-emerald-500"
+                      />
+                    </div>
+                  </div>
 
-                    return (
-                      <div className="absolute left-0 right-0 top-full mt-1 z-30 bg-white border border-slate-200 rounded-xl shadow-xl overflow-hidden py-1 divide-y divide-slate-100">
-                        <div className="px-3 py-1 bg-slate-50 text-[10px] font-bold uppercase tracking-wider text-slate-500 flex items-center justify-between">
-                          <span>Canciones en el Banco</span>
-                          <button
-                            type="button"
-                            onClick={() => setShowBankSuggestions(false)}
-                            className="text-slate-400 hover:text-slate-600 font-normal text-xs"
-                          >
-                            ✕
-                          </button>
+                  {/* INDICADOR EN TIEMPO REAL DE TRANSPOSICIÓN Y BAJADA/SUBIDA DE TONO */}
+                  {(() => {
+                    const delta = calculateSemitoneDistance(newOriginalKey || 'G', newKey || 'G');
+                    if (delta === 0) {
+                      return (
+                        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 flex items-center gap-2">
+                          <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+                          <span>
+                            <strong>Tono Original:</strong> Se cantará en la misma tonalidad original (<strong>{newOriginalKey || newKey}</strong>).
+                          </span>
                         </div>
-                        {matches.map(item => (
-                          <div
-                            key={item.id}
-                            onClick={() => handleSelectFromBank(item)}
-                            className="px-3 py-2 hover:bg-emerald-50 cursor-pointer transition-colors flex items-center justify-between gap-2"
-                          >
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-slate-900 truncate">
-                                {item.title}
-                              </p>
-                              <div className="flex items-center gap-1.5 text-[10px] text-slate-500">
-                                {item.defaultKey && <span className="font-semibold text-emerald-800">Tono: {item.defaultKey}</span>}
-                                {item.artist && <span>· {item.artist}</span>}
-                                {item.audioUrl && <span>· 🎧 Audio</span>}
-                                {item.chordsUrl && <span>· 📄 PDF</span>}
-                                {item.chordChart && <span>· 🎸 Cifrado</span>}
-                              </div>
-                            </div>
-                            <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded flex-shrink-0">
-                              Cargar Datos
-                            </span>
-                          </div>
-                        ))}
+                      );
+                    }
+
+                    const isLower = delta < 0;
+                    return (
+                      <div className={`p-3 rounded-xl border text-xs flex items-start gap-2.5 shadow-2xs ${
+                        isLower 
+                          ? 'bg-amber-50/90 border-amber-300 text-amber-950' 
+                          : 'bg-teal-50/90 border-teal-300 text-teal-950'
+                      }`}>
+                        <Sparkles className={`w-4 h-4 mt-0.5 flex-shrink-0 animate-pulse ${
+                          isLower ? 'text-amber-600' : 'text-teal-600'
+                        }`} />
+                        <div className="space-y-0.5">
+                          <p className="font-black text-xs">
+                            {isLower ? '⬇️ ' : '⬆️ '}
+                            Transposición automática: {formatSemitoneShiftDescription(delta)}
+                          </p>
+                          <p className="text-[11px] opacity-90 leading-relaxed">
+                            Al seleccionar <strong>{newKey}</strong> (original: {newOriginalKey}), el sistema ha ajustado automáticamente todos los acordes del cifrado a la nueva tonalidad para los músicos.
+                          </p>
+                        </div>
                       </div>
                     );
-                  })()
-                )}
-              </div>
+                  })()}
+                </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                  Enlace de YouTube (URL)
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://youtu.be/... o https://youtube.com/watch?v=..."
-                  value={newUrl}
-                  onChange={(e) => setNewUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
+                {/* Enlaces y Notas */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                      Video de YouTube de Referencia (URL)
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://youtu.be/... o https://youtube.com/..."
+                      value={newUrl}
+                      onChange={(e) => setNewUrl(e.target.value)}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
-                  <span>Audio / Pista MP3 (Drive)</span>
-                  <span className="text-[10px] text-emerald-600 font-normal">Con afinador</span>
-                </label>
-                <input
-                  type="url"
-                  placeholder="https://drive.google.com/file/d/... o .mp3"
-                  value={newAudioUrl}
-                  onChange={(e) => setNewAudioUrl(e.target.value)}
-                  className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-700 mb-1 flex items-center justify-between">
+                      <span>Audio / Pista MP3 (Drive)</span>
+                      <span className="text-[10px] text-emerald-600 font-normal">Afinador integrado</span>
+                    </label>
+                    <input
+                      type="url"
+                      placeholder="https://drive.google.com/file/d/... o .mp3"
+                      value={newAudioUrl}
+                      onChange={(e) => setNewAudioUrl(e.target.value)}
+                      className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
+                    />
+                  </div>
+                </div>
 
-            {/* Checkbox guardar en el banco */}
-            <div className="flex items-start gap-2.5 p-2.5 bg-slate-50 border border-slate-200 rounded-xl">
-              <input
-                type="checkbox"
-                id="saveToBank"
-                checked={saveToBankChecked}
-                onChange={(e) => setSaveToBankChecked(e.target.checked)}
-                className="w-4 h-4 mt-0.5 rounded text-emerald-600 focus:ring-emerald-500 cursor-pointer"
-              />
-              <label htmlFor="saveToBank" className="text-xs text-slate-700 cursor-pointer select-none">
-                <span className="font-bold text-slate-900 block">Guardar o actualizar cambios en el Banco Central de Canciones</span>
-                <span className="text-[10px] text-slate-500 block leading-tight mt-0.5">
-                  (Opcional / Desmarcado por defecto): Al seleccionar canciones del banco para armar el culto, no se duplicarán en el banco. Marca esta casilla solo si deseas sobreescribir la canción maestra con nuevos datos.
-                </span>
-              </label>
-            </div>
-
-            {/* Tonalidad con botones rápidos */}
-            <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1.5">
-                Tonalidad a tocar en este culto: <strong>{newKey || 'Sin tono'}</strong>
-              </label>
-              <div className="flex flex-wrap gap-1 mb-2">
-                {COMMON_KEYS.map((k) => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => setNewKey(k)}
-                    className={`px-2 py-0.5 rounded-lg text-[11px] font-bold transition-all ${
-                      newKey === k
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-white border border-slate-200 text-slate-700 hover:border-emerald-300'
-                    }`}
-                  >
-                    {k}
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                <input
-                  type="text"
-                  placeholder="Otro tono (ej. Sol menor)"
-                  value={newKey}
-                  onChange={(e) => setNewKey(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
-                />
-                <input
-                  type="text"
-                  placeholder="Tono original (opcional)"
-                  value={newOriginalKey}
-                  onChange={(e) => setNewOriginalKey(e.target.value)}
-                  className="w-full px-2.5 py-1.5 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
-                />
-              </div>
-            </div>
-
-            {/* Notas opcionales */}
-            <div>
-              <label className="block text-[11px] font-bold text-slate-700 mb-1">
-                Notas Breves / Dinámica de Ensayo (opcional)
-              </label>
-              <input
-                type="text"
-                placeholder="ej. Entrada con piano solo, Coro 2 explota con batería"
-                value={newNotes}
-                onChange={(e) => setNewNotes(e.target.value)}
-                className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
-              />
-            </div>
+                {/* Notas de ensayo */}
+                <div>
+                  <label className="block text-[11px] font-bold text-slate-700 mb-1">
+                    Notas Breves / Dinámica de Ensayo (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="ej. Entrada con piano solo, Coro 2 explota con batería"
+                    value={newNotes}
+                    onChange={(e) => setNewNotes(e.target.value)}
+                    className="w-full px-3 py-2 text-xs border border-slate-200 rounded-xl bg-white focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
 
             {/* SECCIÓN ESPECIALIZADA: CIFRADO ARMÓNICO, LETRA Y URL EXTERNA */}
             <div className="pt-3 border-t border-slate-200/80">
@@ -906,6 +1006,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               </button>
             </div>
           </form>
+        )}
+      </div>
 
           {errorMsg && (
             <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium">

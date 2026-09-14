@@ -6,6 +6,7 @@ import { Navbar } from './components/Navbar';
 import { MusicianLoginScreen } from './components/MusicianLoginScreen';
 import { AdminLoginScreen } from './components/AdminLoginScreen';
 import { CalendarView } from './components/CalendarView';
+import { MusicianMobileHome } from './components/MusicianMobileHome';
 import { MyServicesView } from './components/MyServicesView';
 import { ServiceDetailModal } from './components/ServiceDetailModal';
 import { AdminScheduleTable } from './components/AdminScheduleTable';
@@ -52,6 +53,7 @@ const MainRouter: React.FC = () => {
 
   const [portal, setPortal] = useState<PortalType>(getInitialPortal);
   const [musicianTab, setMusicianTab] = useState<'calendar' | 'my-services'>('calendar');
+  const [mobileMusicianView, setMobileMusicianView] = useState<'home' | 'full-calendar'>('home');
   const [adminTab, setAdminTab] = useState<'visual-board' | 'schedule' | 'musicians' | 'songs-bank'>('visual-board');
 
   const [selectedService, setSelectedService] = useState<ServiceDate | null>(null);
@@ -135,10 +137,37 @@ const MainRouter: React.FC = () => {
 
         <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
           {musicianTab === 'calendar' && (
-            <CalendarView 
-              onSelectService={(s) => setSelectedService(s)} 
-              onOpenSetlist={(s) => setSetlistModalService(s)}
-            />
+            <>
+              {/* MODO MÓVIL (< md): Vista súper práctica para músicos con enlaces a canciones y postulación rápida */}
+              <div className="md:hidden">
+                {mobileMusicianView === 'home' ? (
+                  <MusicianMobileHome 
+                    onSelectService={(s) => setSelectedService(s)}
+                    onGoToFullCalendar={() => setMobileMusicianView('full-calendar')}
+                  />
+                ) : (
+                  <div className="space-y-4">
+                    <button
+                      type="button"
+                      onClick={() => setMobileMusicianView('home')}
+                      className="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors"
+                    >
+                      <span>← Volver a Vista Rápida del Músico</span>
+                    </button>
+                    <CalendarView 
+                      onSelectService={(s) => setSelectedService(s)} 
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* MODO ESCRITORIO (>= md): Calendario completo */}
+              <div className="hidden md:block">
+                <CalendarView 
+                  onSelectService={(s) => setSelectedService(s)} 
+                />
+              </div>
+            </>
           )}
 
           {musicianTab === 'my-services' && (
@@ -157,7 +186,6 @@ const MainRouter: React.FC = () => {
             service={activeSelectedService}
             onClose={() => setSelectedService(null)}
             isMusicianView={true}
-            onOpenSetlist={(s) => setSetlistModalService(s)}
           />
         )}
 

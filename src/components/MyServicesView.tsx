@@ -100,12 +100,30 @@ export const MyServicesView: React.FC<Props> = ({ onSelectService }) => {
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between sm:justify-end gap-3 flex-shrink-0">
+                <div className="flex flex-wrap items-center justify-between sm:justify-end gap-2.5 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+                  {service.isSongsPublished && service.songs && service.songs.length > 0 && (
+                    <a
+                      href={`/#/repertorio/${service.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors"
+                      title="Ver repertorio de canciones y tonos"
+                    >
+                      <Music className="w-3.5 h-3.5" />
+                      <span>🎵 Ver Canciones ({service.songs.length})</span>
+                    </a>
+                  )}
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
                     <InstrumentIcon instrument={mySlot.key} className="w-4 h-4 text-emerald-600" />
                     <span>{mySlot.label}</span>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                  <button
+                    type="button"
+                    onClick={() => onSelectService(service)}
+                    className="p-1 text-slate-400 hover:text-slate-700 transition-colors"
+                  >
+                    <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
                 </div>
               </div>
             );

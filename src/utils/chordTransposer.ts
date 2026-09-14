@@ -536,3 +536,72 @@ export const parseChordChart = (rawText: string): SectionBlock[] => {
 
   return sections;
 };
+
+const SOLFEGE_TO_ENGLISH: Record<string, string> = {
+  'DO': 'C', 'RE': 'D', 'MI': 'E', 'FA': 'F', 'SOL': 'G', 'LA': 'A', 'SI': 'B'
+};
+
+/**
+ * Extrae la nota raíz fundamental de un string de tonalidad (ej. "Sol (G)", "Re", "F#m", "Eb")
+ */
+export const extractRootNote = (keyStr: string): string | null => {
+  if (!keyStr) return null;
+  const clean = keyStr.trim().toUpperCase();
+
+  // Si tiene paréntesis como "Sol (G)", buscar primero dentro del paréntesis
+  const parenMatch = clean.match(/\(([A-G][#B]?)[^)]*\)/);
+  if (parenMatch && NOTE_ALIASES[parenMatch[1]] !== undefined) {
+    return parenMatch[1];
+  }
+
+  // Comprobar si empieza por nombre en Solfeo: DO, RE, MI, FA, SOL, LA, SI
+  const solfegeMatch = clean.match(/^(DO|RE|MI|FA|SOL|LA|SI)(#|B)?/);
+  if (solfegeMatch) {
+    const englishBase = SOLFEGE_TO_ENGLISH[solfegeMatch[1]];
+    const accidental = solfegeMatch[2] || '';
+    const note = `${englishBase}${accidental}`;
+    if (NOTE_ALIASES[note] !== undefined) return note;
+  }
+
+  // Letra inglesa A-G con posible alteración
+  const englishMatch = clean.match(/^([A-G])(#|B)?/);
+  if (englishMatch) {
+    const note = `${englishMatch[1]}${englishMatch[2] || ''}`;
+    if (NOTE_ALIASES[note] !== undefined) return note;
+  }
+
+  return null;
+};
+
+/**
+ * Calcula la distancia en semitonos entre dos tonalidades (-6 a +6 semitonos)
+ * Retorna 0 si son iguales o no se pueden parsear.
+ */
+export const calculateSemitoneDistance = (fromKey: string, toKey: string): number => {
+  const rootFrom = extractRootNote(fromKey);
+  const rootTo = extractRootNote(toKey);
+  if (!rootFrom || !rootTo) return 0;
+
+  const idxFrom = NOTE_ALIASES[rootFrom];
+  const idxTo = NOTE_ALIASES[rootTo];
+  if (idxFrom === undefined || idxTo === undefined) return 0;
+
+  let delta = (idxTo - idxFrom) % 12;
+  // Mantener el rango en [-6, 6] para el salto armónico más corto y natural para los músicos
+  if (delta > 6) delta -= 12;
+  if (delta < -6) delta += 12;
+
+  return delta;
+};
+
+/**
+ * Genera una descripción humana amigable del cambio de tono (ej: "2 semitonos abajo (1 tono)")
+ */
+export const formatSemitoneShiftDescription = (semitones: number): string => {
+  if (semitones === 0) return 'Mismo tono (0 semitonos)';
+  const abs = Math.abs(semitones);
+  const dir = semitones > 0 ? 'arriba' : 'abajo';
+  const toneDesc = abs === 1 ? 'medio tono' : abs === 2 ? '1 tono' : `${abs / 2} tonos`;
+  return `${abs} semitono${abs > 1 ? 's' : ''} ${dir} (${toneDesc})`;
+};
+
