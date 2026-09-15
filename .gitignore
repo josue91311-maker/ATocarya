@@ -31,3 +31,9 @@ dist-ssr
 *.sqlite3
 *.db
 local.db*
+
+# Android / Package files
+*.zip
+*.apk
+*.aab
+*.keystore
