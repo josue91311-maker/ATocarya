@@ -260,23 +260,23 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   })();
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 text-white shadow-2xl overflow-hidden relative transition-all">
+    <div className="bg-[#0B132B] border border-[#1d2d54] rounded-3xl p-4 sm:p-5 text-white shadow-2xl overflow-hidden relative transition-all">
       {/* Glow de fondo */}
-      <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-[#1E74FD]/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-[#FF7E22]/15 rounded-full blur-3xl pointer-events-none" />
 
       {/* Cabecera del reproductor con botón de colapsar para celulares */}
-      <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-800 relative z-10">
+      <div className="flex items-center justify-between gap-3 pb-3 border-b border-[#1d2d54] relative z-10">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/30">
-            <Radio className={`w-5 h-5 ${isPlaying ? 'animate-pulse text-emerald-100' : ''}`} />
+          <div className="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-[#1E74FD] to-[#155de0] flex items-center justify-center text-white shadow-md shadow-blue-950/40">
+            <Radio className={`w-5 h-5 ${isPlaying ? 'animate-pulse text-blue-100' : ''}`} />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                Pista & Tono en Vivo
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[#1E74FD]/20 text-[#60a5fa] border border-[#1E74FD]/30">
+                Pista & Tono Oficial
               </span>
-              <span className="text-xs font-bold text-teal-300">
+              <span className="text-xs font-bold text-[#FF7E22]">
                 {currentKeyDisplay}
               </span>
             </div>
@@ -292,7 +292,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
             href={audioUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-medium items-center gap-1.5 transition-colors border border-slate-700/50"
+            className="hidden sm:flex px-2.5 py-1.5 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 hover:text-white rounded-xl text-xs font-medium items-center gap-1.5 transition-colors border border-[#233566]"
             title="Abrir archivo en Google Drive"
           >
             <ExternalLink className="w-3.5 h-3.5" />
@@ -302,12 +302,12 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors border border-slate-700"
+            className="p-1.5 sm:px-2.5 sm:py-1.5 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors border border-[#233566]"
             title={isCollapsed ? 'Expandir reproductor' : 'Minimizar reproductor'}
           >
             {isCollapsed ? (
               <>
-                <ChevronDown className="w-4 h-4 text-emerald-400" />
+                <ChevronDown className="w-4 h-4 text-[#1E74FD]" />
                 <span className="hidden sm:inline text-[11px]">Expandir</span>
               </>
             ) : (
@@ -323,23 +323,23 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
       {/* Estado de Carga */}
       {isLoading && (
         <div className="py-6 flex flex-col items-center justify-center text-center">
-          <div className="w-7 h-7 border-3 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin mb-2.5" />
+          <div className="w-7 h-7 border-3 border-[#1E74FD]/30 border-t-[#1E74FD] rounded-full animate-spin mb-2.5" />
           <p className="text-xs text-slate-200 font-medium">{loadProgress}</p>
-          <p className="text-[11px] text-slate-400 mt-0.5">Optimizando sincronización rítmica SoundTouch...</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Optimizando motor SoundTouch WSOLA...</p>
         </div>
       )}
 
       {/* Estado de Error */}
       {error && !isLoading && (
         <div className="py-5 flex flex-col items-center justify-center text-center">
-          <AlertCircle className="w-7 h-7 text-amber-400 mb-2" />
+          <AlertCircle className="w-7 h-7 text-[#FF7E22] mb-2" />
           <p className="text-xs text-amber-200 font-medium max-w-sm">{error}</p>
           <div className="mt-3">
             <a
               href={audioUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5"
+              className="px-4 py-2 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5 shadow-md shadow-blue-500/20"
             >
               <ExternalLink className="w-3.5 h-3.5" />
               <span>Abrir directo en Google Drive</span>
@@ -358,17 +358,17 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                 <button
                   type="button"
                   onClick={handleTogglePlay}
-                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-md shadow-emerald-500/20 active:scale-95 transition-transform"
+                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1E74FD] to-[#3b82f6] text-white flex items-center justify-center shadow-md shadow-[#1E74FD]/30 active:scale-95 transition-transform"
                 >
                   {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
                 </button>
                 <div className="text-xs">
                   <div className="font-mono text-slate-300">
-                    <span className="text-emerald-400 font-bold">{formatTime(currentTime)}</span>
+                    <span className="text-[#60a5fa] font-bold">{formatTime(currentTime)}</span>
                     <span className="text-slate-500"> / {formatTime(duration)}</span>
                   </div>
                   <div className="text-[10px] text-slate-400 font-medium">
-                    Tono: <strong className="text-emerald-400">{currentKeyDisplay}</strong>
+                    Tono: <strong className="text-[#FF7E22]">{currentKeyDisplay}</strong>
                   </div>
                 </div>
               </div>
@@ -378,7 +378,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                 <button
                   type="button"
                   onClick={() => handleSemitoneChange(0)}
-                  className="text-[11px] px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700"
+                  className="text-[11px] px-2.5 py-1 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 rounded-lg border border-[#233566]"
                 >
                   Reset Tono
                 </button>
@@ -390,10 +390,10 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
               {/* Barra de Progreso y Tiempo */}
               <div>
                 <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1">
-                  <span className="font-bold text-emerald-400">{formatTime(currentTime)}</span>
+                  <span className="font-bold text-[#60a5fa]">{formatTime(currentTime)}</span>
                   <span>{formatTime(duration)}</span>
                 </div>
-                <div className="relative w-full h-2.5 bg-slate-800 rounded-full overflow-hidden cursor-pointer group">
+                <div className="relative w-full h-2.5 bg-[#141f3d] rounded-full overflow-hidden cursor-pointer group">
                   <input
                     type="range"
                     min={0}
@@ -404,7 +404,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                     className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
                   />
                   <div
-                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75 relative"
+                    className="h-full bg-gradient-to-r from-[#1E74FD] to-[#38bdf8] rounded-full transition-all duration-75 relative"
                     style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
                   >
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform" />
@@ -419,7 +419,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                   <button
                     type="button"
                     onClick={() => handleSkip(-5)}
-                    className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors"
+                    className="px-2.5 py-2 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors border border-[#233566]/60"
                     title="Retroceder 5 segundos"
                   >
                     -5s
@@ -427,7 +427,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                   <button
                     type="button"
                     onClick={() => handleSkip(5)}
-                    className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors"
+                    className="px-2.5 py-2 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors border border-[#233566]/60"
                     title="Adelantar 5 segundos"
                   >
                     +5s
@@ -438,7 +438,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                 <button
                   type="button"
                   onClick={handleTogglePlay}
-                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-all transform active:scale-95"
+                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-[#1E74FD] to-[#3b82f6] hover:from-[#155de0] hover:to-[#2563eb] text-white flex items-center justify-center shadow-lg shadow-[#1E74FD]/30 transition-all transform active:scale-95"
                 >
                   {isPlaying ? (
                     <Pause className="w-6 h-6 fill-current" />
@@ -452,7 +452,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                   <button
                     type="button"
                     onClick={handleReset}
-                    className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors"
+                    className="p-2.5 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 hover:text-white rounded-xl transition-colors border border-[#233566]/60"
                     title="Reiniciar desde el inicio"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -460,22 +460,22 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                   <button
                     type="button"
                     onClick={() => setIsMuted(!isMuted)}
-                    className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors"
+                    className="p-2.5 bg-[#141f3d] hover:bg-[#1a2952] text-slate-300 hover:text-white rounded-xl transition-colors border border-[#233566]/60"
                     title={isMuted ? 'Activar audio' : 'Silenciar'}
                   >
-                    {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4" />}
+                    {isMuted ? <VolumeX className="w-4 h-4 text-[#FF7E22]" /> : <Volume2 className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
               {/* Panel de Transposición de Tono (Semitonos con algoritmo WSOLA sin trabas) */}
-              <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-2xl">
+              <div className="p-3.5 bg-[#111c38]/80 border border-[#1d2d54] rounded-2xl">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#FF7E22]" />
                     Transpositor de Tono (WSOLA Alta Fidelidad)
                   </span>
-                  <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/50">
+                  <span className="text-xs font-bold text-[#FF7E22] bg-[#FF7E22]/10 px-2 py-0.5 rounded-md border border-[#FF7E22]/30">
                     {currentKeyDisplay}
                   </span>
                 </div>
@@ -491,8 +491,8 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                         onClick={() => handleSemitoneChange(st)}
                         className={`py-2 text-xs font-bold rounded-xl transition-all ${
                           isSelected
-                            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30 ring-2 ring-emerald-300 font-extrabold'
-                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                            ? 'bg-[#1E74FD] text-white shadow-md shadow-[#1E74FD]/40 ring-2 ring-blue-300 font-extrabold'
+                            : 'bg-[#141f3d] text-slate-300 hover:bg-[#1a2952] hover:text-white'
                         }`}
                       >
                         {st === 0 ? 'Orig' : st > 0 ? `+${st}` : st}
@@ -506,9 +506,9 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
               </div>
 
               {/* Selector de Velocidad */}
-              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-[#1d2d54]">
                 <span className="text-xs text-slate-400 flex items-center gap-1">
-                  <Gauge className="w-3.5 h-3.5" />
+                  <Gauge className="w-3.5 h-3.5 text-[#60a5fa]" />
                   Velocidad:
                 </span>
                 <div className="flex items-center gap-1">
@@ -519,8 +519,8 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
                       onClick={() => handleSpeedChange(spd)}
                       className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors ${
                         playbackSpeed === spd
-                          ? 'bg-teal-500 text-slate-950'
-                          : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                          ? 'bg-[#1E74FD] text-white shadow-xs'
+                          : 'bg-[#141f3d] text-slate-400 hover:text-slate-200'
                       }`}
                     >
                       {spd}x

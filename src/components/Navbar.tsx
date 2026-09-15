@@ -85,7 +85,7 @@ export const Navbar: React.FC<Props> = ({
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Mis Asignaciones</span>
                     {assignedCount > 0 && (
-                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 tabular-nums">
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#FF7E22] text-white tabular-nums shadow-xs">
                         {assignedCount}
                       </span>
                     )}
@@ -247,7 +247,7 @@ export const Navbar: React.FC<Props> = ({
               <CheckCircle2 className="w-5 h-5 mb-0.5" />
               <span className="text-[11px]">Mis Puestos</span>
               {assignedCount > 0 && (
-                <span className="absolute top-0.5 right-3 w-4 h-4 rounded-full bg-emerald-600 text-white text-[9px] font-bold flex items-center justify-center tabular-nums">
+                <span className="absolute top-0.5 right-3 w-4 h-4 rounded-full bg-[#FF7E22] text-white text-[9px] font-bold flex items-center justify-center tabular-nums shadow-xs">
                   {assignedCount}
                 </span>
               )}

@@ -105,16 +105,17 @@ export const MusicianMobileHome: React.FC<Props> = ({
     <div className="space-y-6 pb-24 animate-in fade-in max-w-lg mx-auto">
       
       {/* 1. Header de Bienvenida & Perfil Rápido */}
-      <div className="bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-800 text-white rounded-3xl p-5 shadow-lg shadow-emerald-950/10 relative overflow-hidden">
-        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl pointer-events-none" />
+      <div className="bg-gradient-to-br from-[#0B132B] via-[#111c38] to-[#1E74FD] text-white rounded-3xl p-5 shadow-xl shadow-blue-950/20 relative overflow-hidden">
+        <div className="absolute -right-6 -bottom-6 w-32 h-32 bg-[#FF7E22]/15 rounded-full blur-xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-24 h-24 bg-[#1E74FD]/20 rounded-full blur-lg pointer-events-none" />
         
         <div className="flex items-center justify-between gap-3 relative z-10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-white/15 backdrop-blur-md border border-white/20 text-white flex items-center justify-center font-display font-black text-xl shadow-inner">
+            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 text-white flex items-center justify-center font-display font-black text-xl shadow-inner">
               {musicianUser.fullName.charAt(0).toUpperCase()}
             </div>
             <div>
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-200/90 block">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-blue-200/90 block">
                 Portal del Músico
               </span>
               <h1 className="text-lg font-bold font-display text-white leading-tight">
@@ -124,17 +125,17 @@ export const MusicianMobileHome: React.FC<Props> = ({
           </div>
 
           <div className="flex flex-col items-end">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/20 backdrop-blur-md border border-white/30 rounded-xl text-xs font-bold text-white shadow-2xs">
-              <InstrumentIcon instrument={musicianUser.primaryInstrument} className="w-3.5 h-3.5 text-emerald-200" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/15 backdrop-blur-md border border-white/25 rounded-xl text-xs font-bold text-white shadow-2xs">
+              <InstrumentIcon instrument={musicianUser.primaryInstrument} className="w-3.5 h-3.5 text-blue-200" />
               <span>{musicianUser.primaryInstrument}</span>
             </span>
           </div>
         </div>
 
         {/* Resumen de Asignaciones */}
-        <div className="mt-4 pt-3.5 border-t border-white/15 flex items-center justify-between text-xs text-emerald-100">
+        <div className="mt-4 pt-3.5 border-t border-white/10 flex items-center justify-between text-xs text-blue-100">
           <div className="flex items-center gap-1.5">
-            <Check className="w-4 h-4 text-emerald-300 stroke-[3]" />
+            <Check className="w-4 h-4 text-[#FF7E22] stroke-[3]" />
             <span>
               Tienes <strong className="text-white font-bold">{myAssignedServices.length}</strong> culto(s) asignado(s)
             </span>
