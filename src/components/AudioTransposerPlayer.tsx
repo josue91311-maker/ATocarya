@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import * as Tone from 'tone';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { PitchShifter } from 'soundtouchjs';
 import { 
   Play, 
   Pause, 
@@ -7,10 +7,12 @@ import {
   Volume2, 
   VolumeX, 
   ExternalLink, 
-  Music, 
   Sparkles, 
   AlertCircle, 
-  Gauge 
+  Gauge,
+  ChevronDown,
+  ChevronUp,
+  Radio
 } from 'lucide-react';
 import { transposeChord } from '../utils/chordTransposer';
 
@@ -20,65 +22,21 @@ interface Props {
   baseKey?: string;
 }
 
-// Cálculo óptimo de tamaño de ventana de correlación acústica (optimizado para baja latencia):
-// - Ventanas más pequeñas = menos latencia en la batería/ritmo (latencia ≈ windowSize / 2)
-// - ±1 semitono: ventana corta (~0.10s = 50ms latencia) — cambio pequeño, no necesita buffer amplio
-// - ±2 semitonos: ventana media (~0.13s = 65ms latencia)
-// - ±3 semitonos: ventana más amplia (~0.16s = 80ms latencia) — necesita más muestras para no distorsionar graves
-const getOptimalWindowSize = (delta: number): number => {
-  if (delta === 0) return 0.1;
-  const absDelta = Math.abs(delta);
-  // Base 0.08 + escala 0.03 por semitono: ±1→0.11, ±2→0.14, ±3→0.17
-  return 0.08 + absDelta * 0.03;
+// Convertir URL de Google Drive a Stream proxy o directa
+const getStreamUrl = (url: string): string => {
+  const trimmed = url.trim();
+  if (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com')) {
+    return `/api/audio-proxy?url=${encodeURIComponent(trimmed)}`;
+  }
+  return trimmed;
 };
 
-// Calibración acústica exacta de pitch shifting (corrige el defecto interno de Tone.js en intervalos negativos)
-// Aplica la fórmula física real del modulador Doppler (Miller Puckette):
-// - Semitono negativo (-1, -2, -3): ratio = 2^(st/12), f = (1 - ratio) / W
-// - Semitono positivo (+1, +2, +3): ratio = 2^(st/12), f = (ratio - 1) / W
-const setCalibratedPitch = (pitchShift: Tone.PitchShift, st: number, windowSize: number) => {
-  const ps = pitchShift as any;
-  if (!ps) return;
-
-  if (st === 0) {
-    pitchShift.pitch = 0;
-    return;
-  }
-
-  const ratio = Math.pow(2, st / 12);
-  const w = windowSize || 0.18;
-
-  if (st < 0) {
-    if (ps._lfoA && ps._lfoB) {
-      ps._lfoA.min = 0;
-      ps._lfoA.max = w;
-      ps._lfoB.min = 0;
-      ps._lfoB.max = w;
-    }
-    const exactFreq = (1 - ratio) / w;
-    if (ps._frequency) {
-      ps._frequency.value = exactFreq;
-    }
-    // Forzar latencia interna de los delay lines a 0 para eliminar retardo extra
-    if (ps._delayA) ps._delayA.delayTime.value = 0;
-    if (ps._delayB) ps._delayB.delayTime.value = 0;
-    ps._pitch = st;
-  } else {
-    if (ps._lfoA && ps._lfoB) {
-      ps._lfoA.min = w;
-      ps._lfoA.max = 0;
-      ps._lfoB.min = w;
-      ps._lfoB.max = 0;
-    }
-    const exactFreq = (ratio - 1) / w;
-    if (ps._frequency) {
-      ps._frequency.value = exactFreq;
-    }
-    // Forzar latencia interna de los delay lines a 0 para eliminar retardo extra
-    if (ps._delayA) ps._delayA.delayTime.value = 0;
-    if (ps._delayB) ps._delayB.delayTime.value = 0;
-    ps._pitch = st;
-  }
+// Formato mm:ss
+const formatTime = (secs: number): string => {
+  if (isNaN(secs) || secs < 0) return '00:00';
+  const mins = Math.floor(secs / 60);
+  const remainder = Math.floor(secs % 60);
+  return `${mins.toString().padStart(2, '0')}:${remainder.toString().padStart(2, '0')}`;
 };
 
 export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, baseKey }) => {
@@ -86,8 +44,9 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   const [isLoading, setIsLoading] = useState(true);
   const [loadProgress, setLoadProgress] = useState<string>('Cargando pista...');
   const [error, setError] = useState<string | null>(null);
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-  // Controles de audio
+  // Parámetros musicales
   const [semitones, setSemitones] = useState<number>(0); // -3 a +3 semitonos
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0); // 0.8x a 1.2x
   const [currentTime, setCurrentTime] = useState<number>(0);
@@ -95,290 +54,204 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   const [volume, setVolume] = useState<number>(1.0);
   const [isMuted, setIsMuted] = useState(false);
 
-  // Tone.js refs
-  const toneBufferRef = useRef<Tone.ToneAudioBuffer | null>(null);
-  const playerRef = useRef<Tone.Player | null>(null);
-  const pitchShiftRef = useRef<Tone.PitchShift | null>(null);
-  const volumeNodeRef = useRef<Tone.Volume | null>(null);
-  
-  const playStartTimeRef = useRef<number>(0);
-  const pausedAtRef = useRef<number>(0);
-  const animFrameRef = useRef<number | null>(null);
+  // Web Audio & SoundTouch Refs
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const gainNodeRef = useRef<GainNode | null>(null);
+  const pitchShifterRef = useRef<PitchShifter | null>(null);
+  const audioBufferRef = useRef<AudioBuffer | null>(null);
+  const isPlayingRef = useRef(false);
+  const semitonesRef = useRef(0);
+  const tempoRef = useRef(1.0);
 
-  // Formato mm:ss
-  const formatTime = (secs: number): string => {
-    if (isNaN(secs) || secs < 0) return '00:00';
-    const mins = Math.floor(secs / 60);
-    const remainder = Math.floor(secs % 60);
-    return `${mins.toString().padStart(2, '0')}:${remainder.toString().padStart(2, '0')}`;
-  };
+  // Mantener refs sincronizadas para callbacks
+  isPlayingRef.current = isPlaying;
+  semitonesRef.current = semitones;
+  tempoRef.current = playbackSpeed;
 
-  // Convertir URL de Google Drive a Stream
-  const getStreamUrl = (url: string): string => {
-    const trimmed = url.trim();
-    if (trimmed.includes('drive.google.com') || trimmed.includes('docs.google.com')) {
-      return `/api/audio-proxy?url=${encodeURIComponent(trimmed)}`;
+  // Obtener o inicializar AudioContext
+  const getAudioContext = useCallback(() => {
+    if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const gain = ctx.createGain();
+      gain.gain.value = isMuted ? 0 : volume;
+      gain.connect(ctx.destination);
+      audioContextRef.current = ctx;
+      gainNodeRef.current = gain;
     }
-    return trimmed;
-  };
+    return { ctx: audioContextRef.current, gain: gainNodeRef.current! };
+  }, [isMuted, volume]);
 
-  // Cargar y decodificar audio en ToneAudioBuffer
+  // Manejador de fin de canción
+  const handleEnded = useCallback(() => {
+    setIsPlaying(false);
+    setCurrentTime(0);
+    if (pitchShifterRef.current) {
+      try {
+        pitchShifterRef.current.percentagePlayed = 0;
+        pitchShifterRef.current.disconnect();
+      } catch {}
+    }
+  }, []);
+
+  // Carga y decodificación de audio
   useEffect(() => {
     let isCancelled = false;
-    stopAudio();
-    pausedAtRef.current = 0;
+
+    // Detener reproducción previa
+    if (pitchShifterRef.current) {
+      try {
+        pitchShifterRef.current.disconnect();
+      } catch {}
+      pitchShifterRef.current = null;
+    }
+    setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
     setIsLoading(true);
     setError(null);
     setLoadProgress('Conectando con la pista...');
 
-    const loadAudio = async () => {
+    const loadAudioFile = async () => {
       try {
+        const { ctx } = getAudioContext();
         const streamUrl = getStreamUrl(audioUrl);
-        setLoadProgress('Descargando audio...');
+        setLoadProgress('Descargando pista...');
 
         let response: Response;
         try {
           response = await fetch(streamUrl);
         } catch {
-          // Si falla a través del proxy en desarrollo local, intentar directo
+          // Fallback a URL directa si proxy no está disponible
           response = await fetch(audioUrl);
         }
 
         if (!response.ok) {
-          throw new Error(`No se pudo cargar el archivo (${response.statusText})`);
+          throw new Error(`Error al conectar con la pista (${response.statusText})`);
         }
 
         const arrayBuffer = await response.arrayBuffer();
         if (isCancelled) return;
 
-        setLoadProgress('Configurando motor de transposición...');
-
-        // Asegurar contexto de audio Tone.js
-        const rawBuffer = await Tone.getContext().rawContext.decodeAudioData(arrayBuffer);
+        setLoadProgress('Procesando motor WSOLA (sin cortes de batería)...');
+        const decodedBuffer = await ctx.decodeAudioData(arrayBuffer);
         if (isCancelled) return;
 
-        const tBuffer = new Tone.ToneAudioBuffer(rawBuffer);
-        toneBufferRef.current = tBuffer;
-        setDuration(tBuffer.duration);
+        audioBufferRef.current = decodedBuffer;
+        setDuration(decodedBuffer.duration);
+
+        // Crear instancia de SoundTouch PitchShifter (WSOLA)
+        // bufferSize 4096 ofrece el equilibrio perfecto entre latencia y fidelidad rítmica
+        const shifter = new PitchShifter(ctx, decodedBuffer, 4096, handleEnded);
+        shifter.pitchSemitones = semitonesRef.current;
+        shifter.tempo = tempoRef.current;
+
+        // Escuchar evento de progreso de tiempo
+        shifter.on('play', (detail) => {
+          if (!isCancelled) {
+            setCurrentTime(detail.timePlayed);
+          }
+        });
+
+        pitchShifterRef.current = shifter;
         setIsLoading(false);
       } catch (err: any) {
         if (isCancelled) return;
-        console.warn('Error al decodificar audio:', err);
-        setError('No se pudo decodificar el archivo directamente. Puedes abrir el enlace original.');
+        console.warn('Error al decodificar audio para SoundTouch:', err);
+        setError('No se pudo decodificar el archivo de audio. Puedes escucharlo abriendo el enlace directo de Google Drive.');
         setIsLoading(false);
       }
     };
 
-    loadAudio();
+    loadAudioFile();
 
     return () => {
       isCancelled = true;
-      stopAudio();
-    };
-  }, [audioUrl]);
-
-  // Actualizar volumen / mute
-  useEffect(() => {
-    if (volumeNodeRef.current) {
-      if (isMuted) {
-        volumeNodeRef.current.mute = true;
-      } else {
-        volumeNodeRef.current.mute = false;
-        // Escala logarítmica / decibeles: 0 es silencio total (-Infinity), 1 es 0 dB
-        volumeNodeRef.current.volume.value = volume <= 0 ? -100 : Tone.gainToDb(volume);
+      if (pitchShifterRef.current) {
+        try {
+          pitchShifterRef.current.disconnect();
+        } catch {}
+        pitchShifterRef.current = null;
       }
+    };
+  }, [audioUrl, getAudioContext, handleEnded]);
+
+  // Actualizar volumen y mute
+  useEffect(() => {
+    if (gainNodeRef.current && audioContextRef.current) {
+      const targetGain = isMuted ? 0 : volume;
+      gainNodeRef.current.gain.setValueAtTime(targetGain, audioContextRef.current.currentTime);
     }
   }, [volume, isMuted]);
 
-  // Iniciar reproducción desde un punto específico
-  const playFrom = async (offset: number) => {
-    if (!toneBufferRef.current || !toneBufferRef.current.loaded) return;
+  // Control Play / Pause
+  const handleTogglePlay = async () => {
+    if (!pitchShifterRef.current || !gainNodeRef.current) return;
 
     try {
-      // Iniciar el contexto de audio si estaba suspendido (política del navegador)
-      if (Tone.getContext().state !== 'running') {
-        await Tone.start();
+      const { ctx, gain } = getAudioContext();
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
       }
 
-      // Limpiar nodo anterior si existía
-      if (playerRef.current) {
-        try {
-          playerRef.current.stop();
-          playerRef.current.dispose();
-        } catch {}
-        playerRef.current = null;
-      }
-
-      // Construir o reusar la cadena de efectos Tone:
-      // Player -> PitchShift (alta fidelidad acústica calibrada) -> Volume -> Destination
-      const wSize = getOptimalWindowSize(semitones);
-      if (!pitchShiftRef.current) {
-        pitchShiftRef.current = new Tone.PitchShift({
-          pitch: semitones,
-          windowSize: wSize,
-          delayTime: 0,
-          feedback: 0
-        });
+      if (isPlaying) {
+        // Pausar: desconectar el nodo de SoundTouch detiene la extracción de muestras sin perder la posición
+        pitchShifterRef.current.disconnect();
+        setIsPlaying(false);
       } else {
-        pitchShiftRef.current.windowSize = wSize;
+        // Reproducir: conectar el nodo de SoundTouch a gainNode para reanudar el flujo WSOLA
+        pitchShifterRef.current.pitchSemitones = semitones;
+        pitchShifterRef.current.tempo = playbackSpeed;
+        pitchShifterRef.current.connect(gain);
+        setIsPlaying(true);
       }
-      setCalibratedPitch(pitchShiftRef.current, semitones, wSize);
-
-      if (!volumeNodeRef.current) {
-        volumeNodeRef.current = new Tone.Volume(volume <= 0 ? -100 : Tone.gainToDb(volume));
-        volumeNodeRef.current.mute = isMuted;
-      }
-
-      // Conectar: PitchShift -> Volume -> Destination
-      pitchShiftRef.current.disconnect();
-      pitchShiftRef.current.connect(volumeNodeRef.current);
-      volumeNodeRef.current.toDestination();
-
-      // Crear nuevo Player con el buffer cargado
-      const player = new Tone.Player(toneBufferRef.current);
-      player.playbackRate = playbackSpeed;
-
-      // BYPASS TOTAL si el tono es 0 (Original):
-      // Conectar directamente Player -> Volume evitando cualquier artefacto de fase o modulación granular
-      if (semitones === 0) {
-        player.connect(volumeNodeRef.current);
-      } else {
-        player.connect(pitchShiftRef.current);
-      }
-
-      const safeOffset = Math.max(0, Math.min(offset, toneBufferRef.current.duration));
-      player.start(0, safeOffset);
-      playerRef.current = player;
-
-      playStartTimeRef.current = Tone.now();
-      pausedAtRef.current = safeOffset;
-      setIsPlaying(true);
-
-      player.onstop = () => {
-        // Solo marcar pausado si realmente terminó la duración
-        if (currentTime >= (toneBufferRef.current?.duration || 0) - 0.5) {
-          setIsPlaying(false);
-          pausedAtRef.current = 0;
-          setCurrentTime(0);
-        }
-      };
     } catch (err) {
-      console.error('Error al iniciar Tone.Player:', err);
+      console.error('Error al alternar reproducción:', err);
     }
   };
 
-  const stopAudio = () => {
-    if (playerRef.current) {
-      try {
-        playerRef.current.stop();
-        playerRef.current.dispose();
-      } catch {}
-      playerRef.current = null;
-    }
-    setIsPlaying(false);
-    if (animFrameRef.current) {
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = null;
-    }
-  };
-
-  const handleTogglePlay = () => {
-    if (isPlaying) {
-      // Pausar y registrar segundo actual
-      const elapsed = (Tone.now() - playStartTimeRef.current) * playbackSpeed;
-      pausedAtRef.current = Math.min(duration, pausedAtRef.current + elapsed);
-      stopAudio();
-    } else {
-      // Reanudar
-      playFrom(pausedAtRef.current);
-    }
-  };
-
+  // Salto de posición (Seek)
   const handleSeek = (newTime: number) => {
-    pausedAtRef.current = newTime;
-    setCurrentTime(newTime);
-    if (isPlaying) {
-      playFrom(newTime);
+    if (!pitchShifterRef.current || duration <= 0) return;
+    const safeTime = Math.max(0, Math.min(duration, newTime));
+    const percentage = safeTime / duration;
+    
+    pitchShifterRef.current.percentagePlayed = percentage;
+    setCurrentTime(safeTime);
+  };
+
+  // Salto rápido en segundos (-5s / +5s)
+  const handleSkip = (deltaSeconds: number) => {
+    handleSeek(currentTime + deltaSeconds);
+  };
+
+  // Reiniciar a 0:00
+  const handleReset = () => {
+    handleSeek(0);
+  };
+
+  // Cambio de Tono en Semitonos (Pitch Shift WSOLA - sin desfase en batería)
+  const handleSemitoneChange = (st: number) => {
+    setSemitones(st);
+    if (pitchShifterRef.current) {
+      // SoundTouch ajusta en tiempo real el ratio de pitch preservando el tiempo y los transitorios de percusión
+      pitchShifterRef.current.pitchSemitones = st;
     }
   };
 
-  const handleSkip = (seconds: number) => {
-    const nextTime = Math.max(0, Math.min(duration, currentTime + seconds));
-    handleSeek(nextTime);
-  };
-
-  // Cambio de Tono en Semitonos (Pitch Shift sin alterar la velocidad)
-  const handleSemitoneChange = (delta: number) => {
-    setSemitones(delta);
-    if (pitchShiftRef.current && volumeNodeRef.current) {
-      const wSize = getOptimalWindowSize(delta);
-      pitchShiftRef.current.windowSize = wSize;
-      setCalibratedPitch(pitchShiftRef.current, delta, wSize);
-
-      // Si el reproductor está activo, conmutar la ruta de señal en caliente
-      if (playerRef.current) {
-        playerRef.current.disconnect();
-        if (delta === 0) {
-          // Retorno a Original: Bypass directo a Volume (audio 100% puro original sin procesamiento)
-          playerRef.current.connect(volumeNodeRef.current);
-        } else {
-          // Con transposición activa: enrutar a través de PitchShift de alta fidelidad calibrado
-          playerRef.current.connect(pitchShiftRef.current);
-        }
-      }
-    }
-  };
-
-  // Cambio de velocidad de reproducción (Tempo independiente)
+  // Cambio de Velocidad (Tempo)
   const handleSpeedChange = (speed: number) => {
     setPlaybackSpeed(speed);
-    if (playerRef.current) {
-      // Ajustar posición base para que el cálculo de tiempo transcurrido sea exacto
-      const elapsed = (Tone.now() - playStartTimeRef.current) * playbackSpeed;
-      pausedAtRef.current = Math.min(duration, pausedAtRef.current + elapsed);
-      playStartTimeRef.current = Tone.now();
-      playerRef.current.playbackRate = speed;
+    if (pitchShifterRef.current) {
+      pitchShifterRef.current.tempo = speed;
     }
   };
 
-  // Loop de animación para actualizar tiempo de progreso
-  useEffect(() => {
-    if (!isPlaying) return;
-
-    const updateProgress = () => {
-      if (isPlaying) {
-        // Nota: la duración y el progreso avanzan según la velocidad de reproducción,
-        // completamente INDEPENDIENTES de la transposición de tono (PitchShift).
-        const elapsed = (Tone.now() - playStartTimeRef.current) * playbackSpeed;
-        const current = Math.min(duration, pausedAtRef.current + elapsed);
-        setCurrentTime(current);
-
-        if (current >= duration && duration > 0) {
-          setIsPlaying(false);
-          pausedAtRef.current = 0;
-          setCurrentTime(0);
-          return;
-        }
-      }
-      animFrameRef.current = requestAnimationFrame(updateProgress);
-    };
-
-    animFrameRef.current = requestAnimationFrame(updateProgress);
-
-    return () => {
-      if (animFrameRef.current) {
-        cancelAnimationFrame(animFrameRef.current);
-      }
-    };
-  }, [isPlaying, playbackSpeed, duration]);
-
-  // Cálculo del Tono Resultante
+  // Tono resultante calculado
   const currentKeyDisplay = (() => {
     if (!baseKey) {
       if (semitones === 0) return 'Tono Original';
-      return semitones > 0 ? `+${semitones} semitono${semitones > 1 ? 's' : ''}` : `${semitones} semitono${semitones < -1 ? 's' : ''}`;
+      return semitones > 0 ? `+${semitones} semitonos` : `${semitones} semitonos`;
     }
     const cleanKey = baseKey.replace(/[^A-Ga-g#b]/g, '');
     const transposed = transposeChord(cleanKey, semitones);
@@ -387,210 +260,276 @@ export const AudioTransposerPlayer: React.FC<Props> = ({ audioUrl, songTitle, ba
   })();
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 sm:p-6 text-white shadow-2xl overflow-hidden relative">
+    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-4 sm:p-5 text-white shadow-2xl overflow-hidden relative transition-all">
       {/* Glow de fondo */}
-      <div className="absolute top-0 right-0 -mt-8 -mr-8 w-44 h-44 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-0 -mb-8 -ml-8 w-44 h-44 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 -mt-10 -mr-10 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-0 -mb-10 -ml-10 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
 
-      {/* Cabecera */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/30">
-            <Music className="w-5 h-5" />
+      {/* Cabecera del reproductor con botón de colapsar para celulares */}
+      <div className="flex items-center justify-between gap-3 pb-3 border-b border-slate-800 relative z-10">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 h-10 shrink-0 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-900/30">
+            <Radio className={`w-5 h-5 ${isPlaying ? 'animate-pulse text-emerald-100' : ''}`} />
           </div>
-          <div>
-            <h4 className="text-sm font-bold text-white tracking-wide truncate max-w-xs sm:max-w-md">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                Pista & Tono en Vivo
+              </span>
+              <span className="text-xs font-bold text-teal-300">
+                {currentKeyDisplay}
+              </span>
+            </div>
+            <h4 className="text-sm font-bold text-white tracking-wide truncate max-w-[200px] sm:max-w-md mt-0.5">
               {songTitle}
             </h4>
-            <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-0.5">
-              <span>Pista de Audio Oficial</span>
-              <span>•</span>
-              <span className="text-emerald-400 font-semibold">{currentKeyDisplay}</span>
-            </p>
           </div>
         </div>
 
-        {/* Enlace original a Drive */}
-        <a
-          href={audioUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="px-3 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors border border-slate-700/50"
-        >
-          <ExternalLink className="w-3.5 h-3.5" />
-          <span>Abrir en Drive</span>
-        </a>
+        {/* Acciones de Cabecera: Abrir Drive y Botón Minimizar */}
+        <div className="flex items-center gap-2 shrink-0">
+          <a
+            href={audioUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden sm:flex px-2.5 py-1.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-medium items-center gap-1.5 transition-colors border border-slate-700/50"
+            title="Abrir archivo en Google Drive"
+          >
+            <ExternalLink className="w-3.5 h-3.5" />
+            <span>Drive</span>
+          </a>
+
+          <button
+            type="button"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="p-1.5 sm:px-2.5 sm:py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-semibold flex items-center gap-1 transition-colors border border-slate-700"
+            title={isCollapsed ? 'Expandir reproductor' : 'Minimizar reproductor'}
+          >
+            {isCollapsed ? (
+              <>
+                <ChevronDown className="w-4 h-4 text-emerald-400" />
+                <span className="hidden sm:inline text-[11px]">Expandir</span>
+              </>
+            ) : (
+              <>
+                <ChevronUp className="w-4 h-4 text-slate-400" />
+                <span className="hidden sm:inline text-[11px]">Minimizar</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
-      {/* Estado de Carga o Error */}
+      {/* Estado de Carga */}
       {isLoading && (
-        <div className="py-8 flex flex-col items-center justify-center text-center">
-          <div className="w-8 h-8 border-3 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin mb-3" />
-          <p className="text-xs text-slate-300 font-medium">{loadProgress}</p>
-          <p className="text-[11px] text-slate-500 mt-1">Preparando el motor de afinación musical...</p>
+        <div className="py-6 flex flex-col items-center justify-center text-center">
+          <div className="w-7 h-7 border-3 border-emerald-500/30 border-t-emerald-400 rounded-full animate-spin mb-2.5" />
+          <p className="text-xs text-slate-200 font-medium">{loadProgress}</p>
+          <p className="text-[11px] text-slate-400 mt-0.5">Optimizando sincronización rítmica SoundTouch...</p>
         </div>
       )}
 
+      {/* Estado de Error */}
       {error && !isLoading && (
-        <div className="py-6 flex flex-col items-center justify-center text-center">
-          <AlertCircle className="w-8 h-8 text-amber-400 mb-2" />
-          <p className="text-xs text-amber-200 font-semibold">{error}</p>
-          <div className="mt-4 flex gap-3">
+        <div className="py-5 flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-7 h-7 text-amber-400 mb-2" />
+          <p className="text-xs text-amber-200 font-medium max-w-sm">{error}</p>
+          <div className="mt-3">
             <a
               href={audioUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors"
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-colors inline-flex items-center gap-1.5"
             >
-              Escuchar directo en Google Drive
+              <ExternalLink className="w-3.5 h-3.5" />
+              <span>Abrir directo en Google Drive</span>
             </a>
           </div>
         </div>
       )}
 
+      {/* REPRODUCTOR LISTO */}
       {!isLoading && !error && (
-        <div className="space-y-5 pt-4">
-          {/* Barra de Progreso y Tiempo */}
-          <div>
-            <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1.5">
-              <span>{formatTime(currentTime)}</span>
-              <span>{formatTime(duration)}</span>
-            </div>
-            <div className="relative w-full h-2.5 bg-slate-800 rounded-full overflow-hidden cursor-pointer group">
-              <input
-                type="range"
-                min={0}
-                max={duration || 100}
-                step={0.1}
-                value={currentTime}
-                onChange={(e) => handleSeek(Number(e.target.value))}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              />
-              <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75 relative"
-                style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-              >
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform" />
-              </div>
-            </div>
-          </div>
-
-          {/* Controles Principales de Reproducción */}
-          <div className="flex items-center justify-between gap-3">
-            {/* Retroceder 5s */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleSkip(-5)}
-                className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors"
-                title="Retroceder 5 segundos"
-              >
-                -5s
-              </button>
-              <button
-                type="button"
-                onClick={() => handleSkip(5)}
-                className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors"
-                title="Adelantar 5 segundos"
-              >
-                +5s
-              </button>
-            </div>
-
-            {/* Play / Pause Principal */}
-            <button
-              type="button"
-              onClick={handleTogglePlay}
-              className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-all transform active:scale-95"
-            >
-              {isPlaying ? (
-                <Pause className="w-6 h-6 fill-current" />
-              ) : (
-                <Play className="w-6 h-6 fill-current ml-1" />
-              )}
-            </button>
-
-            {/* Botón Reiniciar y Volumen */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleSeek(0)}
-                className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors"
-                title="Volver al inicio"
-              >
-                <RotateCcw className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors"
-                title={isMuted ? 'Activar audio' : 'Silenciar'}
-              >
-                {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4" />}
-              </button>
-            </div>
-          </div>
-
-          {/* Panel de Transposición de Tono (Semitonos) */}
-          <div className="p-3.5 bg-slate-800/60 border border-slate-700/60 rounded-2xl">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                Transpositor de Tono (Pitch Shift)
-              </span>
-              <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/50">
-                {currentKeyDisplay}
-              </span>
-            </div>
-
-            {/* Botones de Semitonos */}
-            <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
-              {[-3, -2, -1, 0, 1, 2, 3].map((st) => {
-                const isSelected = semitones === st;
-                return (
-                  <button
-                    key={st}
-                    type="button"
-                    onClick={() => handleSemitoneChange(st)}
-                    className={`py-2 text-xs font-bold rounded-xl transition-all ${
-                      isSelected
-                        ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30 ring-2 ring-emerald-300'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-                    }`}
-                  >
-                    {st === 0 ? 'Original' : st > 0 ? `+${st}` : st}
-                  </button>
-                );
-              })}
-            </div>
-            <p className="text-[10px] text-slate-400 mt-2 text-center">
-              Ajusta el tono de la pista sin alterar el audio original para que los músicos puedan ensayar en su tonalidad.
-            </p>
-          </div>
-
-          {/* Selector de Velocidad */}
-          <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
-            <span className="text-xs text-slate-400 flex items-center gap-1">
-              <Gauge className="w-3.5 h-3.5" />
-              Velocidad:
-            </span>
-            <div className="flex items-center gap-1">
-              {[0.8, 0.9, 1.0, 1.1].map((spd) => (
+        <div className="space-y-4 pt-3">
+          {/* MODO COLAPSADO (Minimalista para ver letras/acordes con el reproductor activo) */}
+          {isCollapsed ? (
+            <div className="flex items-center justify-between gap-3 pt-1">
+              <div className="flex items-center gap-3">
                 <button
-                  key={spd}
                   type="button"
-                  onClick={() => handleSpeedChange(spd)}
-                  className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors ${
-                    playbackSpeed === spd
-                      ? 'bg-teal-500 text-slate-950'
-                      : 'bg-slate-800 text-slate-400 hover:text-slate-200'
-                  }`}
+                  onClick={handleTogglePlay}
+                  className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center shadow-md shadow-emerald-500/20 active:scale-95 transition-transform"
                 >
-                  {spd}x
+                  {isPlaying ? <Pause className="w-5 h-5 fill-current" /> : <Play className="w-5 h-5 fill-current ml-0.5" />}
                 </button>
-              ))}
+                <div className="text-xs">
+                  <div className="font-mono text-slate-300">
+                    <span className="text-emerald-400 font-bold">{formatTime(currentTime)}</span>
+                    <span className="text-slate-500"> / {formatTime(duration)}</span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-medium">
+                    Tono: <strong className="text-emerald-400">{currentKeyDisplay}</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón rápido para volver al tono original si está transpuesto */}
+              {semitones !== 0 && (
+                <button
+                  type="button"
+                  onClick={() => handleSemitoneChange(0)}
+                  className="text-[11px] px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700"
+                >
+                  Reset Tono
+                </button>
+              )}
             </div>
-          </div>
+          ) : (
+            /* MODO EXPANDIDO (Controles completos) */
+            <>
+              {/* Barra de Progreso y Tiempo */}
+              <div>
+                <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-1">
+                  <span className="font-bold text-emerald-400">{formatTime(currentTime)}</span>
+                  <span>{formatTime(duration)}</span>
+                </div>
+                <div className="relative w-full h-2.5 bg-slate-800 rounded-full overflow-hidden cursor-pointer group">
+                  <input
+                    type="range"
+                    min={0}
+                    max={duration || 100}
+                    step={0.1}
+                    value={currentTime}
+                    onChange={(e) => handleSeek(Number(e.target.value))}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-500 to-teal-400 rounded-full transition-all duration-75 relative"
+                    style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
+                  >
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3.5 h-3.5 bg-white rounded-full shadow-md scale-0 group-hover:scale-100 transition-transform" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Controles Principales: Skip, Play/Pause, Reset, Mute */}
+              <div className="flex items-center justify-between gap-3">
+                {/* Salto -5s / +5s */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => handleSkip(-5)}
+                    className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors"
+                    title="Retroceder 5 segundos"
+                  >
+                    -5s
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleSkip(5)}
+                    className="px-2.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition-colors"
+                    title="Adelantar 5 segundos"
+                  >
+                    +5s
+                  </button>
+                </div>
+
+                {/* Play / Pause Central */}
+                <button
+                  type="button"
+                  onClick={handleTogglePlay}
+                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-all transform active:scale-95"
+                >
+                  {isPlaying ? (
+                    <Pause className="w-6 h-6 fill-current" />
+                  ) : (
+                    <Play className="w-6 h-6 fill-current ml-1" />
+                  )}
+                </button>
+
+                {/* Reset & Volumen */}
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleReset}
+                    className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors"
+                    title="Reiniciar desde el inicio"
+                  >
+                    <RotateCcw className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsMuted(!isMuted)}
+                    className="p-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition-colors"
+                    title={isMuted ? 'Activar audio' : 'Silenciar'}
+                  >
+                    {isMuted ? <VolumeX className="w-4 h-4 text-rose-400" /> : <Volume2 className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Panel de Transposición de Tono (Semitonos con algoritmo WSOLA sin trabas) */}
+              <div className="p-3 bg-slate-800/60 border border-slate-700/60 rounded-2xl">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                    Transpositor de Tono (WSOLA Alta Fidelidad)
+                  </span>
+                  <span className="text-xs font-bold text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded-md border border-emerald-800/50">
+                    {currentKeyDisplay}
+                  </span>
+                </div>
+
+                {/* Botones de Semitonos */}
+                <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+                  {[-3, -2, -1, 0, 1, 2, 3].map((st) => {
+                    const isSelected = semitones === st;
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => handleSemitoneChange(st)}
+                        className={`py-2 text-xs font-bold rounded-xl transition-all ${
+                          isSelected
+                            ? 'bg-emerald-500 text-slate-950 shadow-md shadow-emerald-500/30 ring-2 ring-emerald-300 font-extrabold'
+                            : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
+                        }`}
+                      >
+                        {st === 0 ? 'Orig' : st > 0 ? `+${st}` : st}
+                      </button>
+                    );
+                  })}
+                </div>
+                <p className="text-[10px] text-slate-400 mt-2 text-center">
+                  El motor WSOLA mantiene la batería y percusión firmes y sincronizadas al bajar o subir de tono.
+                </p>
+              </div>
+
+              {/* Selector de Velocidad */}
+              <div className="flex items-center justify-between gap-2 pt-1 border-t border-slate-800/60">
+                <span className="text-xs text-slate-400 flex items-center gap-1">
+                  <Gauge className="w-3.5 h-3.5" />
+                  Velocidad:
+                </span>
+                <div className="flex items-center gap-1">
+                  {[0.8, 0.9, 1.0, 1.1].map((spd) => (
+                    <button
+                      key={spd}
+                      type="button"
+                      onClick={() => handleSpeedChange(spd)}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-colors ${
+                        playbackSpeed === spd
+                          ? 'bg-teal-500 text-slate-950'
+                          : 'bg-slate-800 text-slate-400 hover:text-slate-200'
+                      }`}
+                    >
+                      {spd}x
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

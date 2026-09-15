@@ -51,7 +51,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf' | 'audio'>('chords');
+  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf'>('chords');
   const [transposeDelta, setTransposeDelta] = useState<number>(0);
   const [inspectedChord, setInspectedChord] = useState<string | null>(null);
   const [chordProMode, setChordProMode] = useState<'with-chords' | 'lyrics-only'>('with-chords');
@@ -119,19 +119,16 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   // Ajustar la pestaña activa automáticamente si la pestaña actual no tiene contenido para la canción seleccionada
   useEffect(() => {
     if (activeTab === 'chords' && !hasChords) {
-      if (hasAudio) setActiveTab('audio');
-      else if (hasLyrics) setActiveTab('lyrics');
+      if (hasLyrics) setActiveTab('lyrics');
       else if (hasPdf) setActiveTab('pdf');
     } else if (activeTab === 'lyrics' && !hasLyrics) {
       if (hasChords) setActiveTab('chords');
-      else if (hasAudio) setActiveTab('audio');
       else if (hasPdf) setActiveTab('pdf');
     } else if (activeTab === 'pdf' && !hasPdf) {
       if (hasChords) setActiveTab('chords');
-      else if (hasAudio) setActiveTab('audio');
       else if (hasLyrics) setActiveTab('lyrics');
     }
-  }, [activeSongIndex, hasChords, hasAudio, hasLyrics, hasPdf]);
+  }, [activeSongIndex, hasChords, hasLyrics, hasPdf]);
 
   // Limpiar acorde inspeccionado al cambiar de alabanza
   useEffect(() => {
@@ -624,7 +621,18 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     </div>
                   </div>
 
-                  {/* Selector de Pestañas: Cifrado & Compases / Audio & Pista / Letra / Partitura Externa */}
+                  {/* REPRODUCTOR DE PISTA PERSISTENTE (Independiente de las pestañas de Letra / Cifrado) */}
+                  {effectiveAudioUrl && (
+                    <div className="pt-3">
+                      <AudioTransposerPlayer
+                        audioUrl={effectiveAudioUrl}
+                        songTitle={activeSong.title}
+                        baseKey={activeSong.key}
+                      />
+                    </div>
+                  )}
+
+                  {/* Selector de Pestañas de Documento: Cifrado & Compases / Letra / Visor PDF */}
                   <div className="pt-2 border-t border-slate-100">
                     <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-lg flex-wrap">
                       {hasChords && (
@@ -641,19 +649,6 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           <span>Cifrado & Compases</span>
                         </button>
                       )}
-
-                      <button
-                        type="button"
-                        onClick={() => setActiveTab('audio')}
-                        className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                          activeTab === 'audio'
-                            ? 'bg-white text-emerald-950 shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900'
-                        }`}
-                      >
-                        <Headphones className="w-3.5 h-3.5 text-teal-600" />
-                        <span>🎧 Pista & Tono</span>
-                      </button>
 
                       {hasLyrics && (
                         <button
@@ -1128,35 +1123,6 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         />
                       </div>
                     </div>
-                  )}
-
-                  {/* CONTENIDO 4: REPRODUCTOR DE PISTA DE AUDIO CON TRANSPOSICIÓN EN VIVO */}
-                  {activeTab === 'audio' && (
-                    effectiveAudioUrl ? (
-                      <AudioTransposerPlayer
-                        audioUrl={effectiveAudioUrl}
-                        songTitle={activeSong.title}
-                        baseKey={activeSong.key}
-                      />
-                    ) : (
-                      <div className="p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center text-white space-y-3 shadow-xl">
-                        <div className="w-12 h-12 rounded-2xl bg-teal-500/10 border border-teal-500/20 text-teal-400 flex items-center justify-center mx-auto">
-                          <Headphones className="w-6 h-6" />
-                        </div>
-                        <h4 className="text-sm font-bold text-white">
-                          Pista de Audio con Transpositor Musical (Pitch Shift)
-                        </h4>
-                        <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
-                          Esta alabanza aún no tiene configurado un archivo de audio MP3 o enlace de Google Drive.
-                        </p>
-                        <div className="p-3.5 bg-slate-800/80 rounded-2xl max-w-md mx-auto text-left text-[11px] text-slate-300 space-y-1.5 border border-slate-700/60">
-                          <p className="font-bold text-teal-400">💡 ¿Cómo activarlo para los músicos?</p>
-                          <p>1. Ingresa al panel de <strong>Cultos</strong> o al <strong>Banco de Canciones</strong>.</p>
-                          <p>2. Haz clic en <strong>Editar</strong> en esta alabanza.</p>
-                          <p>3. Pega el enlace de Google Drive en el campo <strong>"Audio / Pista MP3 (Drive)"</strong> y guarda los cambios.</p>
-                        </div>
-                      </div>
-                    )
                   )}
 
                   {/* Botones de Herramientas Musicales (Sin Moises) */}
