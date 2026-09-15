@@ -148,8 +148,8 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
               (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
             )
           );
-          // OJO: Si hay un músico en sesión, ÚNICAMENTE si dice Voz Director Y está programado ese día puede editar canciones
-          const canManage = musicianUser ? isVozDirector : isAdminAuthenticated;
+          // El Administrador SIEMPRE puede gestionar canciones, o la Voz Director programada
+          const canManage = isAdminAuthenticated || isVozDirector;
           const songsCount = service.songs?.length || 0;
           const isPublished = Boolean(service.isSongsPublished && songsCount > 0);
 

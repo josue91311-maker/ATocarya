@@ -28,7 +28,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
   onOpenSetlist,
   onGoToFullCalendar 
 }) => {
-  const { musicianUser, services, claimSlot, releaseSlot } = useApp();
+  const { musicianUser, services, claimSlot, releaseSlot, isAdminAuthenticated } = useApp();
   const [claimingSlotKey, setClaimingSlotKey] = useState<string | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
@@ -259,15 +259,15 @@ export const MusicianMobileHome: React.FC<Props> = ({
                   {/* BOTÓN ESTRELLA: ENLACE DIRECTO A CANCIONES (REPERTORIO) */}
                   {/* =========================================================== */}
                   <div className="pt-2 border-t border-slate-100 space-y-2">
-                    {/* Botón rápido exclusivo para Voz Director */}
-                    {isVozDirector && onOpenSetlist && (
+                    {/* Botón rápido para Administrador o Voz Director */}
+                    {(isAdminAuthenticated || isVozDirector) && onOpenSetlist && (
                       <button
                         type="button"
                         onClick={() => onOpenSetlist(service)}
                         className="w-full py-2.5 px-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm shadow-amber-600/20 transition-all active:scale-[0.98]"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-amber-100" />
-                        <span>🎵 Gestionar / Elegir Canciones (Voz Director)</span>
+                        <span>🎵 Gestionar Canciones {isAdminAuthenticated ? '(Admin)' : '(Voz Director)'}</span>
                       </button>
                     )}
                     {isPublished ? (

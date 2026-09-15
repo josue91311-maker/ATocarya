@@ -37,7 +37,9 @@ import {
   parseChordChart,
   getChordDetails,
   hasChordProNotation,
-  parseChordPro
+  parseChordPro,
+  calculateSemitoneDistance,
+  formatSemitoneShiftDescription
 } from '../utils/chordTransposer';
 
 interface Props {
@@ -95,6 +97,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
     : undefined;
 
   const effectiveAudioUrl = activeSong?.audioUrl || bankMatch?.audioUrl;
+  const effectiveOriginalKey = activeSong?.originalKey || bankMatch?.originalKey;
+  const effectiveTargetKey = activeSong?.key;
   const effectiveChordsUrl = activeSong?.chordsUrl || bankMatch?.chordsUrl;
   const effectiveChordChart = (activeSong?.chordChart && activeSong.chordChart.trim()) 
     ? activeSong.chordChart 
@@ -596,11 +600,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         </div>
                       )}
 
-                      {/* Badge Tono Oficial */}
+                      {/* Badge Tono Oficial (Culto) */}
                       {activeSong.key && (
                         <div className="px-4 py-2 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-center shadow-2xs">
                           <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
-                            Tono Oficial
+                            Tono Oficial (Culto)
                           </span>
                           <span className="text-lg font-black font-display text-emerald-950">
                             {displayedKey || activeSong.key}
@@ -608,18 +612,42 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         </div>
                       )}
 
-                      {activeSong.originalKey && (
-                        <div className="px-3 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-                          <span className="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">
-                            Original
+                      {/* Badge Audio Original Grabado */}
+                      {effectiveOriginalKey && (
+                        <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-center">
+                          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">
+                            Audio Grabado
                           </span>
                           <span className="text-sm font-bold text-slate-700">
-                            {activeSong.originalKey}
+                            {effectiveOriginalKey}
                           </span>
                         </div>
                       )}
                     </div>
                   </div>
+
+                  {/* Banner Explicativo si el Tono del Culto difiere del Audio Original */}
+                  {effectiveOriginalKey && effectiveTargetKey && effectiveOriginalKey.toUpperCase() !== effectiveTargetKey.toUpperCase() && (() => {
+                    const shiftDiff = calculateSemitoneDistance(effectiveOriginalKey, effectiveTargetKey);
+                    if (shiftDiff === 0) return null;
+                    const isLower = shiftDiff < 0;
+                    return (
+                      <div className={`p-3.5 rounded-2xl border text-xs flex items-start gap-3 shadow-2xs ${
+                        isLower ? 'bg-amber-50/90 border-amber-300 text-amber-950' : 'bg-teal-50/90 border-teal-300 text-teal-950'
+                      }`}>
+                        <Sparkles className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isLower ? 'text-amber-600' : 'text-teal-600'}`} />
+                        <div className="space-y-0.5">
+                          <p className="font-black">
+                            {isLower ? '⬇️ ' : '⬆️ '}
+                            Afinación para el culto: {formatSemitoneShiftDescription(shiftDiff)}
+                          </p>
+                          <p className="text-[11px] opacity-90 leading-relaxed">
+                            La pista/audio grabado de referencia está en <strong>{effectiveOriginalKey}</strong>. Para este culto se cantará en <strong>{effectiveTargetKey}</strong>. Usa el reproductor abajo para escuchar la pista transpuesta al tono oficial del culto.
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
 
                   {/* REPRODUCTOR DE PISTA PERSISTENTE (Independiente de las pestañas de Letra / Cifrado) */}
                   {effectiveAudioUrl && (
@@ -627,7 +655,9 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       <AudioTransposerPlayer
                         audioUrl={effectiveAudioUrl}
                         songTitle={activeSong.title}
-                        baseKey={activeSong.key}
+                        originalKey={effectiveOriginalKey}
+                        targetKey={effectiveTargetKey}
+                        baseKey={effectiveOriginalKey || effectiveTargetKey}
                       />
                     </div>
                   )}

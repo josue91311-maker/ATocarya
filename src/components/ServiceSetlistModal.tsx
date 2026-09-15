@@ -116,7 +116,8 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
       (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
     )
   );
-  const canEdit = musicianUser ? isVozDirector : isAdminAuthenticated;
+  // El Administrador SIEMPRE tiene permiso para gestionar canciones, o la Voz Director asignada
+  const canEdit = isAdminAuthenticated || isVozDirector;
 
   if (!canEdit) {
     return (

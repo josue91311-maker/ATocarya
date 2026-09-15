@@ -295,8 +295,8 @@ export const ServiceDetailModal: React.FC<Props> = ({
               (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
             )
           );
-          // OJO: En la vista del músico (isMusicianView), ÚNICAMENTE si dice Voz Director Y está programado ese día puede gestionar canciones
-          const canManageSetlist = isMusicianView ? isVozDirector : (isAdminAuthenticated || isVozDirector);
+          // El Administrador SIEMPRE puede gestionar canciones, o la Voz Director programada
+          const canManageSetlist = isAdminAuthenticated || isVozDirector;
           const songs = service.songs || [];
           const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
           const publicUrl = `/#/repertorio/${service.id}`;
