@@ -31,9 +31,9 @@
       "purpose": "maskable"
     },
     {
-      "src": "/logooficial.jpg",
-      "sizes": "1024x512",
-      "type": "image/jpeg",
+      "src": "/logooficial.png",
+      "sizes": "885x325",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

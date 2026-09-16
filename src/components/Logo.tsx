@@ -32,9 +32,9 @@ export const Logo: React.FC<LogoProps> = ({
       {showText ? (
         <div className="flex items-center gap-2.5">
           <img 
-            src="/logooficial.jpg" 
+            src="/logooficial.png" 
             alt="ATocarYa - Worship Team Scheduling" 
-            className={`${imageHeights[size]} w-auto object-contain rounded-xl mix-blend-multiply`}
+            className={`${imageHeights[size]} w-auto object-contain`}
           />
           {subtitle && (
             <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-blue-50 text-[#1E74FD] border border-blue-200/80 text-[10px] font-bold uppercase tracking-wider">
