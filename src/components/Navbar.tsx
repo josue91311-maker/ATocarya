@@ -10,14 +10,15 @@ import {
   Table,
   Sparkles,
   Shield,
-  Music2
+  Music2,
+  Headphones
 } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface Props {
   portal: 'musician' | 'admin';
-  musicianTab: 'calendar' | 'my-services';
-  setMusicianTab: (tab: 'calendar' | 'my-services') => void;
+  musicianTab: 'calendar' | 'my-services' | 'tracks';
+  setMusicianTab: (tab: 'calendar' | 'my-services' | 'tracks') => void;
   adminTab: 'visual-board' | 'schedule' | 'musicians' | 'songs-bank';
   setAdminTab: (tab: 'visual-board' | 'schedule' | 'musicians' | 'songs-bank') => void;
   openShareModal: () => void;
@@ -44,6 +45,9 @@ export const Navbar: React.FC<Props> = ({
   const assignedCount = musicianUser
     ? services.filter(s => Object.values(s.slots).some(slot => slot.musicianId === musicianUser.id)).length
     : 0;
+
+  // Solo Voz Director o Administrador pueden ver la pestaña de Pistas de Audio
+  const canAccessTracks = isAdminAuthenticated || (musicianUser?.primaryInstrument === 'Voz Director');
 
   return (
     <>
@@ -90,6 +94,21 @@ export const Navbar: React.FC<Props> = ({
                       </span>
                     )}
                   </button>
+
+                  {/* Pestaña de Pistas de Audio (solo Voz Director y Administrador) */}
+                  {canAccessTracks && (
+                    <button
+                      onClick={() => setMusicianTab('tracks')}
+                      className={`h-full flex items-center gap-2 px-3 text-xs font-bold transition-all border-b-2 ${
+                        musicianTab === 'tracks'
+                          ? 'border-[#1E74FD] text-[#0B132B]'
+                          : 'border-transparent text-slate-500 hover:text-slate-900 hover:border-slate-300'
+                      }`}
+                    >
+                      <Headphones className="w-4 h-4 text-[#1E74FD]" />
+                      <span>Pistas de Audio</span>
+                    </button>
+                  )}
                 </nav>
               )}
 
@@ -252,6 +271,21 @@ export const Navbar: React.FC<Props> = ({
                 </span>
               )}
             </button>
+
+            {/* Pestaña Pistas de Audio (solo Voz Director o Admin) */}
+            {canAccessTracks && (
+              <button
+                onClick={() => setMusicianTab('tracks')}
+                className={`flex flex-col items-center justify-center min-w-[72px] py-1 px-2 rounded-xl transition-colors touch-target ${
+                  musicianTab === 'tracks'
+                    ? 'text-[#1E74FD] font-bold'
+                    : 'text-slate-500 hover:text-slate-900 font-medium'
+                }`}
+              >
+                <Headphones className="w-5 h-5 mb-0.5" />
+                <span className="text-[11px]">Pistas</span>
+              </button>
+            )}
           </>
         )}
 

@@ -18,6 +18,7 @@ import { WhatsAppShareModal } from './components/WhatsAppShareModal';
 import { PublicSetlistView } from './components/PublicSetlistView';
 import { ServiceSetlistModal } from './components/ServiceSetlistModal';
 import { SongBankManager } from './components/SongBankManager';
+import { SongBankPlayer } from './components/SongBankPlayer';
 
 type PortalType = 'musician' | 'admin';
 
@@ -52,7 +53,7 @@ const MainRouter: React.FC = () => {
   };
 
   const [portal, setPortal] = useState<PortalType>(getInitialPortal);
-  const [musicianTab, setMusicianTab] = useState<'calendar' | 'my-services'>('calendar');
+  const [musicianTab, setMusicianTab] = useState<'calendar' | 'my-services' | 'tracks'>('calendar');
   const [mobileMusicianView, setMobileMusicianView] = useState<'home' | 'full-calendar'>('home');
   const [adminTab, setAdminTab] = useState<'visual-board' | 'schedule' | 'musicians' | 'songs-bank'>('visual-board');
 
@@ -175,6 +176,10 @@ const MainRouter: React.FC = () => {
 
           {musicianTab === 'my-services' && (
             <MyServicesView onSelectService={(s) => setSelectedService(s)} />
+          )}
+
+          {musicianTab === 'tracks' && (
+            <SongBankPlayer />
           )}
         </main>
 
