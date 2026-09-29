@@ -6,13 +6,8 @@ import {
   Play, 
   ExternalLink, 
   Share2, 
-  Calendar, 
   Clock, 
   Users, 
-  ChevronRight, 
-  ChevronLeft,
-  Sparkles, 
-  CheckCircle2, 
   AlertCircle, 
   Copy, 
   Check, 
@@ -20,13 +15,16 @@ import {
   FileText, 
   FileCheck, 
   Headphones, 
-  X, 
-  Info 
+  Link as LinkIcon,
+  MoreVertical,
+  ChevronDown,
+  Menu,
+  Sparkles,
+  X
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { AudioTransposerPlayer } from './AudioTransposerPlayer';
 import { 
-  extractYouTubeId, 
   getYouTubeEmbedUrl, 
   getYouTubeThumbnailUrl, 
   getExternalMusicToolLinks 
@@ -37,9 +35,7 @@ import {
   parseChordChart,
   getChordDetails,
   hasChordProNotation,
-  parseChordPro,
-  calculateSemitoneDistance,
-  formatSemitoneShiftDescription
+  parseChordPro
 } from '../utils/chordTransposer';
 
 interface Props {
@@ -53,7 +49,9 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
   const [copiedLink, setCopiedLink] = useState(false);
-  const [activeTab, setActiveTab] = useState<'chords' | 'lyrics' | 'pdf'>('chords');
+  const [activeTab, setActiveTab] = useState<'lyrics' | 'pdf' | 'chords'>('lyrics');
+  const [mobileOpenAccordion, setMobileOpenAccordion] = useState<'lyrics' | 'pdf' | 'chords' | null>('lyrics');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [transposeDelta, setTransposeDelta] = useState<number>(0);
   const [inspectedChord, setInspectedChord] = useState<string | null>(null);
   const [chordProMode, setChordProMode] = useState<'with-chords' | 'lyrics-only'>('with-chords');
@@ -64,14 +62,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
       <div className="min-h-screen flex items-center justify-center p-4 bg-[#f8fafc]">
         <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-xl border border-slate-200">
           <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-slate-900">Culto no encontrado</h2>
+          <h2 className="text-lg font-bold text-[#0B132B]">Culto no encontrado</h2>
           <p className="text-xs text-slate-500 mt-1">
             El enlace al repertorio no es válido o la fecha fue reprogramada.
           </p>
           {onGoToPortal && (
             <button
               onClick={onGoToPortal}
-              className="mt-5 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition-colors"
+              className="mt-5 px-5 py-2.5 bg-[#1E74FD] hover:bg-[#155de0] text-white text-xs font-bold rounded-xl transition-colors"
             >
               Ir al Portal Principal
             </button>
@@ -91,7 +89,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
   const activeSong: SongItem | undefined = songs[activeSongIndex] || songs[0];
 
-  // Buscar coincidencia en el Banco de Canciones para heredar cifrado, letra, compases, audio o enlaces si faltan en el culto
+  // Buscar coincidencia en el Banco de Canciones
   const bankMatch = activeSong 
     ? songBank.find(b => b.title.trim().toLowerCase() === activeSong.title.trim().toLowerCase()) 
     : undefined;
@@ -117,22 +115,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const hasChords = Boolean(effectiveChordChart && effectiveChordChart.trim());
   const hasLyrics = Boolean(effectiveLyrics && effectiveLyrics.trim());
-  const hasAudio = Boolean(effectiveAudioUrl && effectiveAudioUrl.trim());
   const hasPdf = Boolean(effectiveChordsUrl && effectiveChordsUrl.trim());
-
-  // Ajustar la pestaña activa automáticamente si la pestaña actual no tiene contenido para la canción seleccionada
-  useEffect(() => {
-    if (activeTab === 'chords' && !hasChords) {
-      if (hasLyrics) setActiveTab('lyrics');
-      else if (hasPdf) setActiveTab('pdf');
-    } else if (activeTab === 'lyrics' && !hasLyrics) {
-      if (hasChords) setActiveTab('chords');
-      else if (hasPdf) setActiveTab('pdf');
-    } else if (activeTab === 'pdf' && !hasPdf) {
-      if (hasChords) setActiveTab('chords');
-      else if (hasLyrics) setActiveTab('lyrics');
-    }
-  }, [activeSongIndex, hasChords, hasLyrics, hasPdf]);
 
   // Limpiar acorde inspeccionado al cambiar de alabanza
   useEffect(() => {
@@ -145,11 +128,6 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
     ? transposeChordChartText(rawChordChart, transposeDelta)
     : rawChordChart;
   const parsedSections = parseChordChart(transposedChartText);
-
-  // Tono transpuesto mostrado (usando Tonal)
-  const displayedKey = activeSong?.key && transposeDelta !== 0
-    ? transposeChord(activeSong.key.split(' ')[0], transposeDelta)
-    : activeSong?.key;
 
   // Desglose armónico inteligente del acorde seleccionado (Tonal.js)
   const inspectedChordDetails = useMemo(() => {
@@ -183,13 +161,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
     lines.push(`📅 *${service.title}* (${fullDateStr})`);
     lines.push(`⏰ Culto: ${service.time} ${service.rehearsalTime ? `· Ensayo: ${service.rehearsalTime}` : ''}`);
 
-    // 1. Director al comienzo
     if (directorName) {
       lines.push(`🎤 *Director de Alabanza:* ${directorName}`);
     }
     lines.push('──────────────────────────────');
 
-    // 2. Músicos confirmados (sin vacantes)
     const confirmedSlots = (Object.values(service.slots || {}) as SlotConfig[])
       .filter(slot => slot.enabled !== false && Boolean(slot.musicianId));
 
@@ -201,7 +177,6 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
       lines.push('──────────────────────────────');
     }
 
-    // 3. Canciones con tono y URL
     if (songs.length > 0) {
       lines.push('🎵 *Canciones & Tonalidades:*');
       songs.forEach((s, idx) => {
@@ -224,1019 +199,651 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
+  // Video Slot para pasar a AudioTransposerPlayer
+  const videoElement = (
+    <div className="aspect-video w-full bg-slate-950 rounded-2xl overflow-hidden shadow-sm relative group">
+      {activeVideoUrl ? (
+        <iframe
+          src={activeVideoUrl}
+          title={activeSong?.title || 'Video de referencia'}
+          className="w-full h-full border-0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+        />
+      ) : (
+        <div className="h-full flex flex-col items-center justify-center p-6 text-center text-slate-400 bg-slate-900">
+          <Music className="w-10 h-10 mb-2 text-slate-600" />
+          <p className="text-xs font-bold text-slate-300">Sin video de referencia</p>
+          <p className="text-[11px] text-slate-500 mt-0.5">Esta canción no cuenta con enlace de YouTube.</p>
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col">
+    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col selection:bg-[#1E74FD]/20">
       
-      {/* Header Superior Limpio */}
+      {/* 1. Header Superior Moderno */}
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+          
+          {/* Logo y Botón móvil */}
           <div className="flex items-center gap-3">
-            <Logo size="sm" subtitle="Repertorio Oficial" />
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="sm:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              aria-label="Abrir menú"
+            >
+              <Menu className="w-5 h-5" />
+            </button>
+            <Logo size="sm" showText={true} />
           </div>
 
+          {/* Badge Central Desktop */}
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100/90 text-slate-700 border border-slate-200 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>REPERTORIO OFICIAL</span>
+          </div>
+
+          {/* Acciones Derecha */}
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyLink}
-              className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs"
-              title="Copiar enlace"
+              className="hidden sm:flex px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold items-center gap-1.5 transition-colors shadow-2xs"
+              title="Copiar enlace del repertorio"
             >
               {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
-              <span className="hidden sm:inline">{copiedLink ? '¡Copiado!' : 'Copiar Link'}</span>
+              <span>{copiedLink ? '¡Copiado!' : 'Copiar Link'}</span>
             </button>
 
             <button
               onClick={handleShareWhatsApp}
-              className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black flex items-center gap-1.5 transition-all shadow-sm shadow-emerald-600/20"
+              className="px-3.5 py-1.5 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm shadow-blue-500/20"
               title="Compartir por WhatsApp"
             >
               <Share2 className="w-3.5 h-3.5" />
               <span>WhatsApp</span>
             </button>
+
+            <button
+              type="button"
+              onClick={handleCopyLink}
+              className="sm:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              title="Copiar enlace"
+            >
+              <MoreVertical className="w-5 h-5" />
+            </button>
           </div>
         </div>
+
+        {/* Menú desplegable móvil */}
+        {mobileMenuOpen && (
+          <div className="sm:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-2 shadow-lg animate-in slide-in-from-top-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pb-2 border-b border-slate-100">
+              <span>{service.title}</span>
+              <span className="text-emerald-600 font-bold">Oficial</span>
+            </div>
+            <button
+              onClick={() => {
+                handleCopyLink();
+                setMobileMenuOpen(false);
+              }}
+              className="w-full text-left py-2 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2"
+            >
+              <Copy className="w-4 h-4 text-slate-500" />
+              <span>{copiedLink ? '¡Enlace Copiado!' : 'Copiar enlace directo'}</span>
+            </button>
+            {onGoToPortal && (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onGoToPortal();
+                }}
+                className="w-full text-left py-2 px-3 text-xs font-bold text-[#1E74FD] hover:bg-blue-50 rounded-xl flex items-center gap-2"
+              >
+                <span>Acceder al Portal de Músicos</span>
+              </button>
+            )}
+          </div>
+        )}
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 py-6 pb-20 space-y-6">
+      {/* Main Container */}
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-20 space-y-5 sm:space-y-6">
 
-        {/* Tarjeta de Cabecera del Culto */}
-        <div className="bg-white border border-slate-200/90 rounded-3xl p-5 sm:p-7 shadow-2xs">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="space-y-1">
+        {/* 2. Hero Banner del Culto (Diseño Navy con Imagen de Fondo de Concierto) */}
+        <div className="relative rounded-3xl overflow-hidden bg-[#0B132B] text-white p-5 sm:p-7 shadow-lg border border-slate-800">
+          {/* Fondo sutil de concierto con siluetas de manos levantadas */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
+            style={{ backgroundImage: 'url("/app-bg.jpg")' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#0B132B] via-[#0B132B]/90 to-[#0B132B]/60 pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-900 border border-emerald-300">
-                  {isPublished ? '✓ Repertorio Oficial' : 'En Preparación'}
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#1E74FD]/20 text-[#60a5fa] border border-[#1E74FD]/40">
+                  REPERTORIO OFICIAL
                 </span>
-                <span className="text-xs font-bold text-slate-500 capitalize">
+                <span className="text-xs font-semibold text-slate-300 capitalize">
                   {fullDateStr}
                 </span>
               </div>
-              <h1 className="text-xl sm:text-2xl font-black font-display text-slate-900">
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                 {service.title}
               </h1>
-              <div className="flex items-center gap-3 text-xs text-slate-600 pt-1 flex-wrap">
-                <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                  Culto: <strong>{service.time}</strong>
+              <div className="flex items-center gap-4 text-xs text-slate-300 pt-1 flex-wrap">
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#1E74FD]" />
+                  Culto: <strong className="text-white">{service.time}</strong>
                 </span>
                 {service.rehearsalTime && (
-                  <span>· Ensayo: <strong>{service.rehearsalTime}</strong></span>
+                  <span className="flex items-center gap-1.5">
+                    <Headphones className="w-3.5 h-3.5 text-[#1E74FD]" />
+                    Ensayo: <strong className="text-white">{service.rehearsalTime}</strong>
+                  </span>
                 )}
                 {directorName && (
-                  <span className="text-emerald-900 bg-emerald-50 px-2 py-0.5 rounded-md font-semibold">
-                    🎤 Director: {directorName}
+                  <span className="flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-[#1E74FD]" />
+                    Director: <strong className="text-white">{directorName}</strong>
                   </span>
                 )}
               </div>
             </div>
 
-            <div className="text-left sm:text-right flex-shrink-0">
-              <span className="text-2xl sm:text-3xl font-black font-display text-emerald-800 tabular-nums">
-                {songs.length}
-              </span>
-              <span className="text-xs text-slate-500 block font-medium">
-                alabanzas programadas
-              </span>
+            {/* Tarjeta flotante glassmorphism con contador */}
+            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 sm:p-4 flex items-center gap-3 shrink-0 self-start sm:self-auto">
+              <Music className="w-7 h-7 sm:w-8 sm:h-8 text-[#1E74FD]" />
+              <div>
+                <span className="text-2xl sm:text-3xl font-black text-white leading-none block">
+                  {songs.length}
+                </span>
+                <span className="text-[10px] sm:text-xs text-slate-300 font-medium block">
+                  alabanzas programadas
+                </span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Si el repertorio NO está publicado */}
-        {!isPublished ? (
-          <div className="bg-white border border-slate-200/90 rounded-3xl p-10 sm:p-14 text-center shadow-2xs space-y-3">
-            <div className="w-16 h-16 rounded-3xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto shadow-2xs">
-              <Music className="w-8 h-8" />
+        {/* 3. Selector de Alabanzas */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-sm sm:text-base font-bold text-[#0B132B] flex items-center gap-2">
+              <Music className="w-4 h-4 text-[#1E74FD]" />
+              <span>Repertorio ({songs.length} alabanzas)</span>
+            </h2>
+            <div className="text-xs text-slate-500 font-semibold px-3 py-1 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
+              <span className="hidden sm:inline">Orden personalizado ⌵</span>
+              <span className="sm:hidden">Orden ⌵</span>
             </div>
-            <h2 className="text-lg font-bold text-slate-900">Repertorio en Preparación</h2>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-              El Director de Alabanza o Administrador aún está seleccionando las alabanzas y tonalidades oficiales para este culto.
-            </p>
-            <p className="text-[11px] text-emerald-700 font-semibold">
-              Guarda este enlace o vuelve a consultarlo pronto para ensayar los videos.
-            </p>
           </div>
-        ) : (
-          /* Si está publicado: Selector Superior + Reproductor */
-          <div className="space-y-6">
 
-            {/* SELECTOR SUPERIOR DE CANCIONES (Adaptado a Desktop y Mobile) */}
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-3">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                  <h3 className="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-                    <Music className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Repertorio ({songs.length} Alabanzas)</span>
-                  </h3>
-                </div>
+          {/* Grilla de Canciones: Horizontal en PC, Lista vertical en Móvil */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {songs.map((song, index) => {
+              const isActive = index === activeSongIndex;
+              const match = songBank.find(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase());
+              const thumb = getYouTubeThumbnailUrl(song.youtubeUrl || match?.youtubeUrl);
+              const songHasAudio = Boolean(song.audioUrl || match?.audioUrl);
+              const songHasChords = Boolean(song.chordChart || song.chordsUrl || match?.chordChart || match?.chordsUrl);
 
-                {/* En Mobile: Navegación Rápida Anterior / Siguiente */}
-                <div className="flex sm:hidden items-center gap-1.5">
-                  <button
-                    type="button"
-                    disabled={activeSongIndex === 0}
-                    onClick={() => {
-                      setActiveSongIndex(Math.max(0, activeSongIndex - 1));
-                      setTransposeDelta(0);
-                    }}
-                    className="p-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
-                    title="Alabanza anterior"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
+              return (
+                <button
+                  key={song.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveSongIndex(index);
+                    setTransposeDelta(0);
+                  }}
+                  className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
+                    isActive
+                      ? 'bg-[#F0F7FF] border-[#1E74FD] shadow-xs ring-1 ring-[#1E74FD]/30 scale-[1.01]'
+                      : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                  }`}
+                >
+                  {/* Thumbnail con icono play */}
+                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
+                    <img
+                      src={thumb || '/app-bg.jpg'}
+                      alt={song.title}
+                      className="w-full h-full object-cover"
+                    />
+                    <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-[#1E74FD]/40' : 'bg-black/25'}`}>
+                      <Play className="w-4 h-4 text-white fill-white" />
+                    </div>
+                  </div>
 
-                  <span className="text-xs font-black text-emerald-900 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-300">
-                    {activeSongIndex + 1}/{songs.length}
-                  </span>
+                  {/* Datos del tema */}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className={`w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold ${
+                        isActive ? 'bg-[#1E74FD] text-white' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        {index + 1}
+                      </span>
+                      <h3 className={`text-xs sm:text-sm font-bold truncate leading-tight ${
+                        isActive ? 'text-[#0B132B]' : 'text-slate-800'
+                      }`}>
+                        {song.title}
+                      </h3>
+                    </div>
 
-                  <button
-                    type="button"
-                    disabled={activeSongIndex === songs.length - 1}
-                    onClick={() => {
-                      setActiveSongIndex(Math.min(songs.length - 1, activeSongIndex + 1));
-                      setTransposeDelta(0);
-                    }}
-                    className="p-1.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 disabled:opacity-30 disabled:cursor-not-allowed hover:bg-slate-100 transition-colors"
-                    title="Alabanza siguiente"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      {song.key && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1E74FD]/10 text-[#1E74FD]">
+                          {song.key}
+                        </span>
+                      )}
+                      {song.originalKey && (
+                        <span className="text-[10px] text-slate-400 font-medium">
+                          orig: {song.originalKey}
+                        </span>
+                      )}
+                      {songHasAudio && (
+                        <span title="Pista disponible">
+                          <Headphones className="w-3.5 h-3.5 text-slate-400" />
+                        </span>
+                      )}
+                      {songHasChords && (
+                        <span title="Cifrado / Acordes disponibles">
+                          <LinkIcon className="w-3.5 h-3.5 text-slate-400" />
+                        </span>
+                      )}
+                    </div>
+                  </div>
 
-              {/* VISTA MOBILE: Carrusel Horizontal Deslizable con Snap y Touch Fluido */}
-              <div className="flex sm:hidden gap-2.5 overflow-x-auto pb-1.5 pt-0.5 no-scrollbar snap-x">
-                {songs.map((song, index) => {
-                  const isActive = index === activeSongIndex;
-                  const thumb = getYouTubeThumbnailUrl(song.youtubeUrl);
+                  {/* 3 puntos */}
+                  <div className="shrink-0 text-slate-400 p-1 hover:text-slate-600">
+                    <MoreVertical className="w-4 h-4" />
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
-                  return (
-                    <button
-                      key={song.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveSongIndex(index);
-                        setTransposeDelta(0);
-                      }}
-                      className={`w-[78vw] max-w-[290px] flex-shrink-0 snap-start p-3 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
-                        isActive
-                          ? 'border-emerald-500 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20'
-                          : 'border-slate-200 bg-white hover:border-slate-300'
-                      }`}
-                    >
-                      {/* Mini Thumbnail / Icono */}
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
-                        {thumb ? (
-                          <img src={thumb} alt={song.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <Music className="w-5 h-5 text-slate-400" />
-                        )}
-                        <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-emerald-600/40' : 'bg-black/15'}`}>
-                          <Play className="w-3.5 h-3.5 text-white fill-white" />
-                        </div>
-                      </div>
+        {/* 4. Reproductor Embebido de Video + Transpositor WSOLA + Barra de Audio */}
+        {activeSong && (
+          <AudioTransposerPlayer
+            audioUrl={effectiveAudioUrl}
+            songTitle={activeSong.title}
+            originalKey={effectiveOriginalKey}
+            targetKey={effectiveTargetKey}
+            baseKey={effectiveOriginalKey || effectiveTargetKey}
+            thumbnailUrl={getYouTubeThumbnailUrl(activeSong.youtubeUrl || bankMatch?.youtubeUrl) || '/app-bg.jpg'}
+            videoSlot={videoElement}
+          />
+        )}
 
-                      {/* Info Compacta */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-md ${
-                            isActive ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
-                          }`}>
-                            #{index + 1}
-                          </span>
-                          <h4 className="text-xs font-bold text-slate-900 truncate leading-tight">
-                            {song.title}
-                          </h4>
-                        </div>
+        {/* 5. Documentos del tema: Letras, Cifrados y Partituras PDF */}
+        <div className="space-y-3">
+          
+          {/* VISTA ESCRITORIO (Tabs horizontales) */}
+          <div className="hidden sm:block space-y-4">
+            <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit">
+              {hasLyrics && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('lyrics')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                    activeTab === 'lyrics'
+                      ? 'bg-white text-[#1E74FD] shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Letra</span>
+                </button>
+              )}
 
-                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                          {song.key && (
-                            <span className="text-[10px] font-black px-1.5 py-0.2 bg-emerald-100 text-emerald-900 rounded border border-emerald-300">
-                              {song.key}
-                            </span>
-                          )}
-                          {song.originalKey && (
-                            <span className="text-[9px] text-slate-400">
-                              orig: {song.originalKey}
-                            </span>
-                          )}
-                          {(song.audioUrl || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.audioUrl)) && (
-                            <span className="text-[8px] font-bold px-1 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200">
-                              🎧
-                            </span>
-                          )}
-                          {(song.chordChart || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.chordChart)) && (
-                            <span className="text-[8px] font-bold px-1 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200">
-                              🎸
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              {hasPdf && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('pdf')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                    activeTab === 'pdf'
+                      ? 'bg-white text-[#1E74FD] shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <FileCheck className="w-4 h-4" />
+                  <span>Visor PDF</span>
+                </button>
+              )}
 
-              {/* VISTA TABLET / DESKTOP: Grilla Visual Elegante */}
-              <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-                {songs.map((song, index) => {
-                  const isActive = index === activeSongIndex;
-                  const thumb = getYouTubeThumbnailUrl(song.youtubeUrl);
-
-                  return (
-                    <button
-                      key={song.id}
-                      type="button"
-                      onClick={() => {
-                        setActiveSongIndex(index);
-                        setTransposeDelta(0);
-                      }}
-                      className={`p-3 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
-                        isActive
-                          ? 'border-emerald-500 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20 scale-[1.01]'
-                          : 'border-slate-200 bg-white hover:border-emerald-300 hover:shadow-2xs'
-                      }`}
-                    >
-                      {/* Thumbnail or Icon */}
-                      <div className="w-12 h-12 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
-                        {thumb ? (
-                          <img src={thumb} alt={song.title} className="w-full h-full object-cover" />
-                        ) : (
-                          <Music className="w-5 h-5 text-slate-400" />
-                        )}
-                        <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-emerald-600/40' : 'bg-black/15'}`}>
-                          <Play className="w-3.5 h-3.5 text-white fill-white" />
-                        </div>
-                      </div>
-
-                      {/* Info */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5">
-                          <span className={`text-[10px] font-black px-1.5 py-0.2 rounded-md ${
-                            isActive ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'
-                          }`}>
-                            #{index + 1}
-                          </span>
-                          <h4 className="text-xs font-bold text-slate-900 truncate leading-tight">
-                            {song.title}
-                          </h4>
-                        </div>
-
-                        <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
-                          {song.key && (
-                            <span className="text-[10px] font-black px-1.5 py-0.2 bg-emerald-100 text-emerald-900 rounded border border-emerald-300">
-                              {song.key}
-                            </span>
-                          )}
-                          {song.originalKey && (
-                            <span className="text-[9px] text-slate-400">
-                              orig: {song.originalKey}
-                            </span>
-                          )}
-                          {(song.audioUrl || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.audioUrl)) && (
-                            <span className="text-[8px] font-bold px-1.5 py-0.2 bg-teal-50 text-teal-800 rounded border border-teal-200" title="Audio / Pista disponible">
-                              🎧
-                            </span>
-                          )}
-                          {(song.chordChart || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.chordChart)) && (
-                            <span className="text-[8px] font-bold px-1.5 py-0.2 bg-slate-100 text-slate-700 rounded border border-slate-200" title="Cifrado disponible">
-                              🎸
-                            </span>
-                          )}
-                          {(song.lyrics || songBank.some(b => b.title.trim().toLowerCase() === song.title.trim().toLowerCase() && b.lyrics)) && (
-                            <span className="text-[8px] font-bold px-1.5 py-0.2 bg-blue-50 text-blue-700 rounded border border-blue-200" title="Letra disponible">
-                              🎤
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
+              {hasChords && (
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('chords')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
+                    activeTab === 'chords'
+                      ? 'bg-white text-[#1E74FD] shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  <Music className="w-4 h-4" />
+                  <span>Cifrado & Compases</span>
+                </button>
+              )}
             </div>
 
-            {/* Reproductor Embebido de la Alabanza Activa */}
-            {activeSong && (
-              <div className="bg-white border border-slate-200/90 rounded-3xl overflow-hidden shadow-sm">
-                
-                {/* Contenedor del Video */}
-                {activeVideoUrl ? (
-                  <div className="aspect-video w-full bg-slate-950">
-                    <iframe
-                      src={activeVideoUrl}
-                      title={activeSong.title}
-                      className="w-full h-full border-0"
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                    />
-                  </div>
-                ) : (
-                  <div className="p-8 text-center bg-slate-50 border-b border-slate-200">
-                    <Music className="w-10 h-10 text-slate-300 mx-auto mb-2" />
-                    <p className="text-xs font-bold text-slate-700">Sin video de referencia adjunto</p>
-                    <p className="text-[11px] text-slate-500">Esta alabanza no incluye enlace de YouTube.</p>
-                  </div>
-                )}
-
-                {/* Datos de la Alabanza Activa */}
-                <div className="p-5 sm:p-6 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-black">
-                          #{activeSongIndex + 1}
-                        </span>
-                        <h2 className="text-lg sm:text-xl font-bold font-display text-slate-900">
-                          {activeSong.title}
-                        </h2>
-                      </div>
-                      {activeSong.notes && (
-                        <p className="text-xs text-slate-600 mt-2 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                          💬 <strong>Nota del Director:</strong> {activeSong.notes}
-                        </p>
-                      )}
-                    </div>
-
-                    {/* Badge de Tonalidad Grande y Controles de Transposición */}
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 self-start sm:self-auto flex-shrink-0">
-                      
-                      {/* Control de Transposición en Vivo (+1 / -1 Semitonos) */}
-                      {hasChords && (
-                        <div className="flex items-center gap-1.5 p-1.5 bg-slate-100 border border-slate-200 rounded-2xl">
-                          <span className="text-[10px] font-bold text-slate-500 uppercase px-1.5">
-                            Tono:
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setTransposeDelta(prev => prev - 1)}
-                            className="w-7 h-7 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-black text-xs flex items-center justify-center border border-slate-200 shadow-2xs active:scale-95 transition-all"
-                            title="Bajar 1 semitono (-1)"
-                          >
-                            -1
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setTransposeDelta(0)}
-                            className={`px-2.5 h-7 rounded-xl font-mono text-xs font-bold flex items-center justify-center border transition-all ${
-                              transposeDelta !== 0
-                                ? 'bg-amber-100 text-amber-900 border-amber-300 font-black'
-                                : 'bg-white text-slate-700 border-slate-200'
-                            }`}
-                            title="Restablecer al tono oficial original"
-                          >
-                            {displayedKey || (transposeDelta > 0 ? `+${transposeDelta}` : transposeDelta === 0 ? '0' : `${transposeDelta}`)}
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setTransposeDelta(prev => prev + 1)}
-                            className="w-7 h-7 rounded-xl bg-white hover:bg-slate-200 text-slate-700 font-black text-xs flex items-center justify-center border border-slate-200 shadow-2xs active:scale-95 transition-all"
-                            title="Subir 1 semitono (+1)"
-                          >
-                            +1
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Badge Tono Oficial (Culto) */}
-                      {activeSong.key && (
-                        <div className="px-4 py-2 bg-emerald-50 border-2 border-emerald-300 rounded-2xl text-center shadow-2xs">
-                          <span className="text-[10px] uppercase font-bold text-emerald-800 tracking-wider block">
-                            Tono Oficial (Culto)
-                          </span>
-                          <span className="text-lg font-black font-display text-emerald-950">
-                            {displayedKey || activeSong.key}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Badge Audio Original Grabado */}
-                      {effectiveOriginalKey && (
-                        <div className="px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-2xl text-center">
-                          <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider block">
-                            Audio Grabado
-                          </span>
-                          <span className="text-sm font-bold text-slate-700">
-                            {effectiveOriginalKey}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Banner Explicativo si el Tono del Culto difiere del Audio Original */}
-                  {effectiveOriginalKey && effectiveTargetKey && effectiveOriginalKey.toUpperCase() !== effectiveTargetKey.toUpperCase() && (() => {
-                    const shiftDiff = calculateSemitoneDistance(effectiveOriginalKey, effectiveTargetKey);
-                    if (shiftDiff === 0) return null;
-                    const isLower = shiftDiff < 0;
-                    return (
-                      <div className={`p-3.5 rounded-2xl border text-xs flex items-start gap-3 shadow-2xs ${
-                        isLower ? 'bg-amber-50/90 border-amber-300 text-amber-950' : 'bg-teal-50/90 border-teal-300 text-teal-950'
-                      }`}>
-                        <Sparkles className={`w-4 h-4 mt-0.5 flex-shrink-0 ${isLower ? 'text-amber-600' : 'text-teal-600'}`} />
-                        <div className="space-y-0.5">
-                          <p className="font-black">
-                            {isLower ? '⬇️ ' : '⬆️ '}
-                            Afinación para el culto: {formatSemitoneShiftDescription(shiftDiff)}
-                          </p>
-                          <p className="text-[11px] opacity-90 leading-relaxed">
-                            La pista/audio grabado de referencia está en <strong>{effectiveOriginalKey}</strong>. Para este culto se cantará en <strong>{effectiveTargetKey}</strong>. Usa el reproductor abajo para escuchar la pista transpuesta al tono oficial del culto.
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {/* REPRODUCTOR DE PISTA PERSISTENTE (Independiente de las pestañas de Letra / Cifrado) */}
-                  {effectiveAudioUrl && (
-                    <div className="pt-3">
-                      <AudioTransposerPlayer
-                        audioUrl={effectiveAudioUrl}
-                        songTitle={activeSong.title}
-                        originalKey={effectiveOriginalKey}
-                        targetKey={effectiveTargetKey}
-                        baseKey={effectiveOriginalKey || effectiveTargetKey}
-                      />
-                    </div>
-                  )}
-
-                  {/* Selector de Pestañas de Documento: Cifrado & Compases / Letra / Visor PDF */}
-                  <div className="pt-2 border-t border-slate-100">
-                    <div className="flex items-center gap-2 p-1 bg-slate-100 rounded-2xl max-w-lg flex-wrap">
-                      {hasChords && (
+            {/* Contenedor del documento activo */}
+            <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm">
+              {activeTab === 'lyrics' && hasLyrics && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="text-sm font-bold text-[#0B132B] uppercase tracking-wider">
+                      Letra Oficial
+                    </h3>
+                    {isChordPro && (
+                      <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-xl text-xs font-bold">
                         <button
                           type="button"
-                          onClick={() => setActiveTab('chords')}
-                          className={`flex-1 min-w-[120px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                            activeTab === 'chords'
-                              ? 'bg-white text-emerald-950 shadow-xs'
+                          onClick={() => setChordProMode('with-chords')}
+                          className={`px-2.5 py-1 rounded-lg transition-all ${
+                            chordProMode === 'with-chords'
+                              ? 'bg-white text-[#1E74FD] shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          <Music className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Cifrado & Compases</span>
+                          Con Acordes
                         </button>
-                      )}
-
-                      {hasLyrics && (
                         <button
                           type="button"
-                          onClick={() => setActiveTab('lyrics')}
-                          className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                            activeTab === 'lyrics'
-                              ? 'bg-white text-emerald-950 shadow-xs'
+                          onClick={() => setChordProMode('lyrics-only')}
+                          className={`px-2.5 py-1 rounded-lg transition-all ${
+                            chordProMode === 'lyrics-only'
+                              ? 'bg-white text-[#1E74FD] shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
-                          <FileText className="w-3.5 h-3.5 text-blue-600" />
-                          <span>Letra</span>
+                          Solo Letra
                         </button>
-                      )}
-
-                      {activeSong.chordsUrl && (
-                        <button
-                          type="button"
-                          onClick={() => setActiveTab('pdf')}
-                          className={`flex-1 min-w-[90px] py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                            activeTab === 'pdf'
-                              ? 'bg-white text-emerald-950 shadow-xs'
-                              : 'text-slate-600 hover:text-slate-900'
-                          }`}
-                        >
-                          <FileCheck className="w-3.5 h-3.5 text-indigo-600" />
-                          <span>Visor PDF</span>
-                        </button>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
 
-                  {/* CONTENIDO 1: VISOR DE CIFRADO ARMÓNICO Y COMPASES CON TRANSPOSE */}
-                  {activeTab === 'chords' && hasChords && (
-                    <div className="p-4 sm:p-5 bg-slate-900 text-white rounded-2xl shadow-inner space-y-4">
-                      <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-                            Estructura de Compases & Acordes
-                          </span>
-                          {transposeDelta !== 0 && (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">
-                              Transpuesto ({transposeDelta > 0 ? `+${transposeDelta}` : transposeDelta} semitonos)
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2 text-[11px] text-slate-400 flex-wrap">
-                          <button
-                            type="button"
-                            onClick={() => setShowChordNotesAlways(!showChordNotesAlways)}
-                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 border ${
-                              showChordNotesAlways
-                                ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/60 shadow-xs'
-                                : 'bg-slate-800 text-slate-300 border-slate-700 hover:text-white hover:bg-slate-700/70'
-                            }`}
-                            title="Alternar vista de notas musicales debajo de cada acorde"
-                          >
-                            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>{showChordNotesAlways ? 'Ocultar Notas' : 'Ver Notas de Acordes'}</span>
-                          </button>
-                          <div className="hidden sm:flex items-center gap-1">
-                            <span className="inline-block w-2 h-2 rounded-full bg-amber-400 mr-1"></span>
-                            <span>Nota de Paso</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Banner de Inspector Armónico Inteligente (Tonal.js) */}
-                      {inspectedChordDetails && (
-                        <div className="bg-emerald-950/95 border border-emerald-500/60 rounded-xl p-3 flex items-center justify-between text-xs text-emerald-200 shadow-lg">
-                          <div className="flex items-center gap-3 flex-wrap">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-mono font-black text-base text-emerald-300 px-2.5 py-0.5 bg-emerald-900/90 rounded-lg border border-emerald-400/50">
-                                {inspectedChordDetails.symbol}
+                  {isChordPro && parsedChordPro && chordProMode === 'with-chords' ? (
+                    <div className="space-y-3 font-mono text-sm leading-relaxed overflow-x-auto pb-2">
+                      {parsedChordPro.map((line, lIdx) => {
+                        if (line.type === 'empty') return <div key={lIdx} className="h-2" />;
+                        if (line.type === 'section') {
+                          return (
+                            <div key={lIdx} className="pt-2">
+                              <span className="text-xs font-black uppercase tracking-wider text-[#1E74FD] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg inline-block font-sans">
+                                {line.sectionTitle}
                               </span>
-                              {inspectedChordDetails.name && inspectedChordDetails.name !== inspectedChordDetails.symbol && (
-                                <span className="text-slate-300 font-medium capitalize">
-                                  ({inspectedChordDetails.name})
-                                </span>
-                              )}
                             </div>
-                            <div className="flex items-center gap-1.5 flex-wrap">
-                              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
-                                <Sparkles className="w-3 h-3 text-emerald-400" />
-                                <span>Notas del acorde:</span>
-                              </span>
-                              {inspectedChordDetails.notes.map((note, nIdx) => (
-                                <span 
-                                  key={nIdx}
-                                  className={`font-mono font-black px-1.5 py-0.5 rounded text-xs ${
-                                    note.includes('Bajo')
-                                      ? 'bg-amber-400/20 text-amber-300 border border-amber-400/50'
-                                      : 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30'
-                                  }`}
-                                >
-                                  {note}
+                          );
+                        }
+                        return (
+                          <div key={lIdx} className="flex flex-wrap items-end leading-none py-1 gap-x-1 gap-y-2">
+                            {line.segments?.map((seg, sIdx) => (
+                              <span key={sIdx} className="inline-flex flex-col">
+                                {seg.chord ? (
+                                  <span className="text-xs font-black font-mono text-[#1E74FD] select-none pb-0.5 tracking-tight">
+                                    {seg.chord}
+                                  </span>
+                                ) : (
+                                  <span className="text-xs invisible select-none pb-0.5">_</span>
+                                )}
+                                <span className="text-sm font-sans font-medium text-slate-800 whitespace-pre">
+                                  {seg.text || ' '}
                                 </span>
-                              ))}
-                            </div>
-                          </div>
-                          <button 
-                            onClick={() => setInspectedChord(null)}
-                            className="p-1 hover:bg-emerald-900/80 rounded-lg text-emerald-400 hover:text-white transition-colors ml-2"
-                            title="Cerrar inspector"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Renderizado de Bloques por Sección y Grilla de Compases */}
-                      <div className="space-y-4">
-                        {parsedSections.map((sec, secIdx) => (
-                          <div key={secIdx} className="space-y-2">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="px-2.5 py-0.5 bg-emerald-950/80 text-emerald-300 border border-emerald-700/50 rounded-lg text-xs font-black uppercase tracking-wider">
-                                {sec.title}
-                              </span>
-                              {sec.timeSignature && (
-                                <span className="px-2 py-0.5 bg-indigo-950/90 text-indigo-300 border border-indigo-700/70 rounded-lg text-xs font-mono font-black shadow-xs flex items-center gap-1" title="Métrica de compás">
-                                  <span>⏱️</span>
-                                  <span>{sec.timeSignature}</span>
-                                </span>
-                              )}
-                              {sec.notes && (
-                                <span className="text-xs text-slate-400 italic">
-                                  {sec.notes}
-                                </span>
-                              )}
-                            </div>
-
-                            {/* Filas de Compases */}
-                            <div className="space-y-2">
-                              {sec.measures.map((row, rowIdx) => (
-                                <div 
-                                  key={rowIdx}
-                                  className="grid grid-cols-2 sm:grid-cols-4 gap-2"
-                                >
-                                  {row.map((measure, mIdx) => (
-                                    <div 
-                                      key={mIdx}
-                                      className={`p-2.5 rounded-xl border relative transition-all ${
-                                        measure.isRepeatStart || measure.isRepeatEnd
-                                          ? 'border-emerald-500/80 bg-slate-800/90'
-                                          : 'border-slate-800 bg-slate-800/50 hover:border-slate-700'
-                                      }`}
-                                    >
-                                      {/* Marcador de Repetición */}
-                                      {measure.isRepeatStart && (
-                                        <span className="absolute left-2 top-1.5 text-xs font-black text-emerald-400 font-mono">
-                                          |:
-                                        </span>
-                                      )}
-                                      {measure.isRepeatEnd && (
-                                        <div className="absolute right-2 top-1.5 flex items-center gap-1">
-                                          {measure.repeatCount && (
-                                            <span className="text-[10px] font-black px-1.5 py-0.2 bg-emerald-400/20 text-emerald-300 border border-emerald-400/50 rounded-md">
-                                              {measure.repeatCount}
-                                            </span>
-                                          )}
-                                          <span className="text-xs font-black text-emerald-400 font-mono">
-                                            :|
-                                          </span>
-                                        </div>
-                                      )}
-
-                                      {/* Acordes Principales (con soporte visual destacado para notas con bajo e inspección) */}
-                                      <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
-                                        {measure.chords.map((chord, cIdx) => {
-                                          const isInspected = inspectedChord === chord;
-                                          const chordDetails = showChordNotesAlways ? getChordDetails(chord) : null;
-
-                                          if (chord.includes('/')) {
-                                            const [root, bass] = chord.split('/');
-                                            return (
-                                              <button 
-                                                type="button"
-                                                key={cIdx} 
-                                                onClick={() => setInspectedChord(isInspected ? null : chord)}
-                                                className={`text-center tracking-wide transition-all rounded px-1.5 py-0.5 cursor-pointer ${
-                                                  isInspected
-                                                    ? 'bg-emerald-500/25 ring-1 ring-emerald-400 text-white scale-105'
-                                                    : 'text-emerald-300 hover:text-white hover:bg-slate-700/50'
-                                                }`}
-                                                title={`Clic para ver notas de ${chord}`}
-                                              >
-                                                <div className="text-base sm:text-lg font-black font-mono inline-flex items-baseline gap-0.5">
-                                                  <span>{root}</span>
-                                                  <span className="text-emerald-500/70 text-xs">/</span>
-                                                  <span className="text-amber-300 text-xs sm:text-sm font-black bg-amber-400/15 px-1 py-0.2 rounded border border-amber-400/40">
-                                                    {bass}
-                                                  </span>
-                                                </div>
-                                                {chordDetails && chordDetails.notes.length > 0 && (
-                                                  <div className="text-[9px] font-mono text-emerald-400/80 font-normal mt-0.5">
-                                                    {chordDetails.notes.map(n => n.replace(' (Bajo)', '')).join('·')}
-                                                  </div>
-                                                )}
-                                              </button>
-                                            );
-                                          }
-
-                                          return (
-                                            <button 
-                                              type="button"
-                                              key={cIdx} 
-                                              onClick={() => setInspectedChord(isInspected ? null : chord)}
-                                              className={`text-center tracking-wide transition-all rounded px-1.5 py-0.5 cursor-pointer ${
-                                                isInspected
-                                                  ? 'bg-emerald-500/25 ring-1 ring-emerald-400 text-white scale-105'
-                                                  : 'text-emerald-300 hover:text-white hover:bg-slate-700/50'
-                                              }`}
-                                              title={`Clic para ver notas de ${chord}`}
-                                            >
-                                              <div className="text-base sm:text-lg font-black font-mono">
-                                                {chord}
-                                              </div>
-                                              {chordDetails && chordDetails.notes.length > 0 && (
-                                                <div className="text-[9px] font-mono text-emerald-400/80 font-normal mt-0.5">
-                                                  {chordDetails.notes.map(n => n.replace(' (Bajo)', '')).join('·')}
-                                                </div>
-                                              )}
-                                            </button>
-                                          );
-                                        })}
-
-                                        {/* Notas de Paso resaltadas en Ámbar */}
-                                        {measure.passingChords.map((pch, pIdx) => {
-                                          const isInspected = inspectedChord === pch;
-                                          return (
-                                            <button 
-                                              type="button"
-                                              key={pIdx} 
-                                              onClick={() => setInspectedChord(isInspected ? null : pch)}
-                                              className={`text-xs font-black font-mono px-1.5 py-0.5 rounded-md border transition-all cursor-pointer ${
-                                                isInspected
-                                                  ? 'bg-amber-400/35 text-amber-200 border-amber-300 ring-1 ring-amber-400'
-                                                  : 'bg-amber-400/20 text-amber-300 border-amber-400/40 hover:bg-amber-400/30'
-                                              }`}
-                                              title={`Nota de Paso (clic para ver notas de ${pch})`}
-                                            >
-                                              ({pch})
-                                            </button>
-                                          );
-                                        })}
-                                      </div>
-
-                                      {/* Subdivisión de Pulsos del Compás para Músicos */}
-                                      {measure.chords.length === 1 && measure.passingChords.length === 0 && (
-                                        <div className="flex items-center justify-center gap-1 mt-0.5 text-[8px] font-mono text-slate-500 select-none">
-                                          <span className="text-emerald-400">●</span>
-                                          <span className="text-slate-600">●</span>
-                                          <span className="text-slate-600">●</span>
-                                          <span className="text-slate-600">●</span>
-                                          <span className="text-[7px] uppercase font-bold text-slate-500 ml-0.5">4t</span>
-                                        </div>
-                                      )}
-                                      {measure.chords.length === 2 && measure.passingChords.length === 0 && (
-                                        <div className="flex items-center justify-center gap-1 mt-0.5 text-[8px] font-mono text-slate-500 select-none">
-                                          <span className="text-emerald-400">●</span>
-                                          <span className="text-slate-600">●</span>
-                                          <span className="text-slate-700 font-bold px-0.5">|</span>
-                                          <span className="text-emerald-400">●</span>
-                                          <span className="text-slate-600">●</span>
-                                          <span className="text-[7px] uppercase font-bold text-slate-500 ml-0.5">2t c/u</span>
-                                        </div>
-                                      )}
-
-                                      {/* Anotaciones / Cortes */}
-                                      {measure.annotations.length > 0 && (
-                                        <div className="text-center mt-1">
-                                          {measure.annotations.map((ann, aIdx) => (
-                                            <span 
-                                              key={aIdx}
-                                              className={`text-[10px] font-bold px-1.5 py-0.2 rounded inline-block ${
-                                                ann.toLowerCase().includes('corte') || ann.toLowerCase().includes('stop')
-                                                  ? 'bg-rose-500/30 text-rose-300 border border-rose-500/40'
-                                                  : 'text-slate-400'
-                                              }`}
-                                            >
-                                              {ann}
-                                            </span>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-                                  ))}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* CONTENIDO 2: LETRA (CON SOPORTE CHORDPRO INTELIGENTE) */}
-                  {activeTab === 'lyrics' && hasLyrics && (
-                    <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200 rounded-2xl space-y-4">
-                      <div className="flex items-center justify-between border-b border-slate-200 pb-2.5">
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-                            <FileText className="w-3.5 h-3.5 text-blue-600" />
-                            <span>Letra {isChordPro && '& Cifrado ChordPro'}</span>
-                          </h4>
-                          {isChordPro && transposeDelta !== 0 && (
-                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
-                              Transpuesto ({transposeDelta > 0 ? `+${transposeDelta}` : transposeDelta} st)
-                            </span>
-                          )}
-                        </div>
-
-                        {isChordPro && (
-                          <div className="flex items-center gap-1 bg-slate-200/80 p-0.5 rounded-xl text-xs font-bold">
-                            <button
-                              type="button"
-                              onClick={() => setChordProMode('with-chords')}
-                              className={`px-2.5 py-1 rounded-lg transition-all ${
-                                chordProMode === 'with-chords'
-                                  ? 'bg-white text-emerald-950 shadow-xs'
-                                  : 'text-slate-600 hover:text-slate-900'
-                              }`}
-                            >
-                              Con Acordes
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => setChordProMode('lyrics-only')}
-                              className={`px-2.5 py-1 rounded-lg transition-all ${
-                                chordProMode === 'lyrics-only'
-                                  ? 'bg-white text-emerald-950 shadow-xs'
-                                  : 'text-slate-600 hover:text-slate-900'
-                              }`}
-                            >
-                              Solo Letra
-                            </button>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Inspector flotante en letra si se hace clic en un acorde */}
-                      {inspectedChordDetails && (
-                        <div className="bg-emerald-950 text-white rounded-xl p-3 flex items-center justify-between text-xs shadow-md">
-                          <div className="flex items-center gap-2.5 flex-wrap">
-                            <span className="font-mono font-black text-sm text-emerald-300 px-2 py-0.5 bg-emerald-900 rounded-md border border-emerald-400/50">
-                              {inspectedChordDetails.symbol}
-                            </span>
-                            <span className="text-slate-300 font-medium">
-                              Notas:
-                            </span>
-                            {inspectedChordDetails.notes.map((note, nIdx) => (
-                              <span 
-                                key={nIdx}
-                                className={`font-mono font-bold px-1.5 py-0.5 rounded text-xs ${
-                                  note.includes('Bajo')
-                                    ? 'bg-amber-400/20 text-amber-300 border border-amber-400/50'
-                                    : 'bg-emerald-400/20 text-emerald-200 border border-emerald-400/30'
-                                }`}
-                              >
-                                {note}
                               </span>
                             ))}
                           </div>
-                          <button 
-                            onClick={() => setInspectedChord(null)}
-                            className="p-1 hover:bg-emerald-900 rounded-md text-emerald-400 hover:text-white transition-colors"
-                          >
-                            <X className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      )}
-
-                      {/* Renderizado en Modo ChordPro */}
-                      {isChordPro && parsedChordPro && chordProMode === 'with-chords' ? (
-                        <div className="space-y-3 font-mono text-sm leading-relaxed overflow-x-auto pb-2">
-                          {parsedChordPro.map((line, lIdx) => {
-                            if (line.type === 'empty') {
-                              return <div key={lIdx} className="h-2" />;
-                            }
-
-                            if (line.type === 'section') {
-                              return (
-                                <div key={lIdx} className="pt-2">
-                                  <span className="text-xs font-black uppercase tracking-wider text-emerald-900 bg-emerald-100 border border-emerald-300 px-2.5 py-0.5 rounded-lg inline-block font-sans">
-                                    {line.sectionTitle}
-                                  </span>
-                                </div>
-                              );
-                            }
-
-                            if (line.type === 'directive') {
-                              if (['key', 'tono', 'tempo', 'capo'].includes(line.directiveKey || '')) {
-                                return (
-                                  <div key={lIdx} className="text-xs font-bold text-slate-500 italic">
-                                    [{line.directiveKey?.toUpperCase()}: {line.directiveValue}]
-                                  </div>
-                                );
-                              }
-                              return null;
-                            }
-
-                            return (
-                              <div key={lIdx} className="flex flex-wrap items-end leading-none py-1 gap-x-1 gap-y-2">
-                                {line.segments?.map((seg, sIdx) => (
-                                  <span key={sIdx} className="inline-flex flex-col">
-                                    {seg.chord ? (
-                                      <button 
-                                        type="button"
-                                        onClick={() => setInspectedChord(inspectedChord === seg.chord ? null : (seg.chord || null))}
-                                        className="text-xs font-black font-mono text-emerald-700 select-none pb-0.5 tracking-tight hover:text-emerald-950 text-left transition-colors cursor-pointer"
-                                        title={`Clic para ver notas de ${seg.chord}`}
-                                      >
-                                        {seg.chord}
-                                      </button>
-                                    ) : (
-                                      <span className="text-xs invisible select-none pb-0.5">_</span>
-                                    )}
-                                    <span className="text-sm font-sans font-medium text-slate-800 whitespace-pre">
-                                      {seg.text || ' '}
-                                    </span>
-                                  </span>
-                                ))}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      ) : (
-                        <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
-                          {isChordPro && chordProMode === 'lyrics-only'
-                            ? effectiveLyrics?.replace(/\[[A-G](?:#|b)?[^\]]*\]/g, '').replace(/\{[^}]*\}/g, '').trim()
-                            : effectiveLyrics}
-                        </div>
-                      )}
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
+                      {isChordPro && chordProMode === 'lyrics-only'
+                        ? effectiveLyrics?.replace(/\[[A-G](?:#|b)?[^\]]*\]/g, '').replace(/\{[^}]*\}/g, '').trim()
+                        : effectiveLyrics}
                     </div>
                   )}
+                </div>
+              )}
 
-                  {/* CONTENIDO 3: VISOR INTEGRADO DE PDF / PARTITURA */}
-                  {activeTab === 'pdf' && effectiveChordsUrl && (
-                    <div className="p-4 sm:p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-3">
-                      <div className="flex items-center justify-between text-white border-b border-slate-800 pb-2">
-                        <div className="flex items-center gap-2">
-                          <FileCheck className="w-4 h-4 text-indigo-400" />
-                          <span className="text-xs font-bold uppercase tracking-wider text-indigo-300">
-                            Visor de Cifrado / Partitura (PDF)
-                          </span>
-                        </div>
-                        <a
-                          href={effectiveChordsUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition-colors"
-                        >
-                          <span>Abrir en Pestaña Completa</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
-
-                      {/* Contenedor Iframe con Fallback Automático */}
-                      <div className="w-full h-[550px] sm:h-[650px] rounded-xl overflow-hidden bg-slate-950 border border-slate-800 relative">
-                        <iframe
-                          src={
-                            effectiveChordsUrl.includes('drive.google.com')
-                              ? effectiveChordsUrl.replace('/view', '/preview')
-                              : effectiveChordsUrl.endsWith('.pdf')
-                              ? `https://docs.google.com/viewer?url=${encodeURIComponent(effectiveChordsUrl)}&embedded=true`
-                              : effectiveChordsUrl
-                          }
-                          title="Visor de PDF"
-                          className="w-full h-full border-0 bg-white"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        />
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Botones de Herramientas Musicales (Sin Moises) */}
-                  <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center gap-2">
-                    {activeSong.youtubeUrl && (
-                      <a
-                        href={activeSong.youtubeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
-                      >
-                        <ExternalLink className="w-3.5 h-3.5" />
-                        <span>Abrir en YouTube</span>
-                      </a>
-                    )}
-
-                    {activeSong.chordsUrl && (
-                      <a
-                        href={activeSong.chordsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
-                      >
-                        <FileCheck className="w-3.5 h-3.5" />
-                        <span>Partitura / Cifrado Oficial</span>
-                      </a>
-                    )}
-
-                    {toolLinks && (
-                      <>
-                        <a
-                          href={toolLinks.transposeExtension}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors"
-                          title="Extensión de Chrome para cambiar el tono de YouTube en vivo"
-                        >
-                          <Sliders className="w-3.5 h-3.5" />
-                          <span>Extensión Transpose</span>
-                        </a>
-
-                        <a
-                          href={toolLinks.laCuerdaSearch}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
-                        >
-                          Ver en LaCuerda
-                        </a>
-                      </>
-                    )}
+              {activeTab === 'pdf' && effectiveChordsUrl && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="text-sm font-bold text-[#0B132B] uppercase tracking-wider">
+                      Partitura / Visor PDF
+                    </h3>
+                    <a
+                      href={effectiveChordsUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
+                    >
+                      <span>Abrir Completo</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  </div>
+                  <div className="w-full h-[550px] sm:h-[650px] rounded-xl overflow-hidden bg-slate-900 border border-slate-200">
+                    <iframe
+                      src={
+                        effectiveChordsUrl.includes('drive.google.com')
+                          ? effectiveChordsUrl.replace('/view', '/preview')
+                          : effectiveChordsUrl.endsWith('.pdf')
+                          ? `https://docs.google.com/viewer?url=${encodeURIComponent(effectiveChordsUrl)}&embedded=true`
+                          : effectiveChordsUrl
+                      }
+                      title="Visor de PDF"
+                      className="w-full h-full border-0 bg-white"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    />
                   </div>
                 </div>
+              )}
 
+              {activeTab === 'chords' && hasChords && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h3 className="text-sm font-bold text-[#0B132B] uppercase tracking-wider">
+                      Estructura de Compases & Acordes
+                    </h3>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setShowChordNotesAlways(!showChordNotesAlways)}
+                        className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                          showChordNotesAlways
+                            ? 'bg-[#1E74FD]/10 text-[#1E74FD] border-[#1E74FD]/30 shadow-xs'
+                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:text-slate-900'
+                        }`}
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#1E74FD]" />
+                        <span>{showChordNotesAlways ? 'Ocultar Notas' : 'Ver Notas de Acordes'}</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Renderizado de Compases */}
+                  <div className="space-y-4">
+                    {parsedSections.map((sec, secIdx) => (
+                      <div key={secIdx} className="space-y-2">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="px-2.5 py-0.5 bg-blue-50 text-[#1E74FD] border border-blue-200 rounded-lg text-xs font-bold uppercase tracking-wider">
+                            {sec.title}
+                          </span>
+                          {sec.timeSignature && (
+                            <span className="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-mono font-bold">
+                              ⏱️ {sec.timeSignature}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="space-y-2">
+                          {sec.measures.map((row, rowIdx) => (
+                            <div key={rowIdx} className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                              {row.map((measure, mIdx) => (
+                                <div 
+                                  key={mIdx}
+                                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 text-center space-y-1"
+                                >
+                                  <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
+                                    {measure.chords.map((chord, cIdx) => (
+                                      <span key={cIdx} className="text-base sm:text-lg font-black font-mono text-[#0B132B]">
+                                        {chord}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* VISTA MÓVIL (Acordeón colapsable exactamente como en el screenshot) */}
+          <div className="sm:hidden space-y-2.5">
+            {/* Accordion 1: Letra */}
+            {hasLyrics && (
+              <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setMobileOpenAccordion(mobileOpenAccordion === 'lyrics' ? null : 'lyrics')}
+                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#0B132B]"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileText className="w-4 h-4 text-[#1E74FD]" />
+                    <span>Letra</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'lyrics' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileOpenAccordion === 'lyrics' && (
+                  <div className="p-4 pt-0 border-t border-slate-100">
+                    <div className="whitespace-pre-wrap text-xs text-slate-700 leading-relaxed font-sans pt-3">
+                      {isChordPro
+                        ? effectiveLyrics?.replace(/\[[A-G](?:#|b)?[^\]]*\]/g, '').replace(/\{[^}]*\}/g, '').trim()
+                        : effectiveLyrics}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
-            {/* Integrantes Confirmados en este Culto */}
-            <div className="bg-white border border-slate-200/90 rounded-3xl p-5 shadow-2xs">
-              <div className="flex items-center gap-2 mb-3">
-                <Users className="w-4 h-4 text-emerald-600" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
-                  Equipo de Músicos Asignados
-                </h3>
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {Object.values(service.slots || {})
-                  .filter(s => s && s.enabled !== false && s.musicianId)
-                  .map(slot => (
-                    <div 
-                      key={slot.key}
-                      className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center gap-2"
-                    >
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                      <span className="font-semibold text-slate-800">{slot.musicianName}</span>
-                      <span className="text-[10px] text-slate-500">({slot.label})</span>
+            {/* Accordion 2: Visor PDF */}
+            {hasPdf && (
+              <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setMobileOpenAccordion(mobileOpenAccordion === 'pdf' ? null : 'pdf')}
+                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#0B132B]"
+                >
+                  <span className="flex items-center gap-2">
+                    <FileCheck className="w-4 h-4 text-[#1E74FD]" />
+                    <span>Visor PDF</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'pdf' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileOpenAccordion === 'pdf' && effectiveChordsUrl && (
+                  <div className="p-4 pt-0 border-t border-slate-100 space-y-2">
+                    <div className="pt-3 flex justify-end">
+                      <a
+                        href={effectiveChordsUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3 py-1.5 bg-[#1E74FD] text-white text-[11px] font-bold rounded-lg flex items-center gap-1"
+                      >
+                        <span>Abrir PDF Externo</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
                     </div>
-                  ))}
+                    <div className="w-full h-[400px] rounded-xl overflow-hidden bg-slate-900">
+                      <iframe
+                        src={
+                          effectiveChordsUrl.includes('drive.google.com')
+                            ? effectiveChordsUrl.replace('/view', '/preview')
+                            : effectiveChordsUrl.endsWith('.pdf')
+                            ? `https://docs.google.com/viewer?url=${encodeURIComponent(effectiveChordsUrl)}&embedded=true`
+                            : effectiveChordsUrl
+                        }
+                        title="Visor de PDF Móvil"
+                        className="w-full h-full border-0 bg-white"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
+            {/* Accordion 3: Cifrado & Compases */}
+            {hasChords && (
+              <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+                <button
+                  type="button"
+                  onClick={() => setMobileOpenAccordion(mobileOpenAccordion === 'chords' ? null : 'chords')}
+                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#0B132B]"
+                >
+                  <span className="flex items-center gap-2">
+                    <Music className="w-4 h-4 text-[#1E74FD]" />
+                    <span>Cifrado & Compases</span>
+                  </span>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'chords' ? 'rotate-180' : ''}`} />
+                </button>
+                {mobileOpenAccordion === 'chords' && (
+                  <div className="p-4 pt-0 border-t border-slate-100 space-y-3 pt-3">
+                    {parsedSections.map((sec, secIdx) => (
+                      <div key={secIdx} className="space-y-1.5">
+                        <span className="px-2 py-0.5 bg-blue-50 text-[#1E74FD] border border-blue-200 rounded text-[10px] font-bold uppercase">
+                          {sec.title}
+                        </span>
+                        <div className="grid grid-cols-2 gap-1.5">
+                          {sec.measures.map((row) =>
+                            row.map((measure, mIdx) => (
+                              <div key={mIdx} className="p-2 rounded-lg border border-slate-200 bg-slate-50 text-center font-mono font-bold text-xs text-[#0B132B]">
+                                {measure.chords.join(' - ') || '—'}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
+        </div>
+
+        {/* 6. Equipo Asignado */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Users className="w-4 h-4 text-[#1E74FD]" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+              Equipo de Músicos Asignados
+            </h3>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {Object.values(service.slots || {})
+              .filter(s => s && s.enabled !== false && s.musicianId)
+              .map(slot => (
+                <div 
+                  key={slot.key}
+                  className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center gap-2"
+                >
+                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span className="font-semibold text-slate-800">{slot.musicianName}</span>
+                  <span className="text-[10px] text-slate-500">({slot.label})</span>
+                </div>
+              ))}
+          </div>
+        </div>
 
       </main>
 
@@ -1248,7 +855,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
         {onGoToPortal && (
           <button
             onClick={onGoToPortal}
-            className="mt-2 text-[11px] text-emerald-700 hover:text-emerald-800 font-bold"
+            className="mt-2 text-[11px] text-[#1E74FD] hover:underline font-bold"
           >
             ← Acceder al Portal de Músicos
           </button>
