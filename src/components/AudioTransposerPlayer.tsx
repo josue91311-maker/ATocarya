@@ -38,6 +38,9 @@ const getStreamUrl = (url: string): string => {
   return trimmed;
 };
 
+// Caché global en memoria de AudioBuffer por URL para evitar re-descargas
+const audioBufferCache = new Map<string, AudioBuffer>();
+
 // Formato mm:ss
 const formatTime = (secs: number): string => {
   if (isNaN(secs) || secs < 0) return '0:00';
@@ -92,19 +95,19 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
     ? calculateSemitoneDistance(audioOriginalKey, worshipTargetKey)
     : 0;
 
-  // Obtener o inicializar AudioContext
+  // Obtener o inicializar AudioContext (independiente de volumen para evitar recargas)
   const getAudioContext = useCallback(() => {
     if (!audioContextRef.current || audioContextRef.current.state === 'closed') {
       const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
       const ctx = new AudioCtx();
       const gain = ctx.createGain();
-      gain.gain.value = isMuted ? 0 : volume;
+      gain.gain.value = 1.0;
       gain.connect(ctx.destination);
       audioContextRef.current = ctx;
       gainNodeRef.current = gain;
     }
     return { ctx: audioContextRef.current, gain: gainNodeRef.current! };
-  }, [isMuted, volume]);
+  }, []);
 
   // Manejador de fin de canción
   const handleEnded = useCallback(() => {
@@ -139,33 +142,39 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
       return;
     }
 
-    setIsLoading(true);
-    setLoadProgress('Conectando con la pista...');
-
     const loadAudioFile = async () => {
       try {
-        const { ctx } = getAudioContext();
-        const streamUrl = getStreamUrl(audioUrl);
-        setLoadProgress('Descargando pista...');
+        const { ctx, gain } = getAudioContext();
+        
+        // Configurar ganancia inicial con el volumen actual
+        const currentGain = isMuted ? 0 : volume;
+        gain.gain.setValueAtTime(currentGain, ctx.currentTime);
 
-        let response: Response;
-        try {
-          response = await fetch(streamUrl);
-        } catch {
-          // Fallback a URL directa si proxy no está disponible
-          response = await fetch(audioUrl);
+        let decodedBuffer = audioBufferCache.get(audioUrl);
+        if (!decodedBuffer) {
+          setIsLoading(true);
+          const streamUrl = getStreamUrl(audioUrl);
+          setLoadProgress('Descargando pista...');
+
+          let response: Response;
+          try {
+            response = await fetch(streamUrl);
+          } catch {
+            response = await fetch(audioUrl);
+          }
+
+          if (!response.ok) {
+            throw new Error(`Error al conectar con la pista (${response.statusText})`);
+          }
+
+          const arrayBuffer = await response.arrayBuffer();
+          if (isCancelled) return;
+
+          setLoadProgress('Procesando motor WSOLA...');
+          decodedBuffer = await ctx.decodeAudioData(arrayBuffer);
+          if (isCancelled) return;
+          audioBufferCache.set(audioUrl, decodedBuffer);
         }
-
-        if (!response.ok) {
-          throw new Error(`Error al conectar con la pista (${response.statusText})`);
-        }
-
-        const arrayBuffer = await response.arrayBuffer();
-        if (isCancelled) return;
-
-        setLoadProgress('Procesando motor WSOLA...');
-        const decodedBuffer = await ctx.decodeAudioData(arrayBuffer);
-        if (isCancelled) return;
 
         audioBufferRef.current = decodedBuffer;
         setDuration(decodedBuffer.duration);
