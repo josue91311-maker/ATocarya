@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useApp } from '../context/AppContext';
 import { SlotKey, SlotConfig, ServiceDate } from '../types';
 import { 
   Plus, 
-  RefreshCw, 
   Share2, 
   Download, 
   Calendar, 
@@ -11,17 +10,24 @@ import {
   Eye, 
   EyeOff, 
   Edit3,
-  Layers,
   Camera,
   Sliders,
   Copy,
   Sparkles,
-  Music
+  Music,
+  Users,
+  Search,
+  CheckCircle2,
+  ChevronRight,
+  BarChart2,
+  Music2,
+  Check
 } from 'lucide-react';
 
 import { ConfirmModal, ConfirmDialogOptions } from './ConfirmModal';
 import { AdminDuplicateModal } from './AdminDuplicateModal';
 import { AdminQuickBatchModal } from './AdminQuickBatchModal';
+import { InstrumentIcon } from './InstrumentIcon';
 import { getMonthKey, getMonthLabel, isServicePast, isServiceExpired } from '../utils/dateUtils';
 
 interface Props {
@@ -33,6 +39,31 @@ interface Props {
   onOpenSetlist?: (service: ServiceDate) => void;
 }
 
+interface ColumnConfig {
+  key: SlotKey;
+  label: string;
+  iconKey: string;
+  colorClass: string;
+  bgClass: string;
+  badgeBg: string;
+}
+
+const SLOT_COLUMNS: ColumnConfig[] = [
+  { key: 'piano_1', label: 'PIANO 1', iconKey: 'piano', colorClass: 'text-rose-600', bgClass: 'bg-rose-50 border-rose-200', badgeBg: 'bg-rose-50 border-rose-200 text-rose-900' },
+  { key: 'piano_2', label: 'PIANO 2', iconKey: 'piano', colorClass: 'text-rose-600', bgClass: 'bg-rose-50 border-rose-200', badgeBg: 'bg-rose-50 border-rose-200 text-rose-900' },
+  { key: 'guitarra_1', label: 'GUIT. ELÉC 1', iconKey: 'guitarra_1', colorClass: 'text-[#1E74FD]', bgClass: 'bg-blue-50 border-blue-200', badgeBg: 'bg-blue-50 border-blue-200 text-blue-900' },
+  { key: 'guitarra_2', label: 'GUIT. ELÉC 2', iconKey: 'guitarra_2', colorClass: 'text-[#1E74FD]', bgClass: 'bg-blue-50 border-blue-200', badgeBg: 'bg-blue-50 border-blue-200 text-blue-900' },
+  { key: 'guitarra_acustica', label: 'GUIT. ACÚS', iconKey: 'guitarra_acustica', colorClass: 'text-teal-600', bgClass: 'bg-teal-50 border-teal-200', badgeBg: 'bg-teal-50 border-teal-200 text-teal-900' },
+  { key: 'bateria', label: 'BATERÍA', iconKey: 'bateria', colorClass: 'text-amber-600', bgClass: 'bg-amber-50 border-amber-200', badgeBg: 'bg-amber-50 border-amber-200 text-amber-900' },
+  { key: 'bajo', label: 'BAJO', iconKey: 'bajo', colorClass: 'text-indigo-600', bgClass: 'bg-indigo-50 border-indigo-200', badgeBg: 'bg-indigo-50 border-indigo-200 text-indigo-900' },
+  { key: 'voz_director', label: 'VOZ DIRECTOR', iconKey: 'voz_director', colorClass: 'text-purple-600', bgClass: 'bg-purple-50 border-purple-200', badgeBg: 'bg-purple-50 border-purple-200 text-purple-900' },
+  { key: 'voz_coro_1', label: 'CORO 1', iconKey: 'voz_coro_1', colorClass: 'text-pink-600', bgClass: 'bg-pink-50 border-pink-200', badgeBg: 'bg-pink-50 border-pink-200 text-pink-900' },
+  { key: 'voz_coro_2', label: 'CORO 2', iconKey: 'voz_coro_2', colorClass: 'text-pink-600', bgClass: 'bg-pink-50 border-pink-200', badgeBg: 'bg-pink-50 border-pink-200 text-pink-900' },
+  { key: 'voz_coro_3', label: 'CORO 3', iconKey: 'voz_coro_3', colorClass: 'text-pink-600', bgClass: 'bg-pink-50 border-pink-200', badgeBg: 'bg-pink-50 border-pink-200 text-pink-900' },
+  { key: 'voz_coro_4', label: 'CORO 4', iconKey: 'voz_coro_4', colorClass: 'text-pink-600', bgClass: 'bg-pink-50 border-pink-200', badgeBg: 'bg-pink-50 border-pink-200 text-pink-900' },
+  { key: 'sonido', label: 'SONIDO', iconKey: 'sonido', colorClass: 'text-violet-600', bgClass: 'bg-violet-50 border-violet-200', badgeBg: 'bg-violet-50 border-violet-200 text-violet-900' },
+];
+
 export const AdminScheduleTable: React.FC<Props> = ({
   onOpenService,
   onOpenCreateModal,
@@ -41,43 +72,61 @@ export const AdminScheduleTable: React.FC<Props> = ({
   onEditService,
   onOpenSetlist,
 }) => {
-  const [confirmDialog, setConfirmDialog] = React.useState<ConfirmDialogOptions | null>(null);
-  const [duplicatingService, setDuplicatingService] = React.useState<ServiceDate | null>(null);
-  const [isQuickBatchOpen, setIsQuickBatchOpen] = React.useState<boolean>(false);
-  const [selectedMonth, setSelectedMonth] = React.useState<string>('all');
-  const [hidePast, setHidePast] = React.useState<boolean>(true);
+  const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogOptions | null>(null);
+  const [duplicatingService, setDuplicatingService] = useState<ServiceDate | null>(null);
+  const [isQuickBatchOpen, setIsQuickBatchOpen] = useState<boolean>(false);
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [hidePast, setHidePast] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState<string>('');
 
   const { 
     services, 
     musicians, 
-    generateSundays, 
     deleteService, 
     toggleServiceOpen, 
     exportDatabaseJSON 
   } = useApp();
 
-  const availableMonths = Array.from(new Set(services.map(s => getMonthKey(s.date)))).filter(Boolean).sort();
-  const filteredServices = services.filter(s => {
-    if (hidePast && isServicePast(s.date)) return false;
-    if (selectedMonth !== 'all' && getMonthKey(s.date) !== selectedMonth) return false;
-    return true;
-  });
+  const availableMonths = useMemo(() => {
+    return Array.from(new Set(services.map(s => getMonthKey(s.date)))).filter(Boolean).sort();
+  }, [services]);
 
-  const SLOT_COLUMNS: { key: SlotKey; label: string }[] = [
-    { key: 'piano_1', label: 'Piano 1' },
-    { key: 'piano_2', label: 'Piano 2' },
-    { key: 'guitarra_1', label: 'Guit. Eléc 1' },
-    { key: 'guitarra_2', label: 'Guit. Eléc 2' },
-    { key: 'guitarra_acustica', label: 'Guit. Acús' },
-    { key: 'bateria', label: 'Batería' },
-    { key: 'bajo', label: 'Bajo' },
-    { key: 'voz_director', label: 'Voz Director' },
-    { key: 'voz_coro_1', label: 'Coro 1' },
-    { key: 'voz_coro_2', label: 'Coro 2' },
-    { key: 'voz_coro_3', label: 'Coro 3' },
-    { key: 'voz_coro_4', label: 'Coro 4' },
-    { key: 'sonido', label: 'Sonido' },
-  ];
+  const filteredServices = useMemo(() => {
+    return services.filter(s => {
+      if (hidePast && isServicePast(s.date)) return false;
+      if (selectedMonth !== 'all' && getMonthKey(s.date) !== selectedMonth) return false;
+      if (searchTerm.trim()) {
+        const term = searchTerm.toLowerCase();
+        const matchesTitle = s.title.toLowerCase().includes(term);
+        const matchesDate = s.date.includes(term);
+        const matchesMusician = Object.values(s.slots || {}).some(
+          slot => slot.musicianName && slot.musicianName.toLowerCase().includes(term)
+        );
+        const matchesRole = Object.values(s.slots || {}).some(
+          slot => slot.label && slot.label.toLowerCase().includes(term)
+        );
+        if (!matchesTitle && !matchesDate && !matchesMusician && !matchesRole) return false;
+      }
+      return true;
+    });
+  }, [services, hidePast, selectedMonth, searchTerm]);
+
+  // Cálculos de KPIs
+  const totalAssignments = useMemo(() => {
+    return services.reduce((total, s) => {
+      const activeSlots = Object.values(s.slots || {}).filter(
+        slot => slot?.enabled !== false && Boolean(slot?.musicianId)
+      );
+      return total + activeSlots.length;
+    }, 0);
+  }, [services]);
+
+  const roleCoverage = useMemo(() => {
+    const totalEnabled = services.reduce((total, s) => {
+      return total + Object.values(s.slots || {}).filter(slot => slot?.enabled !== false).length;
+    }, 0);
+    return totalEnabled > 0 ? Math.round((totalAssignments / totalEnabled) * 100) : 0;
+  }, [services, totalAssignments]);
 
   const handleExportJSON = () => {
     const json = exportDatabaseJSON();
@@ -91,29 +140,30 @@ export const AdminScheduleTable: React.FC<Props> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       
-      {/* Top Header & Actions */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700">
-              <Layers className="w-4 h-4" />
-            </div>
-            <h2 className="text-xl font-bold font-display text-slate-900">
-              Matriz de Planes & Asignaciones
-            </h2>
+      {/* 1. Header Superior & Acciones Principales */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1E74FD] flex items-center justify-center border border-blue-100 shrink-0">
+            <Calendar className="w-5 h-5" />
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            <strong className="text-slate-800 tabular-nums">{services.length}</strong> cultos programados · <strong className="text-slate-800 tabular-nums">{musicians.length}</strong> músicos en el equipo
-          </p>
+          <div>
+            <h1 className="text-xl sm:text-2xl font-black text-[#0B132B] tracking-tight">
+              Matriz de Planes & Asignaciones
+            </h1>
+            <p className="text-xs text-slate-500 mt-0.5 font-medium">
+              <strong className="text-slate-800 tabular-nums">{services.length}</strong> cultos programados · <strong className="text-slate-800 tabular-nums">{musicians.length}</strong> músicos en el equipo
+            </p>
+          </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Botones de acción en Desktop */}
+        <div className="hidden sm:flex flex-wrap items-center gap-2">
           {onGoToVisualBoard && (
             <button
               onClick={onGoToVisualBoard}
-              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold rounded-lg text-xs transition-colors shadow-2xs"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold rounded-xl text-xs transition-colors shadow-2xs"
             >
               <Camera className="w-3.5 h-3.5 text-slate-500" />
               <span>Ver como Foto</span>
@@ -122,7 +172,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
 
           <button
             onClick={onOpenCreateModal}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-all shadow-sm shadow-emerald-600/20"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#1E74FD] hover:bg-[#155de0] text-white font-bold rounded-xl text-xs transition-all shadow-sm shadow-blue-500/20 active:scale-95"
           >
             <Plus className="w-4 h-4" />
             <span>Programar Culto</span>
@@ -130,24 +180,24 @@ export const AdminScheduleTable: React.FC<Props> = ({
 
           <button
             onClick={() => setIsQuickBatchOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold rounded-lg text-xs transition-all shadow-2xs"
-            title="Crear fechas para cualquier día de la semana (Lunes a Domingo), cantidad y hora"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-blue-50 text-[#1E74FD] border border-blue-200 font-bold rounded-xl text-xs transition-all shadow-2xs"
+            title="Crear fechas para cualquier día de la semana, cantidad y hora"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+            <Sparkles className="w-3.5 h-3.5 text-[#1E74FD]" />
             <span>⚡ Creación Rápida</span>
           </button>
 
           <button
             onClick={onOpenShareModal}
-            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg text-xs font-semibold transition-colors shadow-2xs"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
           >
-            <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+            <Share2 className="w-3.5 h-3.5 text-[#1E74FD]" />
             <span>WhatsApp</span>
           </button>
 
           <button
             onClick={handleExportJSON}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-lg text-xs font-medium transition-colors"
+            className="flex items-center gap-1.5 px-3 py-2 bg-white hover:bg-slate-50 text-slate-600 border border-slate-200 rounded-xl text-xs font-semibold transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
             <span>JSON</span>
@@ -155,266 +205,518 @@ export const AdminScheduleTable: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Month & Past Filter Bar */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-3 sm:p-4 shadow-2xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-blue-600 flex-shrink-0" />
-          <span className="text-xs font-bold text-slate-700">Filtro por Mes:</span>
-          <select
-            value={selectedMonth}
-            onChange={(e) => setSelectedMonth(e.target.value)}
-            className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600 cursor-pointer"
-          >
-            <option value="all">📅 Todos los meses ({services.length})</option>
-            {availableMonths.map((m) => (
-              <option key={m} value={m}>
-                {getMonthLabel(m)}
-              </option>
-            ))}
-          </select>
+      {/* 2. Tarjetas KPI de Resumen (4 métricas) */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        {/* KPI 1: Cultos Programados */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
+              {services.length}
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
+              Cultos programados
+            </span>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1E74FD] flex items-center justify-center shrink-0">
+            <Calendar className="w-5 h-5" />
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        {/* KPI 2: Músicos en el Equipo */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
+              {musicians.length}
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
+              Músicos en el equipo
+            </span>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* KPI 3: Asignaciones Totales */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
+              {totalAssignments}
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
+              Asignaciones totales
+            </span>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+            <Music2 className="w-5 h-5" />
+          </div>
+        </div>
+
+        {/* KPI 4: Cobertura de Roles */}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
+              {roleCoverage}%
+            </span>
+            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
+              Cobertura de roles
+            </span>
+          </div>
+          <div className="w-10 h-10 rounded-2xl bg-amber-50 text-[#FF7E22] flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* Acciones principales en Móvil (Botón destacado + 2x2 grid) */}
+      <div className="sm:hidden space-y-2.5">
+        <button
+          onClick={onOpenCreateModal}
+          className="w-full py-3 bg-[#1E74FD] hover:bg-[#155de0] text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2 shadow-sm shadow-blue-500/20 active:scale-98"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Programar Culto</span>
+        </button>
+
+        <div className="grid grid-cols-2 gap-2">
+          {onGoToVisualBoard && (
+            <button
+              onClick={onGoToVisualBoard}
+              className="py-2.5 px-3 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
+            >
+              <Camera className="w-3.5 h-3.5 text-slate-500" />
+              <span>Ver como Foto</span>
+            </button>
+          )}
+
+          <button
+            onClick={() => setIsQuickBatchOpen(true)}
+            className="py-2.5 px-3 bg-white border border-blue-200 text-[#1E74FD] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-[#1E74FD]" />
+            <span>Creación Rápida</span>
+          </button>
+
+          <button
+            onClick={onOpenShareModal}
+            className="py-2.5 px-3 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
+          >
+            <Share2 className="w-3.5 h-3.5 text-[#1E74FD]" />
+            <span>WhatsApp</span>
+          </button>
+
+          <button
+            onClick={handleExportJSON}
+            className="py-2.5 px-3 bg-white border border-slate-200 text-slate-600 text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
+          >
+            <Download className="w-3.5 h-3.5" />
+            <span>JSON</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 3. Barra de Filtros & Búsqueda */}
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-3 sm:p-4 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
+          {/* Selector de Mes */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-slate-600 shrink-0 hidden sm:inline">
+              Filtro por Mes:
+            </span>
+            <select
+              value={selectedMonth}
+              onChange={(e) => setSelectedMonth(e.target.value)}
+              className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-[#1E74FD] cursor-pointer w-full sm:w-auto"
+            >
+              <option value="all">📅 Todos los meses ({services.length})</option>
+              {availableMonths.map((m) => (
+                <option key={m} value={m}>
+                  {getMonthLabel(m)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Barra de Búsqueda */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Buscar fecha, músico o rol..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-[#1E74FD]"
+            />
+          </div>
+        </div>
+
+        {/* Toggle Ocultar Pasados & Conteo */}
+        <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
           <label className="flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={hidePast}
               onChange={(e) => setHidePast(e.target.checked)}
-              className="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer"
+              className="rounded text-[#1E74FD] focus:ring-[#1E74FD] w-4 h-4 cursor-pointer"
             />
-            <span>Ocultar fechas que ya pasaron</span>
+            <span className="hidden sm:inline">Ocultar fechas que ya pasaron</span>
+            <span className="sm:hidden">Ocultar pasados</span>
           </label>
           <span className="text-xs text-slate-300">|</span>
           <span className="text-xs font-bold text-slate-700 tabular-nums">
-            {filteredServices.length} fecha(s) visible(s)
+            {filteredServices.length} fecha(s)
           </span>
         </div>
       </div>
 
-      {/* Table container */}
+      {/* 4. Estado Vacío */}
       {filteredServices.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center shadow-sm">
-          <Calendar className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-          <p className="text-sm font-semibold text-slate-800">No hay servicios en el cronograma con los filtros actuales</p>
-          <p className="text-xs text-slate-500 mt-0.5 mb-4">
-            {hidePast ? 'Las fechas pasadas están ocultas. Desmarca la casilla si deseas ver el historial.' : 'No se encontraron servicios para este mes.'}
+        <div className="bg-white border border-slate-200/90 rounded-2xl p-10 text-center shadow-sm space-y-3">
+          <Calendar className="w-10 h-10 text-slate-300 mx-auto" />
+          <h3 className="text-base font-bold text-[#0B132B]">
+            No se encontraron cultos con los filtros actuales
+          </h3>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
+            {hidePast 
+              ? 'Las fechas pasadas están ocultas o no coinciden con la búsqueda. Puedes desactivar la casilla para ver el historial.' 
+              : 'Intenta cambiar el mes o limpiar el término de búsqueda.'}
           </p>
-          <div className="flex items-center justify-center gap-2">
+          <div className="pt-2 flex items-center justify-center gap-2">
             <button
-              onClick={onOpenCreateModal}
-              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
+              onClick={() => {
+                setHidePast(false);
+                setSelectedMonth('all');
+                setSearchTerm('');
+              }}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors"
             >
-              Programar Culto Individual
+              Restablecer filtros
             </button>
             <button
-              onClick={() => setIsQuickBatchOpen(true)}
-              className="px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 text-xs font-bold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+              onClick={onOpenCreateModal}
+              className="px-4 py-2 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-xl text-xs font-bold transition-colors"
             >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>⚡ Creador Rápido en Lote</span>
+              + Programar Nuevo Culto
             </button>
           </div>
         </div>
       ) : (
-        <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-600 uppercase tracking-wider text-[11px]">
-                <tr>
-                  <th className="py-3.5 px-4 sticky left-0 bg-slate-50 z-10 border-r border-slate-200 whitespace-nowrap font-bold">
-                    Fecha & Culto
-                  </th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap font-bold">
-                    Hora
-                  </th>
-                  {SLOT_COLUMNS.map((col) => (
-                    <th key={col.key} className="py-3.5 px-2 text-center whitespace-nowrap font-bold text-slate-700">
-                      {col.label}
-                    </th>
-                  ))}
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap font-bold">
-                    Inscripción
-                  </th>
-                  <th className="py-3.5 px-3 text-center whitespace-nowrap font-bold">
-                    Acciones
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {filteredServices.map((service) => {
-                  const [year, month, day] = service.date.split('-');
-                  const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
-                  const dateStr = dateObj.toLocaleDateString('es-ES', {
-                    weekday: 'short',
-                    day: 'numeric',
-                    month: 'short',
-                  });
-                  const isPast = isServicePast(service.date);
-                  const isExpired = isServiceExpired(service);
+        <>
+          {/* 5. VISTA MÓVIL (< md): Tarjetas de Culto con Músicos Asignados (Sin fotos, con badges elegantes) */}
+          <div className="md:hidden space-y-3">
+            {filteredServices.map((service) => {
+              const [year, month, day] = service.date.split('-');
+              const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+              const dateStr = dateObj.toLocaleDateString('es-ES', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short',
+              });
+              const isPast = isServicePast(service.date);
+              const isExpired = isServiceExpired(service);
+              const confirmedSlots = (Object.values(service.slots || {}) as SlotConfig[])
+                .filter(slot => slot.enabled !== false && Boolean(slot.musicianId));
 
-                  return (
-                    <tr 
-                      key={service.id} 
-                      className={`hover:bg-emerald-50/25 transition-colors cursor-pointer ${
-                        isPast ? 'bg-slate-50/60 opacity-80' : ''
-                      }`}
-                      onClick={() => onOpenService(service.id)}
-                    >
-                      {/* Date */}
-                      <td className="py-3 px-4 sticky left-0 bg-white z-10 border-r border-slate-200 whitespace-nowrap">
-                        <div className="flex items-center gap-1.5">
-                          <p className="font-bold text-slate-900 capitalize font-display">
-                            {dateStr}
-                          </p>
-                          {isPast && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-slate-100 text-slate-500 font-bold">
-                              Pasado
-                            </span>
-                          )}
-                          {isExpired && !isPast && (
-                            <span className="text-[9px] px-1.5 py-0.2 rounded bg-rose-50 text-rose-700 font-bold border border-rose-200">
-                              Expirado
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[11px] text-slate-500 truncate max-w-[140px] font-medium">
-                          {service.title}
-                        </p>
-                        {service.registrationDeadline && (
-                          <p className="text-[10px] text-amber-700 font-medium">
-                            Límite: {service.registrationDeadline}
-                          </p>
+              return (
+                <div 
+                  key={service.id}
+                  onClick={() => onOpenService(service.id)}
+                  className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 cursor-pointer hover:border-blue-300 transition-all active:scale-98"
+                >
+                  <div className="flex items-center gap-3.5 min-w-0">
+                    {/* Thumbnail del Culto */}
+                    <div className="w-13 h-13 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 relative flex items-center justify-center">
+                      <img 
+                        src="/app-bg.jpg" 
+                        alt="Culto" 
+                        className="w-full h-full object-cover opacity-80" 
+                      />
+                    </div>
+
+                    {/* Info del Culto */}
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <h3 className="font-bold text-[#0B132B] text-sm capitalize">
+                          {dateStr}
+                        </h3>
+                        {isPast ? (
+                          <span className="text-[9px] px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                            Pasado
+                          </span>
+                        ) : isExpired ? (
+                          <span className="text-[9px] px-2 py-0.2 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200">
+                            Expirado
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="text-xs text-slate-600 truncate font-medium mt-0.5">
+                        {service.title}
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">
+                        {service.time} {service.registrationDeadline ? `· Límite: ${service.registrationDeadline}` : ''}
+                      </p>
+
+                      {/* Fila de Músicos Asignados (Iniciales limpias, SIN fotos) */}
+                      <div className="flex items-center gap-1 mt-2 flex-wrap">
+                        {confirmedSlots.slice(0, 5).map((slot, idx) => (
+                          <span
+                            key={idx}
+                            title={`${slot.label}: ${slot.musicianName}`}
+                            className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[9px] font-black flex items-center justify-center"
+                          >
+                            {slot.musicianName?.charAt(0).toUpperCase()}
+                          </span>
+                        ))}
+                        {confirmedSlots.length > 5 && (
+                          <span className="text-[10px] font-bold text-slate-400 ml-1">
+                            +{confirmedSlots.length - 5}
+                          </span>
                         )}
-                      </td>
+                      </div>
+                    </div>
+                  </div>
 
-                      {/* Time */}
-                      <td className="py-3 px-3 text-center text-slate-700 font-bold text-xs whitespace-nowrap tabular-nums">
-                        {service.time}
-                      </td>
+                  <ChevronRight className="w-5 h-5 text-slate-400 shrink-0" />
+                </div>
+              );
+            })}
+          </div>
 
-                      {/* Instrument Slots */}
-                      {SLOT_COLUMNS.map((col) => {
-                        const slot = service.slots?.[col.key];
-                        const isEnabled = slot ? slot.enabled !== false : true;
-                        const isOccupied = isEnabled && Boolean(slot?.musicianId);
-                        const firstName = slot?.musicianName?.split(' ')[0] || '';
+          {/* 6. VISTA ESCRITORIO (>= md): Matriz de Tabla Completa Estilizada */}
+          <div className="hidden md:block bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs text-left">
+                <thead className="bg-slate-50/80 border-b border-slate-200/90 text-slate-600 uppercase tracking-wider text-[10px]">
+                  <tr>
+                    <th className="py-3 px-4 sticky left-0 bg-slate-50 z-20 border-r border-slate-200 whitespace-nowrap font-bold">
+                      FECHA & CULTO
+                    </th>
+                    <th className="py-3 px-3 text-center whitespace-nowrap font-bold">
+                      HORA
+                    </th>
+                    {SLOT_COLUMNS.map((col) => (
+                      <th key={col.key} className="py-3 px-2 text-center whitespace-nowrap font-bold">
+                        <div className={`w-6 h-6 rounded-lg ${col.bgClass} flex items-center justify-center ${col.colorClass} mx-auto mb-1`}>
+                          <InstrumentIcon instrument={col.iconKey} size={14} />
+                        </div>
+                        <span className="text-[9px] text-slate-600 block tracking-tight">
+                          {col.label}
+                        </span>
+                      </th>
+                    ))}
+                    <th className="py-3 px-3 text-center whitespace-nowrap font-bold">
+                      INSCRIPCIÓN
+                    </th>
+                    <th className="py-3 px-3 text-center whitespace-nowrap font-bold">
+                      ACCIONES
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {filteredServices.map((service) => {
+                    const [year, month, day] = service.date.split('-');
+                    const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
+                    const dateStr = dateObj.toLocaleDateString('es-ES', {
+                      weekday: 'short',
+                      day: 'numeric',
+                      month: 'short',
+                    });
+                    const isPast = isServicePast(service.date);
+                    const isExpired = isServiceExpired(service);
 
-                        if (!isEnabled) {
+                    return (
+                      <tr 
+                        key={service.id} 
+                        className={`hover:bg-blue-50/30 transition-colors cursor-pointer ${
+                          isPast ? 'bg-slate-50/40 opacity-80' : ''
+                        }`}
+                        onClick={() => onOpenService(service.id)}
+                      >
+                        {/* Celda Fecha & Culto */}
+                        <td className="py-3 px-4 sticky left-0 bg-white z-10 border-r border-slate-200 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 relative flex items-center justify-center">
+                              <img 
+                                src="/app-bg.jpg" 
+                                alt="Culto" 
+                                className="w-full h-full object-cover opacity-80" 
+                              />
+                            </div>
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5">
+                                <span className="font-bold text-[#0B132B] capitalize">
+                                  {dateStr}
+                                </span>
+                                {isPast ? (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                                    Pasado
+                                  </span>
+                                ) : isExpired ? (
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200">
+                                    Expirado
+                                  </span>
+                                ) : null}
+                              </div>
+                              <p className="text-[11px] text-slate-500 truncate max-w-[140px] font-medium">
+                                {service.title}
+                              </p>
+                              {service.registrationDeadline && (
+                                <p className="text-[10px] text-amber-700 font-medium">
+                                  Límite: {service.registrationDeadline}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Hora */}
+                        <td className="py-3 px-3 text-center text-slate-700 font-bold text-xs whitespace-nowrap tabular-nums">
+                          {service.time}
+                        </td>
+
+                        {/* Columnas de Instrumentos (Badges limpios con Iniciales, SIN fotos de usuario) */}
+                        {SLOT_COLUMNS.map((col) => {
+                          const slot = service.slots?.[col.key];
+                          const isEnabled = slot ? slot.enabled !== false : true;
+                          const isOccupied = isEnabled && Boolean(slot?.musicianId);
+                          const firstName = slot?.musicianName?.split(' ')[0] || '';
+
+                          if (!isEnabled) {
+                            return (
+                              <td key={col.key} className="py-3 px-2 text-center whitespace-nowrap">
+                                <span className="text-slate-300 font-mono text-[10px]" title="No requerido">
+                                  —
+                                </span>
+                              </td>
+                            );
+                          }
+
                           return (
                             <td key={col.key} className="py-3 px-2 text-center whitespace-nowrap">
-                              <span className="text-slate-300 font-mono text-[10px]" title="Instrumento no requerido en esta fecha">
-                                —
-                              </span>
+                              {isOccupied ? (
+                                <div 
+                                  title={slot?.musicianName || 'Músico Asignado'}
+                                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full ${col.badgeBg} border text-xs font-semibold max-w-[110px] truncate shadow-2xs`}
+                                >
+                                  <div className={`w-4 h-4 rounded-full ${col.colorClass.replace('text-', 'bg-')} text-white text-[9px] font-bold flex items-center justify-center shrink-0`}>
+                                    {firstName.charAt(0).toUpperCase()}
+                                  </div>
+                                  <span className="truncate">{firstName}</span>
+                                </div>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    onOpenService(service.id);
+                                  }}
+                                  className="inline-flex items-center justify-center px-2 py-0.5 rounded-lg border border-slate-200 bg-slate-50/80 text-slate-400 text-[10px] font-medium hover:border-[#1E74FD] hover:text-[#1E74FD] hover:bg-blue-50/50 transition-colors"
+                                >
+                                  Vacante
+                                </button>
+                              )}
                             </td>
                           );
-                        }
+                        })}
 
-                        return (
-                          <td key={col.key} className="py-3 px-2 text-center whitespace-nowrap">
-                            {isOccupied ? (
-                              <div 
-                                title={slot?.musicianName || 'Músico Asignado'}
-                                className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200/90 text-emerald-900 font-semibold text-[11px] max-w-[95px] truncate shadow-2xs"
-                              >
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0"></span>
-                                <span className="truncate">{firstName || 'Asignado'}</span>
-                              </div>
+                        {/* Inscripción (Abierto / Cerrado) */}
+                        <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => toggleServiceOpen(service.id)}
+                            className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-colors ${
+                              service.isOpen
+                                ? 'bg-blue-50 text-[#1E74FD] border border-blue-200/80 hover:bg-blue-100'
+                                : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'
+                            }`}
+                          >
+                            {service.isOpen ? (
+                              <span className="flex items-center gap-1">
+                                <Eye className="w-3 h-3 text-[#1E74FD]" /> 
+                                <span>Abierto</span>
+                              </span>
                             ) : (
-                              <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-md border border-dashed border-slate-300 text-slate-400 text-[10px] font-medium hover:border-emerald-400 hover:text-emerald-700 hover:bg-emerald-50/50 transition-colors">
-                                Vacante
+                              <span className="flex items-center gap-1">
+                                <EyeOff className="w-3 h-3 text-slate-400" /> 
+                                <span>Cerrado</span>
                               </span>
                             )}
-                          </td>
-                        );
-                      })}
+                          </button>
+                        </td>
 
-                      {/* State toggle */}
-                      <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                        <button
-                          onClick={() => toggleServiceOpen(service.id)}
-                          className={`px-2 py-1 rounded text-[11px] font-semibold transition-colors ${
-                            service.isOpen
-                              ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                              : 'bg-slate-100 text-slate-500 border border-slate-200'
-                          }`}
-                        >
-                          {service.isOpen ? (
-                            <span className="flex items-center gap-1"><Eye className="w-3 h-3 text-emerald-600" /> Abierto</span>
-                          ) : (
-                            <span className="flex items-center gap-1"><EyeOff className="w-3 h-3 text-slate-400" /> Cerrado</span>
-                          )}
-                        </button>
-                      </td>
+                        {/* Acciones */}
+                        <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
+                          <div className="flex items-center justify-center gap-1">
+                            {onEditService && (
+                              <button
+                                onClick={() => onEditService(service)}
+                                title="Editar fecha y configurar instrumentos"
+                                className="p-1.5 text-slate-500 hover:text-[#1E74FD] hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                <Sliders className="w-3.5 h-3.5" />
+                              </button>
+                            )}
 
-                      {/* Actions */}
-                      <td className="py-3 px-3 text-center whitespace-nowrap" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex items-center justify-center gap-1">
-                          <button
-                            onClick={() => setDuplicatingService(service)}
-                            title="Duplicar esta fecha (cambiar fecha del evento y fecha límite)"
-                            className="p-1.5 text-emerald-700 hover:text-emerald-900 hover:bg-emerald-50 rounded-lg transition-colors"
-                          >
-                            <Copy className="w-3.5 h-3.5" />
-                          </button>
-                          {onEditService && (
                             <button
-                              onClick={() => onEditService(service)}
-                              title="Editar fecha y configurar instrumentos"
-                              className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
+                              onClick={() => onOpenService(service.id)}
+                              title="Ver / Asignar músicos"
+                              className="p-1.5 text-slate-500 hover:text-[#1E74FD] hover:bg-blue-50 rounded-lg transition-colors"
                             >
-                              <Sliders className="w-3.5 h-3.5" />
+                              <Edit3 className="w-3.5 h-3.5" />
                             </button>
-                          )}
-                          <button
-                            onClick={() => onOpenService(service.id)}
-                            title="Ver / Asignar músicos"
-                            className="p-1.5 text-slate-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
-                          >
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
-                          {onOpenSetlist && (
+
+                            {onOpenSetlist && (
+                              <button
+                                onClick={() => onOpenSetlist(service)}
+                                title="Gestionar repertorio de canciones (Setlist)"
+                                className={`p-1.5 rounded-lg transition-colors ${
+                                  service.songs && service.songs.length > 0
+                                    ? 'text-[#1E74FD] hover:text-[#155de0] bg-blue-50'
+                                    : 'text-slate-400 hover:text-[#1E74FD] hover:bg-blue-50'
+                                }`}
+                              >
+                                <Music className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+
                             <button
-                              onClick={() => onOpenSetlist(service)}
-                              title="Gestionar repertorio de canciones (Setlist)"
-                              className={`p-1.5 rounded-lg transition-colors ${
-                                service.songs && service.songs.length > 0
-                                  ? 'text-emerald-700 hover:text-emerald-900 bg-emerald-50'
-                                  : 'text-slate-400 hover:text-emerald-700 hover:bg-emerald-50'
-                              }`}
+                              onClick={() => setDuplicatingService(service)}
+                              title="Duplicar fecha"
+                              className="p-1.5 text-slate-500 hover:text-[#1E74FD] hover:bg-blue-50 rounded-lg transition-colors"
                             >
-                              <Music className="w-3.5 h-3.5" />
+                              <Copy className="w-3.5 h-3.5" />
                             </button>
-                          )}
-                          <button
-                            onClick={() => {
-                              setConfirmDialog({
-                                isOpen: true,
-                                title: '¿Eliminar fecha de servicio?',
-                                message: `¿Estás seguro de que deseas eliminar la fecha del ${dateStr}? Se removerá del cronograma.`,
-                                confirmText: 'Sí, eliminar fecha',
-                                cancelText: 'Cancelar',
-                                type: 'danger',
-                                onConfirm: () => {
-                                  setConfirmDialog(null);
-                                  deleteService(service.id);
-                                },
-                                onCancel: () => setConfirmDialog(null),
-                              });
-                            }}
-                            title="Eliminar fecha"
-                            className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+
+                            <button
+                              onClick={() => {
+                                setConfirmDialog({
+                                  isOpen: true,
+                                  title: '¿Eliminar fecha de servicio?',
+                                  message: `¿Estás seguro de que deseas eliminar la fecha del ${dateStr}? Se removerá del cronograma.`,
+                                  confirmText: 'Sí, eliminar fecha',
+                                  cancelText: 'Cancelar',
+                                  type: 'danger',
+                                  onConfirm: () => {
+                                    setConfirmDialog(null);
+                                    deleteService(service.id);
+                                  },
+                                  onCancel: () => setConfirmDialog(null),
+                                });
+                              }}
+                              title="Eliminar fecha"
+                              className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Modern In-App Confirmation Dialog */}
