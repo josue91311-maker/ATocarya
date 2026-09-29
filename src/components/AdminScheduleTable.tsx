@@ -111,22 +111,28 @@ export const AdminScheduleTable: React.FC<Props> = ({
     });
   }, [services, hidePast, selectedMonth, searchTerm]);
 
-  // Cálculos de KPIs
-  const totalAssignments = useMemo(() => {
-    return services.reduce((total, s) => {
-      const activeSlots = Object.values(s.slots || {}).filter(
-        slot => slot?.enabled !== false && Boolean(slot?.musicianId)
-      );
-      return total + activeSlots.length;
-    }, 0);
+  // Cálculos de KPIs estrictamente basados en cultos activos pendientes y huecos cubiertos
+  const pendingServices = useMemo(() => {
+    return services.filter(s => s && s.date && !isServicePast(s.date));
   }, [services]);
 
-  const roleCoverage = useMemo(() => {
-    const totalEnabled = services.reduce((total, s) => {
-      return total + Object.values(s.slots || {}).filter(slot => slot?.enabled !== false).length;
+  const totalPendingSlots = useMemo(() => {
+    return pendingServices.reduce((acc, s) => {
+      return acc + Object.values(s.slots || {}).filter(slot => slot && slot.enabled !== false).length;
     }, 0);
-    return totalEnabled > 0 ? Math.round((totalAssignments / totalEnabled) * 100) : 0;
-  }, [services, totalAssignments]);
+  }, [pendingServices]);
+
+  const coveredPendingSlots = useMemo(() => {
+    return pendingServices.reduce((acc, s) => {
+      return acc + Object.values(s.slots || {}).filter(slot => slot && slot.enabled !== false && Boolean(slot.musicianId)).length;
+    }, 0);
+  }, [pendingServices]);
+
+  const vacantPendingSlots = totalPendingSlots - coveredPendingSlots;
+
+  const pendingCoverage = totalPendingSlots > 0 
+    ? Math.round((coveredPendingSlots / totalPendingSlots) * 100) 
+    : 0;
 
   const handleExportJSON = () => {
     const json = exportDatabaseJSON();
@@ -153,7 +159,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
               Matriz de Planes & Asignaciones
             </h1>
             <p className="text-xs text-slate-500 mt-0.5 font-medium">
-              <strong className="text-slate-800 tabular-nums">{services.length}</strong> cultos programados · <strong className="text-slate-800 tabular-nums">{musicians.length}</strong> músicos en el equipo
+              <strong className="text-slate-800 tabular-nums">{pendingServices.length}</strong> cultos activos pendientes · <strong className="text-slate-800 tabular-nums">{musicians.length}</strong> músicos en el equipo · <strong className="text-emerald-700 tabular-nums">{coveredPendingSlots}/{totalPendingSlots}</strong> huecos cubiertos ({pendingCoverage}%)
             </p>
           </div>
         </div>
@@ -205,16 +211,19 @@ export const AdminScheduleTable: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* 2. Tarjetas KPI de Resumen (4 métricas) */}
+      {/* 2. Tarjetas KPI de Resumen (4 métricas de Cultos Activos Pendientes) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-        {/* KPI 1: Cultos Programados */}
+        {/* KPI 1: Cultos Activos Pendientes */}
         <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
-              {services.length}
+              {pendingServices.length}
             </span>
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
-              Cultos programados
+            <span className="text-[11px] sm:text-xs font-bold text-slate-600 block">
+              Cultos activos pendientes
+            </span>
+            <span className="text-[10px] text-slate-400 block font-medium">
+              Fechas por realizarse
             </span>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-blue-50 text-[#1E74FD] flex items-center justify-center shrink-0">
@@ -228,8 +237,11 @@ export const AdminScheduleTable: React.FC<Props> = ({
             <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
               {musicians.length}
             </span>
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
+            <span className="text-[11px] sm:text-xs font-bold text-slate-600 block">
               Músicos en el equipo
+            </span>
+            <span className="text-[10px] text-slate-400 block font-medium">
+              Total registrados
             </span>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
@@ -237,14 +249,22 @@ export const AdminScheduleTable: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* KPI 3: Asignaciones Totales */}
+        {/* KPI 3: Huecos Cubiertos (Cultos Pendientes) */}
         <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
-            <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
-              {totalAssignments}
+            <div className="flex items-baseline gap-1">
+              <span className="text-2xl sm:text-3xl font-black text-emerald-700 tabular-nums leading-none">
+                {coveredPendingSlots}
+              </span>
+              <span className="text-xs sm:text-sm font-bold text-slate-400 tabular-nums">
+                / {totalPendingSlots}
+              </span>
+            </div>
+            <span className="text-[11px] sm:text-xs font-bold text-slate-600 block">
+              Huecos cubiertos (pendientes)
             </span>
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
-              Asignaciones totales
+            <span className="text-[10px] text-amber-700 block font-medium">
+              {vacantPendingSlots} vacantes por cubrir
             </span>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
@@ -252,14 +272,17 @@ export const AdminScheduleTable: React.FC<Props> = ({
           </div>
         </div>
 
-        {/* KPI 4: Cobertura de Roles */}
+        {/* KPI 4: Cobertura de Roles Pendientes */}
         <div className="bg-white border border-slate-200/90 rounded-2xl p-3.5 sm:p-4 shadow-sm flex items-center justify-between">
           <div className="space-y-1">
             <span className="text-2xl sm:text-3xl font-black text-[#0B132B] tabular-nums block leading-none">
-              {roleCoverage}%
+              {pendingCoverage}%
             </span>
-            <span className="text-[11px] sm:text-xs font-semibold text-slate-500 block">
-              Cobertura de roles
+            <span className="text-[11px] sm:text-xs font-bold text-slate-600 block">
+              Cobertura roles pendientes
+            </span>
+            <span className="text-[10px] text-emerald-700 block font-medium">
+              {coveredPendingSlots} asignaciones activas
             </span>
           </div>
           <div className="w-10 h-10 rounded-2xl bg-amber-50 text-[#FF7E22] flex items-center justify-center shrink-0">
@@ -402,81 +425,151 @@ export const AdminScheduleTable: React.FC<Props> = ({
         </div>
       ) : (
         <>
-          {/* 5. VISTA MÓVIL (< md): Tarjetas de Culto con Músicos Asignados (Sin fotos, con badges elegantes) */}
+          {/* 5. VISTA MÓVIL (< md): Tarjetas de Culto con Músicos Asignados (Sin fotos de usuario, badges limpios) */}
           <div className="md:hidden space-y-3">
             {filteredServices.map((service) => {
-              const [year, month, day] = service.date.split('-');
+              const parts = (service.date || '').split('-');
+              const year = parts[0] || '2026';
+              const month = parts[1] || '01';
+              const day = parts[2] || '01';
               const dateObj = new Date(Number(year), Number(month) - 1, Number(day));
               const dateStr = dateObj.toLocaleDateString('es-ES', {
                 weekday: 'short',
                 day: 'numeric',
                 month: 'short',
               });
+              const monthShort = dateObj.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '').slice(0, 3);
               const isPast = isServicePast(service.date);
               const isExpired = isServiceExpired(service);
-              const confirmedSlots = (Object.values(service.slots || {}) as SlotConfig[])
-                .filter(slot => slot.enabled !== false && Boolean(slot.musicianId));
+              
+              const allEnabledSlots = (Object.values(service.slots || {}) as SlotConfig[])
+                .filter(slot => slot && slot.enabled !== false);
+              const confirmedSlots = allEnabledSlots
+                .filter(slot => Boolean(slot.musicianId));
+              const totalSlotsCount = allEnabledSlots.length;
+              const confirmedCount = confirmedSlots.length;
+              const hasSongs = service.songs && service.songs.length > 0;
 
               return (
                 <div 
                   key={service.id}
-                  onClick={() => onOpenService(service.id)}
-                  className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm flex items-center justify-between gap-3 cursor-pointer hover:border-blue-300 transition-all active:scale-98"
+                  className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-sm hover:border-blue-300 transition-all space-y-3"
                 >
-                  <div className="flex items-center gap-3.5 min-w-0">
-                    {/* Thumbnail del Culto */}
-                    <div className="w-13 h-13 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 relative flex items-center justify-center">
-                      <img 
-                        src="/app-bg.jpg" 
-                        alt="Culto" 
-                        className="w-full h-full object-cover opacity-80" 
-                      />
+                  <div 
+                    onClick={() => onOpenService(service.id)}
+                    className="flex items-center justify-between gap-3 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      {/* Badge Calendario de la Fecha (Sin fotos) */}
+                      <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-100 flex flex-col items-center justify-center shrink-0 text-[#1E74FD]">
+                        <span className="text-[10px] font-bold uppercase tracking-wider leading-none text-[#FF7E22]">
+                          {monthShort}
+                        </span>
+                        <span className="text-base font-black leading-tight tabular-nums text-[#0B132B]">
+                          {day}
+                        </span>
+                      </div>
+
+                      {/* Info del Culto */}
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <h3 className="font-bold text-[#0B132B] text-sm capitalize">
+                            {dateStr}
+                          </h3>
+                          {isPast ? (
+                            <span className="text-[9px] px-2 py-0.2 rounded-full bg-slate-100 text-slate-600 font-bold border border-slate-200">
+                              Pasado
+                            </span>
+                          ) : isExpired ? (
+                            <span className="text-[9px] px-2 py-0.2 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200">
+                              Expirado
+                            </span>
+                          ) : (
+                            <span className="text-[9px] px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
+                              Activo
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-slate-700 truncate font-semibold mt-0.5">
+                          {service.title}
+                        </p>
+                        <p className="text-[11px] text-slate-500 mt-0.5 flex items-center gap-1.5 flex-wrap">
+                          <span>⏰ {service.time}</span>
+                          {service.rehearsalTime && <span>· Ensayo: {service.rehearsalTime}</span>}
+                        </p>
+                      </div>
                     </div>
 
-                    {/* Info del Culto */}
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-1.5 flex-wrap">
-                        <h3 className="font-bold text-[#0B132B] text-sm capitalize">
-                          {dateStr}
-                        </h3>
-                        {isPast ? (
-                          <span className="text-[9px] px-2 py-0.2 rounded-full bg-emerald-50 text-emerald-700 font-bold border border-emerald-200">
-                            Pasado
-                          </span>
-                        ) : isExpired ? (
-                          <span className="text-[9px] px-2 py-0.2 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200">
-                            Expirado
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="text-xs text-slate-600 truncate font-medium mt-0.5">
-                        {service.title}
-                      </p>
-                      <p className="text-[10px] text-slate-400 mt-0.5">
-                        {service.time} {service.registrationDeadline ? `· Límite: ${service.registrationDeadline}` : ''}
-                      </p>
-
-                      {/* Fila de Músicos Asignados (Iniciales limpias, SIN fotos) */}
-                      <div className="flex items-center gap-1 mt-2 flex-wrap">
-                        {confirmedSlots.slice(0, 5).map((slot, idx) => (
-                          <span
-                            key={idx}
-                            title={`${slot.label}: ${slot.musicianName}`}
-                            className="w-5 h-5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[9px] font-black flex items-center justify-center"
-                          >
-                            {slot.musicianName?.charAt(0).toUpperCase()}
-                          </span>
-                        ))}
-                        {confirmedSlots.length > 5 && (
-                          <span className="text-[10px] font-bold text-slate-400 ml-1">
-                            +{confirmedSlots.length - 5}
-                          </span>
-                        )}
-                      </div>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                        confirmedCount === totalSlotsCount && totalSlotsCount > 0
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          : confirmedCount > 0
+                          ? 'bg-blue-50 text-[#1E74FD] border-blue-200'
+                          : 'bg-amber-50 text-amber-700 border-amber-200'
+                      }`}>
+                        {confirmedCount}/{totalSlotsCount} cupos
+                      </span>
+                      <ChevronRight className="w-4 h-4 text-slate-400 mt-1" />
                     </div>
                   </div>
 
-                  <ChevronRight className="w-5 h-5 text-slate-400 shrink-0" />
+                  {/* Fila de Músicos Asignados (Iniciales limpias, SIN fotos de usuario) */}
+                  <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                    <div className="flex items-center gap-1 flex-wrap min-w-0">
+                      {confirmedSlots.length === 0 ? (
+                        <span className="text-[11px] text-slate-400 italic">
+                          Sin músicos asignados aún
+                        </span>
+                      ) : (
+                        <>
+                          {confirmedSlots.slice(0, 6).map((slot, idx) => (
+                            <span
+                              key={idx}
+                              title={`${slot.label}: ${slot.musicianName}`}
+                              className="w-6 h-6 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-[10px] font-black flex items-center justify-center shrink-0 shadow-2xs"
+                            >
+                              {(slot.musicianName || '?').charAt(0).toUpperCase()}
+                            </span>
+                          ))}
+                          {confirmedSlots.length > 6 && (
+                            <span className="text-[10px] font-bold text-slate-500 ml-1">
+                              +{confirmedSlots.length - 6} más
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+
+                    {/* Acciones directas móviles */}
+                    <div className="flex items-center gap-1 shrink-0">
+                      {hasSongs && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onOpenSetlist && onOpenSetlist(service);
+                          }}
+                          className="px-2 py-1 bg-blue-50 hover:bg-blue-100 text-[#1E74FD] border border-blue-200 rounded-lg text-[10px] font-bold flex items-center gap-1"
+                          title="Ver repertorio de canciones"
+                        >
+                          <Music className="w-3 h-3" />
+                          <span>Canciones</span>
+                        </button>
+                      )}
+                      {onEditService && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            onEditService(service);
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg"
+                          title="Editar Culto"
+                        >
+                          <Edit3 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -535,12 +628,13 @@ export const AdminScheduleTable: React.FC<Props> = ({
                         {/* Celda Fecha & Culto */}
                         <td className="py-3 px-4 sticky left-0 bg-white z-10 border-r border-slate-200 whitespace-nowrap">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 relative flex items-center justify-center">
-                              <img 
-                                src="/app-bg.jpg" 
-                                alt="Culto" 
-                                className="w-full h-full object-cover opacity-80" 
-                              />
+                            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex flex-col items-center justify-center shrink-0 text-[#1E74FD]">
+                              <span className="text-[9px] font-bold uppercase tracking-wider leading-none text-[#FF7E22]">
+                                {dateObj.toLocaleDateString('es-ES', { month: 'short' }).replace('.', '').slice(0, 3)}
+                              </span>
+                              <span className="text-sm font-black leading-tight tabular-nums text-[#0B132B]">
+                                {day}
+                              </span>
                             </div>
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5">

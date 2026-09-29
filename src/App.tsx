@@ -55,7 +55,7 @@ const MainRouter: React.FC = () => {
   const [portal, setPortal] = useState<PortalType>(getInitialPortal);
   const [musicianTab, setMusicianTab] = useState<'calendar' | 'my-services' | 'tracks'>('calendar');
   const [mobileMusicianView, setMobileMusicianView] = useState<'home' | 'full-calendar'>('home');
-  const [adminTab, setAdminTab] = useState<'visual-board' | 'schedule' | 'musicians' | 'songs-bank'>('visual-board');
+  const [adminTab, setAdminTab] = useState<'visual-board' | 'schedule' | 'musicians' | 'songs-bank'>('schedule');
 
   const [selectedService, setSelectedService] = useState<ServiceDate | null>(null);
   const [editingService, setEditingService] = useState<ServiceDate | null>(null);
@@ -121,8 +121,8 @@ const MainRouter: React.FC = () => {
       <div className="min-h-screen flex flex-col bg-[#f8fafc] text-slate-900 relative">
         {/* Subtle Ambient Background */}
         <div 
-          className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.18]"
-          style={{ backgroundImage: 'url("/app-bg.jpg")' }}
+          className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url("/app-bg.jpg")', opacity: 0.08 }}
           aria-hidden="true"
         />
 
@@ -218,8 +218,8 @@ const MainRouter: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-[#f8fafc] text-slate-900 relative">
       {/* Subtle Ambient Background */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.18]"
-        style={{ backgroundImage: 'url("/app-bg.jpg")' }}
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url("/app-bg.jpg")', opacity: 0.08 }}
         aria-hidden="true"
       />
 
