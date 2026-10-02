@@ -111,17 +111,34 @@ export const MusicianMobileHome: React.FC<Props> = ({
     if (alreadyAssigned) return false;
     if (isServiceExpired(service)) return false;
     if (service.isOpen === false) return false;
-    // Que tenga al menos 1 puesto libre
     const hasVacant = slots.some(slot => slot && slot.enabled !== false && !slot.musicianId);
     return hasVacant;
   });
 
-  // Estadísticas para las 3 tarjetas del Hero
+  // Estadísticas claras y directas
   const assignedCount = myAssignedServices.length;
-  // Por confirmar: cultos próximos donde está asignado (o 1 si tiene cultos)
-  const porConfirmarCount = myAssignedServices.length > 0 ? 1 : 0;
-  // Pendientes: cultos vacantes disponibles
-  const pendientesCount = availableServices.length;
+
+  // Detección estricta de culto HOY en horario oficial de Perú (UTC-5 / America/Lima)
+  const getPeruTodayStr = (): string => {
+    try {
+      const formatter = new Intl.DateTimeFormat('en-CA', {
+        timeZone: 'America/Lima',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+      return formatter.format(new Date()); // "YYYY-MM-DD"
+    } catch {
+      const d = new Date();
+      const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+      const peruDate = new Date(utc - (5 * 3600000));
+      return peruDate.toISOString().split('T')[0];
+    }
+  };
+
+  const peruTodayStr = getPeruTodayStr();
+  const cultosToday = myAssignedServices.filter(s => s.date === peruTodayStr);
+  const hasCultoToday = cultosToday.length > 0;
 
   const handleQuickClaim = (serviceId: string, slotKey: SlotKey) => {
     setClaimingSlotKey(`${serviceId}_${slotKey}`);
@@ -158,7 +175,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
     <div className="-mx-4 -mt-6 sm:mx-0 sm:mt-0 pb-24 animate-in fade-in select-none">
       
       {/* ========================================================================= */}
-      {/* 1. HERO HEADER OSCURO ESTILO CONCIERTO (CON LOGO, SALUDO Y 3 STAT CARDS) */}
+      {/* 1. HERO HEADER OSCURO ESTILO CONCIERTO (CON LOGO BLANCO Y SALUDO)         */}
       {/* ========================================================================= */}
       <div 
         className="relative bg-[#0B132B] text-white pt-5 pb-9 px-4 sm:px-6 overflow-hidden shadow-xl"
@@ -173,24 +190,44 @@ export const MusicianMobileHome: React.FC<Props> = ({
         <div className="absolute -bottom-10 left-10 w-48 h-48 bg-[#FF7E22]/15 rounded-full blur-2xl pointer-events-none" />
 
         <div className="relative z-10 space-y-4 max-w-lg mx-auto">
-          {/* Barra Superior del Hero: Logo + Campana + Avatar Inicial */}
+          {/* Barra Superior del Hero: Logo con letras blancas + Campana de hoy + Avatar */}
           <div className="flex items-center justify-between">
+            {/* Logo Oficial con LETRAS BLANCAS */}
             <div className="flex items-center gap-2.5">
-              <Logo size="sm" showText={true} />
-              <div className="border-l border-white/20 pl-2.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-blue-200 block leading-tight">
+              <div className="w-8 h-8 relative flex items-center justify-center shrink-0 bg-white/10 rounded-xl p-1 border border-white/20 shadow-xs">
+                <svg viewBox="0 0 64 64" fill="none" className="w-full h-full">
+                  <circle cx="32" cy="32" r="23" stroke="#1E74FD" strokeWidth="6.5" strokeLinecap="round" strokeDasharray="115 35" strokeDashoffset="-12" />
+                  <polygon points="47,15 52,20 48,24 43,19" fill="#FF7E22" />
+                  <circle cx="24" cy="42" r="9.5" fill="#FFFFFF" />
+                  <path d="M24 42 V26 L34 36 L55 15" stroke="#1E74FD" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-white font-black text-lg tracking-tight leading-none font-display">
+                  ATocarYa
+                </span>
+                <span className="text-[9px] font-bold uppercase tracking-wider text-blue-200/90 leading-tight mt-0.5">
                   Portal de Músicos
                 </span>
               </div>
             </div>
 
             <div className="flex items-center gap-2.5">
-              {/* Notificación Campana con Badge */}
-              <div className="relative p-2 rounded-xl bg-white/10 hover:bg-white/15 transition-colors border border-white/10">
-                <Bell className="w-4 h-4 text-white" />
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center shadow-xs">
-                  {assignedCount || 1}
-                </span>
+              {/* Notificación Campana: Solo activa si tiene culto el día de HOY (Hora Perú) */}
+              <div 
+                className={`relative p-2 rounded-xl border transition-all ${
+                  hasCultoToday 
+                    ? 'bg-rose-500/20 border-rose-400/50 text-white' 
+                    : 'bg-white/10 border-white/10 text-white/70'
+                }`}
+                title={hasCultoToday ? `¡Hoy tienes ${cultosToday.length} culto(s) programado(s)!` : 'Sin cultos para hoy (Hora Perú)'}
+              >
+                <Bell className={`w-4 h-4 ${hasCultoToday ? 'text-rose-400 animate-pulse' : 'text-white/80'}`} />
+                {hasCultoToday && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[9px] font-black flex items-center justify-center shadow-xs animate-bounce">
+                    {cultosToday.length}
+                  </span>
+                )}
               </div>
 
               {/* Avatar inicial con color azul eléctrico */}
@@ -205,7 +242,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
               <button
                 type="button"
                 onClick={logoutMusician}
-                className="p-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white transition-colors"
+                className="p-2 rounded-xl bg-white/10 hover:bg-white/15 text-slate-300 hover:text-white transition-colors cursor-pointer"
                 title="Cerrar sesión"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -223,43 +260,40 @@ export const MusicianMobileHome: React.FC<Props> = ({
             </p>
           </div>
 
-          {/* 3 Tarjetas Estadísticas Estilo App */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 pt-1">
+          {/* 2 Tarjetas Estadísticas Reales (Sin la tarjeta confusa de 'Pendientes') */}
+          <div className="grid grid-cols-2 gap-3 pt-1">
             {/* Card 1: Asignados (Azul Eléctrico) */}
-            <div className="bg-[#1E74FD] text-white rounded-2xl p-3 shadow-md shadow-blue-500/25 flex flex-col justify-between min-h-[78px] border border-blue-400/30">
-              <Calendar className="w-4 h-4 text-blue-100" />
-              <div>
-                <span className="text-2xl font-black leading-none block">
+            <div className="bg-[#1E74FD] text-white rounded-2xl p-3.5 shadow-md shadow-blue-500/25 flex flex-col justify-between min-h-[82px] border border-blue-400/30">
+              <div className="flex items-center justify-between">
+                <Calendar className="w-5 h-5 text-blue-100" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-100 bg-white/15 px-2 py-0.5 rounded-full">
+                  Confirmados
+                </span>
+              </div>
+              <div className="mt-2">
+                <span className="text-3xl font-black leading-none block tabular-nums">
                   {assignedCount}
                 </span>
-                <span className="text-[10px] font-bold text-blue-100 uppercase tracking-tight block mt-0.5">
-                  Asignados
+                <span className="text-[11px] font-bold text-blue-100 uppercase tracking-tight block mt-1">
+                  Cultos Asignados
                 </span>
               </div>
             </div>
 
-            {/* Card 2: Por Confirmar (Ámbar / Naranja) */}
-            <div className="bg-[#FF7E22] text-white rounded-2xl p-3 shadow-md shadow-amber-500/25 flex flex-col justify-between min-h-[78px] border border-amber-400/30">
-              <Sun className="w-4 h-4 text-amber-100" />
-              <div>
-                <span className="text-2xl font-black leading-none block">
-                  {porConfirmarCount}
-                </span>
-                <span className="text-[10px] font-bold text-amber-100 uppercase tracking-tight block mt-0.5">
-                  Por confirmar
+            {/* Card 2: Total Cultos en Calendario (Naranja / Ámbar) */}
+            <div className="bg-[#FF7E22] text-white rounded-2xl p-3.5 shadow-md shadow-amber-500/25 flex flex-col justify-between min-h-[82px] border border-amber-400/30">
+              <div className="flex items-center justify-between">
+                <Sparkles className="w-5 h-5 text-amber-100" />
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-100 bg-white/15 px-2 py-0.5 rounded-full">
+                  Calendario
                 </span>
               </div>
-            </div>
-
-            {/* Card 3: Pendientes / Vacantes (Glassmorphism Oscuro) */}
-            <div className="bg-white/10 backdrop-blur-md text-white rounded-2xl p-3 shadow-md border border-white/15 flex flex-col justify-between min-h-[78px]">
-              <FileText className="w-4 h-4 text-slate-300" />
-              <div>
-                <span className="text-2xl font-black leading-none block">
-                  {pendientesCount}
+              <div className="mt-2">
+                <span className="text-3xl font-black leading-none block tabular-nums">
+                  {upcomingServices.length}
                 </span>
-                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-tight block mt-0.5">
-                  Pendientes
+                <span className="text-[11px] font-bold text-amber-100 uppercase tracking-tight block mt-1">
+                  Cultos Programados
                 </span>
               </div>
             </div>

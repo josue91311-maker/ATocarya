@@ -257,7 +257,7 @@ export const Navbar: React.FC<Props> = ({
             {/* 1. Inicio */}
             <button
               onClick={() => setMusicianTab('calendar')}
-              className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-all cursor-pointer ${
+              className={`flex flex-col items-center justify-center min-w-[70px] py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'calendar'
                   ? 'text-[#1E74FD] font-black'
                   : 'text-slate-400 hover:text-slate-700 font-medium'
@@ -270,7 +270,7 @@ export const Navbar: React.FC<Props> = ({
             {/* 2. Mis Cultos */}
             <button
               onClick={() => setMusicianTab('my-services')}
-              className={`relative flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-all cursor-pointer ${
+              className={`relative flex flex-col items-center justify-center min-w-[70px] py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'my-services'
                   ? 'text-[#1E74FD] font-black'
                   : 'text-slate-400 hover:text-slate-700 font-medium'
@@ -279,52 +279,34 @@ export const Navbar: React.FC<Props> = ({
               <Calendar className="w-5 h-5 mb-0.5" />
               <span className="text-[10px]">Mis Cultos</span>
               {assignedCount > 0 && (
-                <span className="absolute top-0 right-1.5 w-4 h-4 rounded-full bg-[#FF7E22] text-white text-[9px] font-bold flex items-center justify-center tabular-nums shadow-xs">
+                <span className="absolute top-0.5 right-2 w-4 h-4 rounded-full bg-[#FF7E22] text-white text-[9px] font-bold flex items-center justify-center tabular-nums shadow-xs">
                   {assignedCount}
                 </span>
               )}
             </button>
 
-            {/* 3. Botón Central Flotante '+' */}
-            <button
-              onClick={() => setMusicianTab('calendar')}
-              className="w-11 h-11 -mt-5 rounded-full bg-[#1E74FD] hover:bg-[#155de0] text-white flex items-center justify-center shadow-lg shadow-blue-500/35 active:scale-95 transition-all cursor-pointer"
-              title="Postularse a Culto / Ver Disponibles"
-            >
-              <Plus className="w-6 h-6 stroke-[2.5]" />
-            </button>
-
-            {/* 4. Pistas de Audio o Equipo */}
-            {canAccessTracks ? (
+            {/* 3. Canciones / Pistas (SOLO PARA VOZ DIRECTOR O ADMINISTRADOR) */}
+            {canAccessTracks && (
               <button
                 onClick={() => setMusicianTab('tracks')}
-                className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-all cursor-pointer ${
+                className={`flex flex-col items-center justify-center min-w-[70px] py-1.5 px-2 rounded-xl transition-all cursor-pointer ${
                   musicianTab === 'tracks'
                     ? 'text-[#1E74FD] font-black'
                     : 'text-slate-400 hover:text-slate-700 font-medium'
                 }`}
               >
                 <Headphones className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px]">Pistas</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => setMusicianTab('my-services')}
-                className="flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl text-slate-400 hover:text-slate-700 font-medium cursor-pointer"
-              >
-                <Users className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px]">Equipo</span>
+                <span className="text-[10px]">Canciones</span>
               </button>
             )}
 
-            {/* 5. Salir / Sesión */}
+            {/* 4. Salir */}
             <button
               onClick={logoutMusician}
-              className="flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+              className="flex flex-col items-center justify-center min-w-[70px] py-1.5 px-2 rounded-xl text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
               title="Cerrar Sesión"
             >
               <LogOut className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px]">Salir</span>
             </button>
           </>
         )}
