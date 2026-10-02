@@ -11,7 +11,9 @@ import {
   Sparkles,
   Shield,
   Music2,
-  Headphones
+  Headphones,
+  Home,
+  Plus
 } from 'lucide-react';
 import { Logo } from './Logo';
 
@@ -52,7 +54,11 @@ export const Navbar: React.FC<Props> = ({
   return (
     <>
       {/* Top Navbar - Planning Center Services Style */}
-      <header className="sticky top-0 z-40 w-full bg-white border-b border-slate-200/90 shadow-2xs">
+      <header className={`sticky top-0 z-40 w-full border-b transition-colors ${
+        portal === 'musician' && musicianTab === 'calendar'
+          ? 'hidden md:block bg-white border-slate-200/90 shadow-2xs'
+          : 'bg-white border-slate-200/90 shadow-2xs'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
             
@@ -245,52 +251,81 @@ export const Navbar: React.FC<Props> = ({
       </header>
 
       {/* MOBILE BOTTOM NAVIGATION BAR (FIXED ON SMARTPHONES < 768px) */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-slate-200 py-1.5 px-4 flex items-center justify-around shadow-lg">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200/90 py-1.5 px-3 flex items-center justify-around shadow-lg">
         {portal === 'musician' && (
           <>
+            {/* 1. Inicio */}
             <button
               onClick={() => setMusicianTab('calendar')}
-              className={`flex flex-col items-center justify-center min-w-[72px] py-1 px-2 rounded-xl transition-colors touch-target ${
+              className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'calendar'
-                  ? 'text-emerald-700 font-bold'
-                  : 'text-slate-500 hover:text-slate-900 font-medium'
+                  ? 'text-[#1E74FD] font-black'
+                  : 'text-slate-400 hover:text-slate-700 font-medium'
+              }`}
+            >
+              <Home className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px]">Inicio</span>
+            </button>
+
+            {/* 2. Mis Cultos */}
+            <button
+              onClick={() => setMusicianTab('my-services')}
+              className={`relative flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-all cursor-pointer ${
+                musicianTab === 'my-services'
+                  ? 'text-[#1E74FD] font-black'
+                  : 'text-slate-400 hover:text-slate-700 font-medium'
               }`}
             >
               <Calendar className="w-5 h-5 mb-0.5" />
-              <span className="text-[11px]">Fechas</span>
-            </button>
-
-            <button
-              onClick={() => setMusicianTab('my-services')}
-              className={`relative flex flex-col items-center justify-center min-w-[72px] py-1 px-2 rounded-xl transition-colors touch-target ${
-                musicianTab === 'my-services'
-                  ? 'text-emerald-700 font-bold'
-                  : 'text-slate-500 hover:text-slate-900 font-medium'
-              }`}
-            >
-              <CheckCircle2 className="w-5 h-5 mb-0.5" />
-              <span className="text-[11px]">Mis Puestos</span>
+              <span className="text-[10px]">Mis Cultos</span>
               {assignedCount > 0 && (
-                <span className="absolute top-0.5 right-3 w-4 h-4 rounded-full bg-[#FF7E22] text-white text-[9px] font-bold flex items-center justify-center tabular-nums shadow-xs">
+                <span className="absolute top-0 right-1.5 w-4 h-4 rounded-full bg-[#FF7E22] text-white text-[9px] font-bold flex items-center justify-center tabular-nums shadow-xs">
                   {assignedCount}
                 </span>
               )}
             </button>
 
-            {/* Pestaña Pistas de Audio (solo Voz Director o Admin) */}
-            {canAccessTracks && (
+            {/* 3. Botón Central Flotante '+' */}
+            <button
+              onClick={() => setMusicianTab('calendar')}
+              className="w-11 h-11 -mt-5 rounded-full bg-[#1E74FD] hover:bg-[#155de0] text-white flex items-center justify-center shadow-lg shadow-blue-500/35 active:scale-95 transition-all cursor-pointer"
+              title="Postularse a Culto / Ver Disponibles"
+            >
+              <Plus className="w-6 h-6 stroke-[2.5]" />
+            </button>
+
+            {/* 4. Pistas de Audio o Equipo */}
+            {canAccessTracks ? (
               <button
                 onClick={() => setMusicianTab('tracks')}
-                className={`flex flex-col items-center justify-center min-w-[72px] py-1 px-2 rounded-xl transition-colors touch-target ${
+                className={`flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-all cursor-pointer ${
                   musicianTab === 'tracks'
-                    ? 'text-[#1E74FD] font-bold'
-                    : 'text-slate-500 hover:text-slate-900 font-medium'
+                    ? 'text-[#1E74FD] font-black'
+                    : 'text-slate-400 hover:text-slate-700 font-medium'
                 }`}
               >
                 <Headphones className="w-5 h-5 mb-0.5" />
-                <span className="text-[11px]">Pistas</span>
+                <span className="text-[10px]">Pistas</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => setMusicianTab('my-services')}
+                className="flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl text-slate-400 hover:text-slate-700 font-medium cursor-pointer"
+              >
+                <Users className="w-5 h-5 mb-0.5" />
+                <span className="text-[10px]">Equipo</span>
               </button>
             )}
+
+            {/* 5. Salir / Sesión */}
+            <button
+              onClick={logoutMusician}
+              className="flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl text-slate-400 hover:text-rose-600 transition-colors cursor-pointer"
+              title="Cerrar Sesión"
+            >
+              <LogOut className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px]">Salir</span>
+            </button>
           </>
         )}
 
