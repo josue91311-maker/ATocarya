@@ -37,8 +37,6 @@ export const MusicianMobileHome: React.FC<Props> = ({
   const { musicianUser, services, claimSlot, releaseSlot, isAdminAuthenticated, logoutMusician } = useApp();
   const [claimingSlotKey, setClaimingSlotKey] = useState<string | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
-  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
-
   if (!musicianUser) return null;
 
   // Primer nombre para saludo amigable
@@ -62,36 +60,6 @@ export const MusicianMobileHome: React.FC<Props> = ({
       return { weekday: 'Fecha', dayNum: 0, monthName: '', full: dateStr };
     }
   };
-
-  // Generador de la tira de 7 días de la semana actual (Lunes a Domingo)
-  const getDaysOfWeek = () => {
-    const now = new Date();
-    const currentDayOfWeek = (now.getDay() + 6) % 7; // 0 = Lunes, 6 = Domingo
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - currentDayOfWeek);
-
-    const days = [];
-    const dayNames = ['LUN', 'MAR', 'MIÉ', 'JUE', 'VIE', 'SÁB', 'DOM'];
-
-    for (let i = 0; i < 7; i++) {
-      const d = new Date(monday);
-      d.setDate(monday.getDate() + i);
-      const year = d.getFullYear();
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      const dateStr = `${year}-${month}-${day}`;
-      const isToday = d.toDateString() === now.toDateString();
-      days.push({
-        dateStr,
-        dayName: dayNames[i],
-        dayNum: d.getDate(),
-        isToday
-      });
-    }
-    return days;
-  };
-
-  const weekDays = getDaysOfWeek();
 
   // 1. Filtrar servicios futuros
   const upcomingServices = services
@@ -165,11 +133,6 @@ export const MusicianMobileHome: React.FC<Props> = ({
       setTimeout(() => setFeedbackMsg(null), 3000);
     }
   };
-
-  // Filtrado opcional por día de la semana tocado en la tira
-  const displayedAssignedServices = selectedDateFilter
-    ? myAssignedServices.filter(s => s.date === selectedDateFilter)
-    : myAssignedServices;
 
   return (
     <div className="-mx-4 -mt-6 sm:mx-0 sm:mt-0 pb-24 animate-in fade-in select-none">
@@ -318,46 +281,14 @@ export const MusicianMobileHome: React.FC<Props> = ({
           </div>
         )}
 
-        {/* Tira Horizontal de 7 Días de la Semana */}
-        <div className="flex items-center justify-between gap-1 pb-1 border-b border-slate-100 overflow-x-auto">
-          {weekDays.map((day) => {
-            const isSelected = selectedDateFilter === day.dateStr || (!selectedDateFilter && day.isToday);
-            return (
-              <button
-                key={day.dateStr}
-                type="button"
-                onClick={() => {
-                  if (selectedDateFilter === day.dateStr) {
-                    setSelectedDateFilter(null);
-                  } else {
-                    setSelectedDateFilter(day.dateStr);
-                  }
-                }}
-                className={`flex flex-col items-center justify-center py-2 px-1.5 min-w-[42px] rounded-2xl transition-all cursor-pointer ${
-                  isSelected
-                    ? 'bg-[#1E74FD] text-white shadow-md shadow-blue-500/25 scale-[1.05]'
-                    : 'text-slate-600 hover:bg-slate-50'
-                }`}
-              >
-                <span className={`text-[10px] font-black uppercase tracking-tight ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                  {day.dayName}
-                </span>
-                <span className={`text-sm font-black tabular-nums mt-0.5 ${isSelected ? 'text-white' : 'text-slate-800'}`}>
-                  {day.dayNum}
-                </span>
-              </button>
-            );
-          })}
-        </div>
-
         {/* ========================================================================= */}
-        {/* SECCIÓN: MIS CULTOS DE HOY / PRÓXIMOS CULTOS                              */}
+        {/* SECCIÓN: MIS PRÓXIMOS CULTOS                                              */}
         {/* ========================================================================= */}
         <section className="space-y-3">
           <div className="flex items-center justify-between px-0.5">
             <div className="flex items-center gap-2">
               <h2 className="text-base font-black text-slate-900 tracking-tight">
-                Mis cultos de hoy
+                Mis Próximos Cultos
               </h2>
               <span className="w-5 h-5 rounded-full bg-blue-100 text-[#1E74FD] text-xs font-black flex items-center justify-center tabular-nums">
                 {myAssignedServices.length}
@@ -370,35 +301,26 @@ export const MusicianMobileHome: React.FC<Props> = ({
                 onClick={onGoToFullCalendar}
                 className="text-xs font-bold text-[#1E74FD] hover:underline flex items-center gap-0.5 cursor-pointer"
               >
-                <span>Ver calendario</span>
+                <span>Ver calendario completo</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             )}
           </div>
 
           {/* Lista de Tarjetas de Cultos Asignados */}
-          {displayedAssignedServices.length === 0 ? (
+          {myAssignedServices.length === 0 ? (
             <div className="bg-slate-50 border border-slate-200/90 rounded-3xl p-6 text-center space-y-2">
               <Calendar className="w-9 h-9 text-slate-300 mx-auto" />
               <h3 className="text-sm font-bold text-slate-800">
-                {selectedDateFilter ? 'No tienes cultos asignados en este día' : 'No tienes cultos asignados actualmente'}
+                No tienes cultos asignados actualmente
               </h3>
               <p className="text-xs text-slate-500 max-w-xs mx-auto">
                 Revisa los cultos abiertos abajo para postularte con tu instrumento o voz.
               </p>
-              {selectedDateFilter && (
-                <button
-                  type="button"
-                  onClick={() => setSelectedDateFilter(null)}
-                  className="text-xs font-bold text-[#1E74FD] hover:underline pt-1 block mx-auto"
-                >
-                  Ver todos los cultos asignados
-                </button>
-              )}
             </div>
           ) : (
             <div className="space-y-3.5">
-              {displayedAssignedServices.map(service => {
+              {myAssignedServices.map(service => {
                 const dateInfo = formatServiceDate(service.date);
                 const slots = Object.values(service.slots || {}) as SlotConfig[];
                 const mySlot = slots.find(s => s && s.musicianId === musicianUser.id);
