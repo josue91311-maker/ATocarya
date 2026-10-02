@@ -63,8 +63,18 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
   const [loadProgress, setLoadProgress] = useState<string>('Cargando pista...');
   const [error, setError] = useState<string | null>(null);
 
-  // Parámetros musicales
-  const [semitones, setSemitones] = useState<number>(0); // -3 a +3 semitonos
+  // Determinar la tonalidad original de la pista de audio grabada
+  const audioOriginalKey = originalKey?.trim() || (!targetKey ? baseKey?.trim() : undefined) || baseKey?.trim() || 'A';
+  // Determinar la tonalidad oficial requerida para el culto
+  const worshipTargetKey = targetKey?.trim() || (!originalKey ? baseKey?.trim() : undefined) || audioOriginalKey;
+
+  // Distancia en semitonos entre el audio grabado y el tono requerido para el culto (ej: B -> Bb = -1 st)
+  const worshipDelta = (audioOriginalKey && worshipTargetKey)
+    ? calculateSemitoneDistance(audioOriginalKey, worshipTargetKey)
+    : 0;
+
+  // Parámetros musicales - Inicializado por defecto con el tono oficial del culto (worshipDelta)
+  const [semitones, setSemitones] = useState<number>(worshipDelta);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1.0); // 0.8x a 1.2x
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
@@ -77,7 +87,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
   const pitchShifterRef = useRef<PitchShifter | null>(null);
   const audioBufferRef = useRef<AudioBuffer | null>(null);
   const isPlayingRef = useRef(false);
-  const semitonesRef = useRef(0);
+  const semitonesRef = useRef(worshipDelta);
   const tempoRef = useRef(1.0);
 
   // Mantener refs sincronizadas para callbacks
@@ -85,15 +95,14 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
   semitonesRef.current = semitones;
   tempoRef.current = playbackSpeed;
 
-  // Determinar la tonalidad original de la pista de audio grabada
-  const audioOriginalKey = originalKey?.trim() || (!targetKey ? baseKey?.trim() : undefined) || baseKey?.trim() || 'A';
-  // Determinar la tonalidad oficial requerida para el culto
-  const worshipTargetKey = targetKey?.trim() || (!originalKey ? baseKey?.trim() : undefined) || audioOriginalKey;
-
-  // Distancia en semitonos entre el audio grabado y el tono requerido para el culto (ej: B -> Bb = -1 st)
-  const worshipDelta = (audioOriginalKey && worshipTargetKey)
-    ? calculateSemitoneDistance(audioOriginalKey, worshipTargetKey)
-    : 0;
+  // Sincronizar automáticamente el tono al tono oficial por defecto cuando cambie de alabanza o configuración de culto
+  useEffect(() => {
+    setSemitones(worshipDelta);
+    semitonesRef.current = worshipDelta;
+    if (pitchShifterRef.current) {
+      pitchShifterRef.current.pitchSemitones = worshipDelta;
+    }
+  }, [songTitle, audioUrl, worshipDelta]);
 
   // Obtener o inicializar AudioContext (independiente de volumen para evitar recargas)
   const getAudioContext = useCallback(() => {
@@ -287,13 +296,59 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
     return semitones === 0 ? `${audioOriginalKey} (Original)` : `${transposed} (${semitones > 0 ? `+${semitones}` : semitones} st)`;
   })();
 
-  // 7 semitones range: -3, -2, -1, 0, 1, 2, 3
-  const semitonesList = [-3, -2, -1, 0, 1, 2, 3];
+  // -7 a +7 semitonos organizados en 2 filas limpias para perfecta adaptabilidad en móvil y PC
+  const lowerSemitonesList = [-7, -6, -5, -4, -3, -2, -1];
+  const higherAndOrigSemitonesList = [0, 1, 2, 3, 4, 5, 6, 7];
+
+  // Renderizador de botón individual de semitono
+  const renderSemitoneButton = (st: number) => {
+    const isSelected = semitones === st;
+    const isWorshipTarget = st === worshipDelta;
+    const cleanKey = audioOriginalKey ? audioOriginalKey.replace(/[^A-Ga-g#b]/g, '') : '';
+    const noteAtSt = cleanKey ? transposeChord(cleanKey, st) : '';
+    const label = st === 0 ? 'orig (0)' : st > 0 ? `+${st}` : `${st}`;
+
+    return (
+      <button
+        key={st}
+        type="button"
+        onClick={() => handleSemitoneChange(st)}
+        className={`relative py-1.5 sm:py-2 px-0.5 text-center rounded-xl transition-all flex flex-col items-center justify-center min-h-[46px] sm:min-h-[50px] cursor-pointer ${
+          isSelected
+            ? 'bg-[#1E74FD] text-white shadow-sm font-bold ring-2 ring-[#1E74FD]/40 scale-[1.02] z-10'
+            : isWorshipTarget
+            ? 'bg-blue-50/80 hover:bg-blue-100 text-[#1E74FD] border-2 border-[#1E74FD]/60 font-bold'
+            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 font-semibold'
+        }`}
+        title={`Transportar ${st === 0 ? 'tono original' : `${st > 0 ? `+${st}` : st} semitonos`} (${noteAtSt})${isWorshipTarget ? ' - Tono oficial del culto' : ''}`}
+      >
+        {isWorshipTarget && (
+          <span
+            className={`absolute -top-1.5 -right-1 px-1 py-0.2 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-tighter shadow-2xs ${
+              isSelected ? 'bg-amber-400 text-slate-950 font-black' : 'bg-[#1E74FD] text-white'
+            }`}
+          >
+            Culto
+          </span>
+        )}
+        <span className="text-xs sm:text-sm font-black leading-tight">
+          {noteAtSt || (st === 0 ? 'Orig' : st)}
+        </span>
+        <span
+          className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 font-medium ${
+            isSelected ? 'text-blue-100' : isWorshipTarget ? 'text-[#1E74FD] font-bold' : 'text-slate-400'
+          }`}
+        >
+          {label}
+        </span>
+      </button>
+    );
+  };
 
   // Componente: Tarjeta del Transpositor
   const transpositorCard = (
     <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between h-full">
-      {/* Header del Transpositor */}
+      {/* 1. Header del Transpositor */}
       <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <Activity className="w-4 h-4 text-[#1E74FD]" />
@@ -302,55 +357,111 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
           </h3>
         </div>
         <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FF7E22]/10 text-[#FF7E22] border border-[#FF7E22]/20">
-          {audioOriginalKey} (Original)
+          Pista: {audioOriginalKey} (Original)
         </span>
       </div>
 
-      {/* Botones de Semitonos (-3 a +3) */}
-      <div className="py-3">
+      {/* 2. Banner Grande: Tonalidad que se va a tocar en el Culto */}
+      <div className={`p-3.5 sm:p-4 rounded-2xl my-3 border transition-all ${
+        worshipDelta !== 0
+          ? 'bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-blue-50/30 border-[#1E74FD]/40 shadow-xs'
+          : 'bg-slate-50 border-slate-200/90'
+      }`}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5">
+              <span className={`w-2.5 h-2.5 rounded-full ${worshipDelta !== 0 ? 'bg-[#1E74FD] animate-pulse' : 'bg-emerald-500'}`} />
+              <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider ${worshipDelta !== 0 ? 'text-[#1E74FD]' : 'text-slate-600'}`}>
+                {worshipDelta !== 0 ? 'Tono Requerido para el Culto' : 'Tono Oficial del Culto'}
+              </span>
+            </div>
+            
+            {worshipDelta !== 0 ? (
+              <p className="text-xs text-slate-700 mt-1 font-medium leading-snug">
+                Pista grabada en <strong className="text-slate-900 font-bold">{audioOriginalKey}</strong> ➔ Transportada{' '}
+                <span className="font-bold text-[#1E74FD]">
+                  {formatSemitoneShiftDescription(worshipDelta)}
+                </span>
+              </p>
+            ) : (
+              <p className="text-xs text-slate-500 mt-1">
+                Se cantará en la misma tonalidad original de la pista ({audioOriginalKey})
+              </p>
+            )}
+
+            {/* Aviso si el usuario alteró el transportador a otro tono */}
+            {semitones !== worshipDelta && (
+              <div className="mt-2 flex items-center gap-2 flex-wrap">
+                <span className="text-[11px] text-amber-800 bg-amber-100/90 px-2 py-0.5 rounded-md font-bold">
+                  Escuchando en {currentKeyDisplay}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => handleSemitoneChange(worshipDelta)}
+                  className="text-[11px] font-bold text-[#1E74FD] hover:underline cursor-pointer"
+                >
+                  ↩ Restablecer a tono del culto ({worshipTargetKey})
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* GRAN VISUALIZACIÓN DE LA TONALIDAD A TOCAR */}
+          <div className="text-center shrink-0 bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border-2 border-[#1E74FD]/30 shadow-xs">
+            <span className="text-2xl sm:text-4xl font-black text-[#1E74FD] tracking-tight block leading-none">
+              {worshipTargetKey}
+            </span>
+            <span className="text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-wider block mt-1">
+              Tono a Tocar
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Botones de Semitonos (-7 a +7) en dos filas */}
+      <div className="py-1 space-y-2.5">
         {isLoading ? (
           <div className="py-6 text-center text-xs text-slate-500">
             <div className="w-6 h-6 border-2 border-[#1E74FD]/20 border-t-[#1E74FD] rounded-full animate-spin mx-auto mb-2" />
             {loadProgress}
           </div>
         ) : (
-          <div className="grid grid-cols-7 gap-1 sm:gap-2">
-            {semitonesList.map((st) => {
-              const isSelected = semitones === st;
-              const cleanKey = audioOriginalKey.replace(/[^A-Ga-g#b]/g, '');
-              const noteAtSt = cleanKey ? transposeChord(cleanKey, st) : '';
-              const label = st === 0 ? 'orig (0)' : st > 0 ? `+${st} st` : `${st} st`;
+          <>
+            {/* Fila 1: Bajar Tono (-7 a -1) */}
+            <div>
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 mb-1 px-0.5">
+                <span className="flex items-center gap-1">
+                  <span>↓ Bajar Tono</span>
+                  <span className="text-[10px] text-slate-400 font-medium">(-7 a -1 semitonos)</span>
+                </span>
+              </div>
+              <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
+                {lowerSemitonesList.map((st) => renderSemitoneButton(st))}
+              </div>
+            </div>
 
-              return (
-                <button
-                  key={st}
-                  type="button"
-                  onClick={() => handleSemitoneChange(st)}
-                  className={`py-2 px-1 text-center rounded-xl transition-all flex flex-col items-center justify-center min-h-[52px] ${
-                    isSelected
-                      ? 'bg-[#1E74FD] text-white shadow-sm font-bold ring-2 ring-[#1E74FD]/30 scale-[1.02]'
-                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 font-semibold'
-                  }`}
-                  title={`Transportar ${label}`}
-                >
-                  <span className="text-xs sm:text-sm font-bold leading-tight">
-                    {noteAtSt || (st === 0 ? 'Orig' : st)}
-                  </span>
-                  <span className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 font-medium ${isSelected ? 'text-blue-100' : 'text-slate-400'}`}>
-                    {label}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
+            {/* Fila 2: Original & Subir Tono (0 a +7) */}
+            <div>
+              <div className="flex items-center justify-between text-[11px] font-bold text-slate-500 mb-1 px-0.5">
+                <span className="flex items-center gap-1">
+                  <span>↑ Original & Subir Tono</span>
+                  <span className="text-[10px] text-slate-400 font-medium">(0 a +7 semitonos)</span>
+                </span>
+              </div>
+              <div className="grid grid-cols-8 gap-1 sm:gap-1.5">
+                {higherAndOrigSemitonesList.map((st) => renderSemitoneButton(st))}
+              </div>
+            </div>
+          </>
         )}
 
-        <p className="text-[11px] text-slate-400 text-center mt-3 font-normal">
-          El motor WSOLA mantiene el ritmo y percusión perfectos al bajar o subir semitonos sin distorsión.
-        </p>
+        <div className="flex items-center justify-between text-[10px] sm:text-[11px] text-slate-400 pt-1 font-normal">
+          <span>El motor WSOLA mantiene el tempo sin distorsión.</span>
+          <span className="text-slate-500 font-semibold">Rango: -7 a +7 st</span>
+        </div>
       </div>
 
-      {/* Velocidad de Reproducción */}
+      {/* 4. Velocidad de Reproducción */}
       <div className="flex items-center justify-between gap-2 pt-3 border-t border-slate-100">
         <span className="text-xs font-semibold text-slate-600">
           Velocidad de reproducción
@@ -397,11 +508,11 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
               {songTitle}
             </h4>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#1E74FD]/10 text-[#1E74FD]">
-                PISTA & TONO OFICIAL
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-[#1E74FD]/10 text-[#1E74FD]">
+                TONO CULTO: {worshipTargetKey}
               </span>
               <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FF7E22]/10 text-[#FF7E22]">
-                {currentKeyDisplay}
+                SONANDO EN: {currentKeyDisplay}
               </span>
             </div>
           </div>

@@ -96,7 +96,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   const effectiveAudioUrl = activeSong?.audioUrl || bankMatch?.audioUrl;
   const effectiveOriginalKey = activeSong?.originalKey || bankMatch?.originalKey;
-  const effectiveTargetKey = activeSong?.key;
+  const effectiveTargetKey = activeSong?.key || bankMatch?.defaultKey;
   const effectiveChordsUrl = activeSong?.chordsUrl || bankMatch?.chordsUrl;
   const effectiveChordChart = (activeSong?.chordChart && activeSong.chordChart.trim()) 
     ? activeSong.chordChart 
@@ -434,13 +434,17 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
                     <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                       {song.key && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-[#1E74FD]/10 text-[#1E74FD]">
-                          {song.key}
+                        <span className={`text-[10px] font-black px-2 py-0.5 rounded ${
+                          song.originalKey && song.key.trim().toLowerCase() !== song.originalKey.trim().toLowerCase()
+                            ? 'bg-[#1E74FD] text-white shadow-2xs'
+                            : 'bg-[#1E74FD]/10 text-[#1E74FD]'
+                        }`}>
+                          Tono: {song.key}
                         </span>
                       )}
-                      {song.originalKey && (
+                      {song.originalKey && (!song.key || song.key.trim().toLowerCase() !== song.originalKey.trim().toLowerCase()) && (
                         <span className="text-[10px] text-slate-400 font-medium">
-                          orig: {song.originalKey}
+                          (orig: {song.originalKey})
                         </span>
                       )}
                       {songHasAudio && (
