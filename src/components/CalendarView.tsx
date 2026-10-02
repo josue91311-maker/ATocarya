@@ -614,7 +614,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
                 >
                   {/* Left: Date & Title */}
                   <div className="flex items-center gap-3.5 min-w-0">
-                    <div className="w-13 h-14 rounded-2xl border border-emerald-300 bg-white flex flex-col items-center overflow-hidden flex-shrink-0 shadow-2xs">
+                    <div className="w-14 h-14 min-w-[56px] rounded-2xl border border-emerald-300 bg-white flex flex-col items-center overflow-hidden shrink-0 shadow-2xs">
                       <span className="w-full bg-emerald-600 text-white text-[9px] uppercase font-bold text-center py-0.2 tracking-wider">
                         {monthName}
                       </span>

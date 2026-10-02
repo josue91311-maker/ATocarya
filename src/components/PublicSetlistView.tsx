@@ -399,14 +399,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     setActiveSongIndex(index);
                     setTransposeDelta(0);
                   }}
-                  className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
+                  className={`w-full p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
                     isActive
-                      ? 'bg-[#F0F7FF] border-[#1E74FD] shadow-xs ring-1 ring-[#1E74FD]/30 scale-[1.01]'
+                      ? 'bg-[#F0F7FF] border-2 border-[#1E74FD] shadow-xs ring-1 ring-[#1E74FD]/30 scale-[1.01]'
                       : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
                   }`}
                 >
-                  {/* Thumbnail con icono play */}
-                  <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-xl overflow-hidden bg-slate-900 border border-slate-200 flex-shrink-0 relative flex items-center justify-center">
+                  {/* Thumbnail con icono play - Dimensiones fijas para móvil y PC */}
+                  <div className="w-14 h-14 min-w-[56px] min-h-[56px] max-w-[56px] max-h-[56px] sm:w-16 sm:h-16 sm:min-w-[64px] sm:min-h-[64px] sm:max-w-[64px] sm:max-h-[64px] rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shrink-0 relative flex items-center justify-center">
                     <img
                       src={thumb || '/app-bg.jpg'}
                       alt={song.title}

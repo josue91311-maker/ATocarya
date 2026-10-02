@@ -388,52 +388,22 @@ export const MusicianMobileHome: React.FC<Props> = ({
                     key={service.id}
                     className="bg-white border border-slate-200/90 hover:border-slate-300 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3.5 transition-all"
                   >
-                    {/* Encabezado Principal de la Tarjeta */}
-                    <div className="flex items-start justify-between gap-3">
-                      {/* Bloque de Hora y Fecha a la izquierda */}
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex flex-col items-start pr-3 border-r border-slate-100 shrink-0">
-                          <span className="text-lg sm:text-xl font-black text-slate-900 leading-none tabular-nums">
-                            {service.time}
-                          </span>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight mt-1">
-                            {dateInfo.weekday} {dateInfo.dayNum} {dateInfo.monthName}
-                          </span>
-                        </div>
-
-                        {/* Título y Detalles */}
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200">
-                              ✓ ASIGNADO
-                            </span>
-                          </div>
-
-                          <h3 className="font-black text-sm sm:text-base text-slate-900 mt-1 truncate leading-tight">
-                            {service.title}
-                          </h3>
-
-                          <div className="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
-                            {service.rehearsalTime && (
-                              <span className="flex items-center gap-1 font-semibold text-slate-700">
-                                <Clock className="w-3.5 h-3.5 text-amber-500" />
-                                <span>Ensayo: {service.rehearsalTime}</span>
-                              </span>
-                            )}
-                            <span className="flex items-center gap-1 text-slate-400">
-                              <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                              <span>Auditorio Principal</span>
-                            </span>
-                          </div>
-                        </div>
+                    {/* 1. Fila de Badges: Estado de Asignado y Chip de Rol/Instrumento */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs">
+                          ✓ ASIGNADO
+                        </span>
+                        <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md tabular-nums">
+                          {service.time} · {dateInfo.weekday} {dateInfo.dayNum} {dateInfo.monthName}
+                        </span>
                       </div>
 
-                      {/* Chip del Instrumento Asignado a la derecha */}
                       {mySlot && (
                         <button
                           type="button"
                           onClick={() => onSelectService(service)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#1E74FD] text-white text-xs font-black shadow-xs hover:bg-[#155de0] transition-colors shrink-0"
+                          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#1E74FD] text-white text-xs font-black shadow-xs hover:bg-[#155de0] transition-colors shrink-0 cursor-pointer"
                           title="Toca para ver detalles"
                         >
                           <InstrumentIcon instrument={mySlot.key} className="w-3.5 h-3.5 text-white" />
@@ -443,7 +413,26 @@ export const MusicianMobileHome: React.FC<Props> = ({
                       )}
                     </div>
 
-                    {/* Fila 1: Canciones */}
+                    {/* 2. Título del Culto a TODO el ancho (sin truncamiento) */}
+                    <div>
+                      <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug">
+                        {service.title}
+                      </h3>
+                      <div className="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                        {service.rehearsalTime && (
+                          <span className="flex items-center gap-1 font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70">
+                            <Clock className="w-3 h-3 text-amber-600" />
+                            <span>Ensayo: <strong>{service.rehearsalTime}</strong></span>
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1 text-slate-400">
+                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <span>Auditorio Principal</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* 3. Fila de Canciones */}
                     <div className="pt-2 border-t border-slate-100">
                       <button
                         type="button"
@@ -456,7 +445,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
                             onSelectService(service);
                           }
                         }}
-                        className="w-full flex items-center justify-between py-1 text-xs font-bold text-slate-700 hover:text-[#1E74FD] transition-colors"
+                        className="w-full flex items-center justify-between py-1 text-xs font-bold text-slate-700 hover:text-[#1E74FD] transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
                           <Music className={`w-4 h-4 ${hasSongs ? 'text-[#1E74FD]' : 'text-slate-400'}`} />
@@ -468,12 +457,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
                       </button>
                     </div>
 
-                    {/* Fila 2: Ver Equipo Asignado con Avatares */}
+                    {/* 4. Fila: Ver Equipo Asignado con Avatares */}
                     <div className="pt-1.5 border-t border-slate-100">
                       <button
                         type="button"
                         onClick={() => onSelectService(service)}
-                        className="w-full flex items-center justify-between py-1 text-xs font-bold text-slate-700 hover:text-[#1E74FD] transition-colors"
+                        className="w-full flex items-center justify-between py-1 text-xs font-bold text-slate-700 hover:text-[#1E74FD] transition-colors cursor-pointer"
                       >
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-slate-500" />
@@ -500,7 +489,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
                     </div>
 
                     {/* ========================================================= */}
-                    {/* BOTONES DE ACCIÓN: GESTIONAR CANCIONES / VER CANCIONES    */}
+                    {/* 5. BOTONES DE ACCIÓN: GESTIONAR CANCIONES O VER REPERTORIO */}
                     {/* ========================================================= */}
                     <div className="pt-2 border-t border-slate-100 space-y-2">
                       {/* BOTÓN ESTRELLA: GESTIONAR CANCIONES (SOLO VOZ DIRECTOR O ADMIN) */}
@@ -516,41 +505,34 @@ export const MusicianMobileHome: React.FC<Props> = ({
                         </button>
                       )}
 
-                      {/* Botones para Músicos o cuando no es Voz Director */}
-                      {(!isVozDirector || !onOpenSetlist) && (
-                        <div className="flex items-center gap-2">
-                          {isPublished ? (
-                            <a
-                              href={`/#/repertorio/${service.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 py-2.5 px-4 bg-white hover:bg-slate-50 text-[#1E74FD] border-2 border-[#1E74FD] rounded-2xl text-xs font-black flex items-center justify-center gap-2 transition-all shadow-2xs"
-                            >
-                              <Sparkles className="w-3.5 h-3.5 text-[#1E74FD]" />
-                              <span>Ver Canciones</span>
-                            </a>
-                          ) : hasSongs ? (
-                            <a
-                              href={`/#/repertorio/${service.id}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex-1 py-2.5 px-4 bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all"
-                            >
-                              <Music className="w-3.5 h-3.5 text-slate-500" />
-                              <span>Ver Canciones ({songsCount})</span>
-                            </a>
-                          ) : null}
-
-                          <button
-                            type="button"
-                            onClick={() => onSelectService(service)}
-                            className="flex-1 py-2.5 px-4 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm shadow-blue-600/30 transition-all cursor-pointer"
-                          >
-                            <Check className="w-3.5 h-3.5 stroke-[3]" />
-                            <span>Confirmar Asistencia</span>
-                          </button>
+                      {/* Botón de Canciones para Músicos (Sin botón redundante de Confirmar Asistencia) */}
+                      {isPublished ? (
+                        <a
+                          href={`/#/repertorio/${service.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-3 px-4 bg-[#1E74FD] hover:bg-[#155de0] active:scale-[0.98] text-white rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm shadow-blue-500/25 transition-all cursor-pointer"
+                        >
+                          <Sparkles className="w-4 h-4 text-blue-100" />
+                          <span>🎵 Ver Canciones & Acordes ({songsCount})</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-blue-200 ml-auto" />
+                        </a>
+                      ) : hasSongs ? (
+                        <a
+                          href={`/#/repertorio/${service.id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                        >
+                          <Music className="w-4 h-4 text-slate-600" />
+                          <span>Ver Canciones ({songsCount} en borrador)</span>
+                          <ExternalLink className="w-3.5 h-3.5 text-slate-500 ml-auto" />
+                        </a>
+                      ) : !isVozDirector ? (
+                        <div className="py-2.5 px-3 bg-slate-50 border border-slate-200/60 rounded-xl text-center text-xs text-slate-500">
+                          Canciones en preparación por el equipo de alabanza
                         </div>
-                      )}
+                      ) : null}
 
                       {/* Enlace discreto para liberar puesto */}
                       {mySlot && (
@@ -604,32 +586,32 @@ export const MusicianMobileHome: React.FC<Props> = ({
                     key={service.id}
                     className="bg-white border border-slate-200 hover:border-slate-300 rounded-3xl p-4 sm:p-5 shadow-sm space-y-3 transition-all"
                   >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <div className="flex flex-col items-start pr-3 border-r border-slate-100 shrink-0">
-                          <span className="text-lg sm:text-xl font-black text-slate-900 leading-none tabular-nums">
-                            {service.time}
-                          </span>
-                          <span className="text-[10px] font-black text-slate-400 uppercase tracking-tight mt-1">
-                            {dateInfo.weekday} {dateInfo.dayNum} {dateInfo.monthName}
-                          </span>
-                        </div>
+                    {/* 1. Badges superiores */}
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200">
+                        ○ VACANTES LIBRES ({vacantSlots.length})
+                      </span>
+                      <span className="text-[11px] font-bold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md tabular-nums">
+                        {service.time} · {dateInfo.weekday} {dateInfo.dayNum} {dateInfo.monthName}
+                      </span>
+                    </div>
 
-                        <div className="min-w-0 flex-1">
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200">
-                            ○ VACANTES LIBRES
+                    {/* 2. Título a todo el ancho */}
+                    <div>
+                      <h3 className="font-black text-base sm:text-lg text-slate-900 leading-snug">
+                        {service.title}
+                      </h3>
+                      <div className="flex items-center gap-3 text-xs text-slate-500 mt-1 flex-wrap">
+                        {service.rehearsalTime && (
+                          <span className="flex items-center gap-1 font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/70">
+                            <Clock className="w-3 h-3 text-amber-600" />
+                            <span>Ensayo: <strong>{service.rehearsalTime}</strong></span>
                           </span>
-                          <h3 className="font-black text-sm sm:text-base text-slate-900 mt-1 truncate leading-tight">
-                            {service.title}
-                          </h3>
-                          <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                            <Clock className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Culto: {service.time}</span>
-                            {service.rehearsalTime && (
-                              <span>· Ensayo: {service.rehearsalTime}</span>
-                            )}
-                          </div>
-                        </div>
+                        )}
+                        <span className="flex items-center gap-1 text-slate-400">
+                          <MapPin className="w-3 h-3 text-slate-400" />
+                          <span>Auditorio Principal</span>
+                        </span>
                       </div>
                     </div>
 
