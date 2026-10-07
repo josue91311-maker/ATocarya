@@ -7,7 +7,9 @@ import {
   KeyRound, 
   Trash2, 
   Search,
-  Edit3
+  Edit3,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 import { AdminRegisterMusicianModal } from './AdminRegisterMusicianModal';
@@ -20,6 +22,11 @@ export const MusicianDirectory: React.FC = () => {
   const [editingMusician, setEditingMusician] = useState<Musician | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogOptions | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [revealedPins, setRevealedPins] = useState<Record<string, boolean>>({});
+
+  const togglePinVisibility = (id: string) => {
+    setRevealedPins(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const getAssignmentCount = (musicianId: string): number => {
     return services.filter(s =>
@@ -155,11 +162,25 @@ export const MusicianDirectory: React.FC = () => {
                         {m.age} años
                       </td>
 
-                      {/* PIN */}
+                      {/* PIN - Oculto por defecto contra miradas indiscretas */}
                       <td className="py-3 px-3 text-center">
-                        <span className="font-mono text-slate-700 font-bold bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
-                          {m.pin}
-                        </span>
+                        <div className="inline-flex items-center gap-1.5 bg-slate-100 px-2 py-0.5 rounded border border-slate-200">
+                          <span className="font-mono text-slate-700 font-bold select-none tracking-widest text-[11px]">
+                            {revealedPins[m.id] ? m.pin : '••••'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => togglePinVisibility(m.id)}
+                            className="text-slate-400 hover:text-slate-700 transition-colors p-0.5 rounded"
+                            title={revealedPins[m.id] ? 'Ocultar PIN' : 'Ver PIN'}
+                          >
+                            {revealedPins[m.id] ? (
+                              <EyeOff className="w-3 h-3 text-slate-600" />
+                            ) : (
+                              <Eye className="w-3 h-3 text-slate-400" />
+                            )}
+                          </button>
+                        </div>
                       </td>
 
                       {/* Phone */}

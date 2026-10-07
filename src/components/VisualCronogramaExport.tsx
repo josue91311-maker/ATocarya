@@ -87,7 +87,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
         link.href = dataUrl;
         link.click();
       } catch (err) {
-        console.error('Error generando imagen de la fecha:', err);
+        if (import.meta.env?.DEV) console.error('Error generando imagen de la fecha:', err);
         alert('Error al generar la imagen. Puedes copiar los datos a WhatsApp.');
       } finally {
         setDownloadingId(null);
@@ -110,7 +110,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
       link.href = dataUrl;
       link.click();
     } catch (err) {
-      console.error('Error generando tablero completo:', err);
+      if (import.meta.env?.DEV) console.error('Error generando tablero completo:', err);
     } finally {
       setIsDownloading(false);
     }

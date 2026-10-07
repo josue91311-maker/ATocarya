@@ -76,12 +76,26 @@ interface AppContextType {
   importDatabaseJSON: (jsonStr: string) => { success: boolean; message?: string };
 }
 
+const isDev = Boolean((import.meta as any).env?.DEV);
+const logWarn = (...args: any[]) => {
+  if (isDev) console.warn(...args);
+};
+
+const hashSecret = (secret: string): string => {
+  let h = 0x811c9dc5;
+  const str = `_atocarya_salt_${secret.trim()}_worship_2026_`;
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+  }
+  return (h >>> 0).toString(16);
+};
+
 const STORAGE_KEYS = {
   MUSICIANS: 'atocarya_musicians_v3',
   SERVICES: 'atocarya_services_v3',
   MUSICIAN_USER: 'atocarya_musician_user_v3',
-  ADMIN_AUTH: 'atocarya_admin_auth_v3',
-  ADMIN_PIN: 'atocarya_admin_pin_v3',
+  ADMIN_SESSION: 'atocarya_adm_sess_sig',
 };
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -117,7 +131,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [musicians, setMusicians] = useState<Musician[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MUSICIANS);
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+      try { return JSON.parse(saved); } catch { return []; }
     }
     return [];
   });
@@ -125,7 +139,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [services, setServices] = useState<ServiceDate[]>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.SERVICES);
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+      try { return JSON.parse(saved); } catch { return []; }
     }
     return [];
   });
@@ -133,7 +147,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [musicianUser, setMusicianUser] = useState<Musician | null>(() => {
     const saved = localStorage.getItem(STORAGE_KEYS.MUSICIAN_USER);
     if (saved) {
-      try { return JSON.parse(saved); } catch (e) { console.error(e); }
+      try { return JSON.parse(saved); } catch { return null; }
     }
     return null;
   });
@@ -144,17 +158,29 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       try { 
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) return deduplicateSongBank(parsed);
-      } catch (e) { console.error(e); }
+      } catch { return []; }
     }
     return [];
   });
 
   const [isAdminAuthenticated, setIsAdminAuthenticated] = useState<boolean>(() => {
-    return localStorage.getItem(STORAGE_KEYS.ADMIN_AUTH) === 'true';
+    try {
+      // Limpiar datos inseguros antiguos de localStorage
+      localStorage.removeItem('atocarya_admin_auth_v3');
+      localStorage.removeItem('atocarya_admin_pin_v3');
+      const sig = sessionStorage.getItem(STORAGE_KEYS.ADMIN_SESSION);
+      if (!sig) return false;
+      return sig === hashSecret('admin_authenticated_session');
+    } catch {
+      return false;
+    }
   });
 
   const [adminPin, setAdminPin] = useState<string>(() => {
-    return localStorage.getItem(STORAGE_KEYS.ADMIN_PIN) || '7777';
+    try {
+      localStorage.removeItem('atocarya_admin_pin_v3');
+    } catch {}
+    return '7777';
   });
 
   // Sync state to LocalStorage
@@ -178,14 +204,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [musicianUser]);
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_AUTH, isAdminAuthenticated ? 'true' : 'false');
-  }, [isAdminAuthenticated]);
-
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEYS.ADMIN_PIN, adminPin);
-  }, [adminPin]);
-
   // Sync state con backend SQLite (Turso) al iniciar la aplicación
   useEffect(() => {
     const fetchRemoteData = async () => {
@@ -205,7 +223,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           setSongBank(deduplicateSongBank(remoteSongBank));
         }
       } catch (err) {
-        console.warn('Operando con persistencia local:', err);
+        logWarn('Operando con persistencia local:', err);
       }
     };
     fetchRemoteData();
@@ -225,18 +243,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setMusicianUser(musician);
     // Limpiar sesión de administrador al usar portal de músico para evitar herencia accidental de permisos
     setIsAdminAuthenticated(false);
+    try {
+      sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+    } catch {}
     return { success: true };
   };
 
   const logoutMusician = () => {
     setMusicianUser(null);
     setIsAdminAuthenticated(false);
+    try {
+      sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+    } catch {}
   };
 
-  // Admin Auth
+  // Admin Auth - Protegido contra manipulación de localStorage
   const loginAdmin = (pin: string) => {
-    if (pin.trim() === adminPin || pin.trim() === '7777') {
+    const trimmed = pin.trim();
+    if (trimmed === adminPin || trimmed === '7777') {
       setIsAdminAuthenticated(true);
+      try {
+        sessionStorage.setItem(STORAGE_KEYS.ADMIN_SESSION, hashSecret('admin_authenticated_session'));
+      } catch {}
       return { success: true };
     }
     return { success: false, message: 'PIN de Administrador incorrecto.' };
@@ -244,6 +272,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logoutAdmin = () => {
     setIsAdminAuthenticated(false);
+    try {
+      sessionStorage.removeItem(STORAGE_KEYS.ADMIN_SESSION);
+      localStorage.removeItem('atocarya_admin_auth_v3');
+      localStorage.removeItem('atocarya_admin_pin_v3');
+    } catch {}
   };
 
   // Musician Slot Actions
@@ -863,7 +896,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       await apiUpdateServiceSongs(serviceId, songs, isPublished);
     } catch (err) {
-      console.warn('Error al persistir canciones en Turso:', err);
+      logWarn('Error al persistir canciones en Turso:', err);
     }
 
     return { success: true };
@@ -918,7 +951,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     try {
       await apiSaveBankSong(fullSong);
     } catch (err) {
-      console.warn('Error al guardar en Turso song_bank:', err);
+      logWarn('Error al guardar en Turso song_bank:', err);
     }
 
     // Propagar cambios automáticamente a cultos existentes que contengan esta canción
@@ -963,7 +996,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       await apiDeleteBankSong(songId);
       return true;
     } catch (err) {
-      console.warn('Error al borrar de Turso song_bank:', err);
+      logWarn('Error al borrar de Turso song_bank:', err);
       return false;
     }
   };
@@ -973,7 +1006,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const remote = await apiGetSongBank();
       if (remote) setSongBank(remote);
     } catch (err) {
-      console.warn('Error al recargar song_bank:', err);
+      logWarn('Error al recargar song_bank:', err);
     }
   };
 

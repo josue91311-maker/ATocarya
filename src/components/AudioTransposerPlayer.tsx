@@ -204,7 +204,6 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         setIsLoading(false);
       } catch (err: any) {
         if (isCancelled) return;
-        console.warn('Error al decodificar audio para SoundTouch:', err);
         setError('No se pudo cargar la pista. Abre el enlace directo en Google Drive.');
         setIsLoading(false);
       }
@@ -251,7 +250,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         setIsPlaying(true);
       }
     } catch (err) {
-      console.error('Error al alternar reproducción:', err);
+      // Ignorar interrupción de audio context
     }
   };
 

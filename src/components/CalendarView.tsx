@@ -178,8 +178,6 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
                 {nextService.isSongsPublished && nextService.songs && nextService.songs.length > 0 && (
                   <a
                     href={`/#/repertorio/${nextService.id}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
                   >
                     <Music className="w-3.5 h-3.5 text-emerald-600" />

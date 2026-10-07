@@ -104,8 +104,6 @@ export const MyServicesView: React.FC<Props> = ({ onSelectService }) => {
                   {service.isSongsPublished && service.songs && service.songs.length > 0 && (
                     <a
                       href={`/#/repertorio/${service.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-colors"
                       title="Ver repertorio de canciones y tonos"
                     >

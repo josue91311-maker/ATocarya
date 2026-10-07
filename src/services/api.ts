@@ -328,7 +328,7 @@ export const apiSaveBankSong = async (song: BankSong): Promise<boolean> => {
     const ok = await tursoSaveBankSong(song);
     if (ok) success = true;
   } catch (err) {
-    console.warn('Error en tursoSaveBankSong directo:', err);
+    // Modo offline / fallo silencioso de red
   }
 
   // 2. Sincronizar o fallback con serverless /api/song_bank
@@ -340,7 +340,7 @@ export const apiSaveBankSong = async (song: BankSong): Promise<boolean> => {
     });
     if (res.ok) success = true;
   } catch (err) {
-    console.warn('Error en /api/song_bank serverless:', err);
+    // Modo offline / fallo silencioso de red
   }
 
   return success;

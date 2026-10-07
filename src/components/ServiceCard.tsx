@@ -193,8 +193,6 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
                 </div>
                 <a
                   href={`/#/repertorio/${service.id}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1 shadow-2xs"
                 >
                   <span>Ver Repertorio</span>

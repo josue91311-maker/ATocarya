@@ -394,7 +394,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
                         type="button"
                         onClick={() => {
                           if (isPublished) {
-                            window.open(`/#/repertorio/${service.id}`, '_blank');
+                            window.location.hash = `#/repertorio/${service.id}`;
                           } else if ((isAdminAuthenticated || isVozDirector) && onOpenSetlist) {
                             onOpenSetlist(service);
                           } else {
@@ -461,28 +461,24 @@ export const MusicianMobileHome: React.FC<Props> = ({
                         </button>
                       )}
 
-                      {/* Botón de Canciones para Músicos (Sin botón redundante de Confirmar Asistencia) */}
+                      {/* Botón de Canciones para Músicos (Sin abrir nueva pestaña) */}
                       {isPublished ? (
                         <a
                           href={`/#/repertorio/${service.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="w-full py-3 px-4 bg-[#1E74FD] hover:bg-[#155de0] active:scale-[0.98] text-white rounded-2xl text-xs font-black flex items-center justify-center gap-2 shadow-sm shadow-blue-500/25 transition-all cursor-pointer"
                         >
                           <Sparkles className="w-4 h-4 text-blue-100" />
                           <span>🎵 Ver Canciones & Acordes ({songsCount})</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-blue-200 ml-auto" />
+                          <ChevronRight className="w-3.5 h-3.5 text-blue-200 ml-auto" />
                         </a>
                       ) : hasSongs ? (
                         <a
                           href={`/#/repertorio/${service.id}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
                           className="w-full py-2.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
                         >
                           <Music className="w-4 h-4 text-slate-600" />
                           <span>Ver Canciones ({songsCount} en borrador)</span>
-                          <ExternalLink className="w-3.5 h-3.5 text-slate-500 ml-auto" />
+                          <ChevronRight className="w-3.5 h-3.5 text-slate-500 ml-auto" />
                         </a>
                       ) : !isVozDirector ? (
                         <div className="py-2.5 px-3 bg-slate-50 border border-slate-200/60 rounded-xl text-center text-xs text-slate-500">

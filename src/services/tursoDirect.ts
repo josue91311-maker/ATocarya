@@ -1,6 +1,11 @@
 import { createClient, Client } from '@libsql/client/web';
 import { Musician, ServiceDate, SlotKey, SlotConfig, SongItem, BankSong } from '../types';
 
+const isDev = Boolean((import.meta as any).env?.DEV);
+const logWarn = (...args: any[]) => {
+  if (isDev) console.warn(...args);
+};
+
 const TURSO_URL = (import.meta as any).env?.VITE_TURSO_DATABASE_URL || 'libsql://atocarya-db-jothejmaster.aws-us-west-2.turso.io';
 const TURSO_TOKEN = (import.meta as any).env?.VITE_TURSO_AUTH_TOKEN || 'eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3ODg0NjA4MTMsImlkIjoiMDFhMDY4OTEtZjkwMS03MWE0LWI5YzYtZDE2Mzc1MjNiZTFiIiwia2lkIjoiWVEybHJTYVROWk9hU3BRYUtrM0UtN3BqWnBXbkExa045SVdXSTQ5N0hPVSIsInJpZCI6IjQzOGRhODNjLWQzMTYtNDI0Yi1iMzk3LTcxMzZlZGU1NDkzMiJ9.ThZ8YS1HyVPIZJNT9jdwQxlmUcpj4PnBDBsOiq3OzIDU58cbW8V43j_u2i5SVdkH7aedbVJuM-X5C5lbVBKdDw';
 
@@ -32,7 +37,7 @@ export const tursoGetMusicians = async (): Promise<Musician[] | null> => {
       createdAt: String(r.created_at),
     }));
   } catch (err) {
-    console.warn('Error al obtener músicos desde Turso:', err);
+    logWarn('Error al obtener músicos desde Turso:', err);
     return null;
   }
 };
@@ -55,7 +60,7 @@ export const tursoCreateMusician = async (musician: Musician): Promise<boolean> 
     });
     return true;
   } catch (err) {
-    console.warn('Error al crear músico en Turso:', err);
+    logWarn('Error al crear músico en Turso:', err);
     return false;
   }
 };
@@ -78,7 +83,7 @@ export const tursoUpdateMusician = async (musician: Musician): Promise<boolean> 
     });
     return true;
   } catch (err) {
-    console.warn('Error al actualizar músico en Turso:', err);
+    logWarn('Error al actualizar músico en Turso:', err);
     return false;
   }
 };
@@ -92,7 +97,7 @@ export const tursoDeleteMusician = async (id: string): Promise<boolean> => {
     });
     return true;
   } catch (err) {
-    console.warn('Error al eliminar músico en Turso:', err);
+    logWarn('Error al eliminar músico en Turso:', err);
     return false;
   }
 };
@@ -150,7 +155,7 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
       };
     });
   } catch (err) {
-    console.warn('Error al obtener cultos desde Turso:', err);
+    logWarn('Error al obtener cultos desde Turso:', err);
     return null;
   }
 };
@@ -186,7 +191,7 @@ export const tursoSaveService = async (service: ServiceDate): Promise<boolean> =
     });
     return true;
   } catch (err) {
-    console.warn('Error al guardar servicio en Turso:', err);
+    logWarn('Error al guardar servicio en Turso:', err);
     return false;
   }
 };
@@ -204,7 +209,7 @@ export const tursoUpdateServiceSongs = async (
     });
     return true;
   } catch (err) {
-    console.warn('Error al actualizar repertorio en Turso:', err);
+    logWarn('Error al actualizar repertorio en Turso:', err);
     return false;
   }
 };
@@ -218,7 +223,7 @@ export const tursoDeleteService = async (serviceId: string): Promise<boolean> =>
     });
     return true;
   } catch (err) {
-    console.warn('Error al borrar culto en Turso:', err);
+    logWarn('Error al borrar culto en Turso:', err);
     return false;
   }
 };
@@ -232,7 +237,7 @@ export const tursoUpdateSlots = async (serviceId: string, slots: Record<SlotKey,
     });
     return true;
   } catch (err) {
-    console.warn('Error al actualizar cupos en Turso:', err);
+    logWarn('Error al actualizar cupos en Turso:', err);
     return false;
   }
 };
@@ -259,7 +264,7 @@ export const tursoGetSongBank = async (): Promise<BankSong[] | null> => {
       createdAt: String(r.created_at || new Date().toISOString()),
     }));
   } catch (err) {
-    console.warn('Error al obtener banco de canciones en Turso:', err);
+    logWarn('Error al obtener banco de canciones en Turso:', err);
     return null;
   }
 };
@@ -290,7 +295,7 @@ export const tursoSaveBankSong = async (song: BankSong): Promise<boolean> => {
     });
     return true;
   } catch (err) {
-    console.warn('Error al guardar canción en el banco de Turso:', err);
+    logWarn('Error al guardar canción en el banco de Turso:', err);
     return false;
   }
 };
@@ -304,7 +309,7 @@ export const tursoDeleteBankSong = async (songId: string): Promise<boolean> => {
     });
     return true;
   } catch (err) {
-    console.warn('Error al eliminar canción del banco en Turso:', err);
+    logWarn('Error al eliminar canción del banco en Turso:', err);
     return false;
   }
 };

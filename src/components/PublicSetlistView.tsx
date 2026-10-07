@@ -20,7 +20,8 @@ import {
   ChevronDown,
   Menu,
   Sparkles,
-  X
+  X,
+  ArrowLeft
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { AudioTransposerPlayer } from './AudioTransposerPlayer';
@@ -227,15 +228,24 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
       <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           
-          {/* Logo y Botón móvil */}
-          <div className="flex items-center gap-3">
+          {/* Logo y Botón Volver */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="sm:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
-              aria-label="Abrir menú"
+              onClick={() => {
+                if (onGoToPortal) {
+                  onGoToPortal();
+                } else if (window.history.length > 1) {
+                  window.history.back();
+                } else {
+                  window.location.hash = '#/';
+                }
+              }}
+              className="p-1.5 sm:px-3 sm:py-1.5 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              title="Volver"
             >
-              <Menu className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4" />
+              <span className="hidden sm:inline">Volver</span>
             </button>
             <Logo size="sm" showText={true} />
           </div>

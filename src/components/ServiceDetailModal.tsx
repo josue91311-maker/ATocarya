@@ -342,8 +342,7 @@ export const ServiceDetailModal: React.FC<Props> = ({
                   )}
                   <a
                     href={publicUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    onClick={onClose}
                     className="p-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition-colors"
                     title="Ver link público oficial"
                   >
@@ -373,8 +372,7 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
                 <a
                   href={publicUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  onClick={onClose}
                   className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-1.5 self-end sm:self-auto"
                 >
                   <span>Ver Canciones & Tonos</span>
