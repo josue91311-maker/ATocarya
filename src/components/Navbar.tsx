@@ -27,6 +27,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { Logo } from './Logo';
+import { MusicianProfileModal } from './MusicianProfileModal';
 
 interface Props {
   portal: 'musician' | 'admin';
@@ -63,6 +64,7 @@ export const Navbar: React.FC<Props> = ({
 
   const [searchQuery, setSearchQuery] = useState('');
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
 
@@ -104,7 +106,15 @@ export const Navbar: React.FC<Props> = ({
     ? (myAssignedToday.length > 0 ? myAssignedToday.length : (servicesToday.length > 0 ? 1 : 0))
     : servicesToday.length;
 
-  const canAccessTracks = isAdminAuthenticated || (musicianUser?.primaryInstrument === 'Voz Director');
+  // Validación de rol de dirección musical
+  const isDirector = Boolean(
+    musicianUser && (
+      musicianUser.primaryInstrument === 'Voz Director' ||
+      musicianUser.primaryInstrument?.toLowerCase().includes('director')
+    )
+  );
+
+  const canAccessTracks = isAdminAuthenticated || isDirector;
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-[#F7F4EF] text-[#202C37]">
@@ -195,39 +205,27 @@ export const Navbar: React.FC<Props> = ({
                 )}
               </button>
 
-              <button
-                type="button"
-                onClick={() => {
-                  if (canAccessTracks) {
-                    setMusicianTab('tracks');
-                  } else {
-                    setMusicianTab('calendar');
-                  }
-                }}
-                title="Repertorio"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                  musicianTab === 'tracks'
-                    ? 'bg-white text-[#315F6D] shadow-xs'
-                    : 'text-white/85 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <Music className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && <span>Repertorio</span>}
-              </button>
+              {/* Repertorio: Exclusivo para rol de Voz Director / Director */}
+              {isDirector && (
+                <button
+                  type="button"
+                  onClick={() => setMusicianTab('tracks')}
+                  title="Repertorio Musical"
+                  className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    musicianTab === 'tracks'
+                      ? 'bg-white text-[#315F6D] shadow-xs'
+                      : 'text-white/85 hover:bg-white/10 hover:text-white'
+                  }`}
+                >
+                  <Music className="w-4 h-4 shrink-0" />
+                  {!isSidebarCollapsed && <span>Repertorio</span>}
+                </button>
+              )}
 
+              {/* Mi Perfil: Abre el panel interactivo del perfil del músico */}
               <button
                 type="button"
-                onClick={() => setMusicianTab('calendar')}
-                title="Equipos"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-xs font-semibold text-white/85 hover:bg-white/10 hover:text-white transition-all cursor-pointer`}
-              >
-                <UsersRound className="w-4 h-4 shrink-0" />
-                {!isSidebarCollapsed && <span>Equipos</span>}
-              </button>
-
-              <button
-                type="button"
-                onClick={() => onNavigatePortal('admin')}
+                onClick={() => setProfileModalOpen(true)}
                 title="Mi Perfil"
                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-xs font-semibold text-white/85 hover:bg-white/10 hover:text-white transition-all cursor-pointer`}
               >
@@ -569,11 +567,22 @@ export const Navbar: React.FC<Props> = ({
                       type="button"
                       onClick={() => {
                         setProfileDropdownOpen(false);
+                        setProfileModalOpen(true);
+                      }}
+                      className="w-full text-left px-3.5 py-2 text-xs text-[#202C37] hover:bg-[#FAF9F6] font-semibold flex items-center gap-2 cursor-pointer"
+                    >
+                      <UserRound className="w-3.5 h-3.5 text-[#315F6D]" />
+                      <span>Ver Mi Perfil</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setProfileDropdownOpen(false);
                         onNavigatePortal('admin');
                       }}
-                      className="w-full text-left px-3.5 py-2 text-xs text-[#202C37] hover:bg-[#FAF9F6] font-semibold flex items-center gap-2"
+                      className="w-full text-left px-3.5 py-2 text-xs text-[#64717C] hover:bg-[#FAF9F6] font-semibold flex items-center gap-2 cursor-pointer"
                     >
-                      <Shield className="w-3.5 h-3.5 text-[#315F6D]" />
+                      <Shield className="w-3.5 h-3.5 text-[#89939C]" />
                       <span>Acceso Administrador</span>
                     </button>
                     <button
@@ -658,29 +667,34 @@ export const Navbar: React.FC<Props> = ({
               )}
             </button>
 
-            {/* 3. Repertorio / Pistas */}
+            {/* 3. Repertorio / Pistas: Solo si es Voz Director / Director */}
+            {isDirector && (
+              <button
+                onClick={() => setMusicianTab('tracks')}
+                className={`flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+                  musicianTab === 'tracks'
+                    ? 'text-[#315F6D] font-bold'
+                    : 'text-[#89939C] hover:text-[#202C37] font-medium'
+                }`}
+              >
+                <Music className="w-5 h-5 mb-0.5" />
+                <span className="text-[10px]">Repertorio</span>
+              </button>
+            )}
+
+            {/* 4. Mi Perfil */}
             <button
-              onClick={() => {
-                if (canAccessTracks) {
-                  setMusicianTab('tracks');
-                } else {
-                  setMusicianTab('calendar');
-                }
-              }}
-              className={`flex flex-col items-center justify-center min-w-[70px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
-                musicianTab === 'tracks'
-                  ? 'text-[#315F6D] font-bold'
-                  : 'text-[#89939C] hover:text-[#202C37] font-medium'
-              }`}
+              onClick={() => setProfileModalOpen(true)}
+              className="flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl text-[#89939C] hover:text-[#315F6D] font-medium transition-all cursor-pointer"
             >
-              <Music className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px]">Repertorio</span>
+              <UserRound className="w-5 h-5 mb-0.5" />
+              <span className="text-[10px]">Mi Perfil</span>
             </button>
 
-            {/* 4. Salir */}
+            {/* 5. Salir */}
             <button
               onClick={logoutMusician}
-              className="flex flex-col items-center justify-center min-w-[70px] py-1 px-2 rounded-xl text-[#89939C] hover:text-[#C96B65] transition-colors cursor-pointer"
+              className="flex flex-col items-center justify-center min-w-[60px] py-1 px-2 rounded-xl text-[#89939C] hover:text-[#C96B65] transition-colors cursor-pointer"
               title="Cerrar Sesión"
             >
               <LogOut className="w-5 h-5 mb-0.5" />
@@ -741,6 +755,14 @@ export const Navbar: React.FC<Props> = ({
           </>
         )}
       </nav>
+
+      {/* Modal del Perfil del Músico */}
+      {portal === 'musician' && (
+        <MusicianProfileModal
+          isOpen={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+        />
+      )}
     </div>
   );
 };

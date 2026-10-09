@@ -165,18 +165,14 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
 
           {/* Repertorio Indicator / Botón Ver Repertorio */}
           {(() => {
-            const isScheduledInThisService = Boolean(
-              musicianUser && Object.values(service.slots || {}).some(
-                slot => slot && slot.musicianId === musicianUser.id
-              )
-            );
-            const isVozDirector = Boolean(
+            const isDirector = Boolean(
               musicianUser && (
-                service.slots?.voz_director?.musicianId === musicianUser.id ||
-                (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
+                musicianUser.primaryInstrument === 'Voz Director' ||
+                musicianUser.primaryInstrument?.toLowerCase().includes('director') ||
+                service.slots?.voz_director?.musicianId === musicianUser.id
               )
             );
-            const canManage = isAdminAuthenticated || isVozDirector;
+            const canManage = isAdminAuthenticated || isDirector;
             const songsCount = service.songs?.length || 0;
             const isPublished = Boolean(service.isSongsPublished && songsCount > 0);
 

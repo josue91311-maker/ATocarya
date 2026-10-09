@@ -21,6 +21,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
+import { MusicianProfileModal } from './MusicianProfileModal';
 
 interface Props {
   onSelectService: (service: ServiceDate) => void;
@@ -37,6 +38,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
   const [claimingSlotKey, setClaimingSlotKey] = useState<string | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   if (!musicianUser) return null;
 
   // Primer nombre para saludo amigable
@@ -185,13 +187,15 @@ export const MusicianMobileHome: React.FC<Props> = ({
                 )}
               </button>
 
-              {/* Avatar inicial en círculo mostaza editorial */}
-              <div 
-                className="w-8 h-8 rounded-full bg-[#E8B844] text-[#26313B] font-black text-sm flex items-center justify-center shadow-sm border border-white/30"
-                title={`${musicianUser.fullName} (${musicianUser.primaryInstrument})`}
+              {/* Avatar inicial en círculo mostaza editorial: Tocar para ver perfil */}
+              <button 
+                type="button"
+                onClick={() => setShowProfileModal(true)}
+                className="w-8 h-8 rounded-full bg-[#E8B844] hover:bg-[#BD8C29] text-[#26313B] font-black text-sm flex items-center justify-center shadow-sm border border-white/30 transition-transform active:scale-95 cursor-pointer"
+                title={`Ver perfil de ${musicianUser.fullName}`}
               >
                 {userInitial}
-              </div>
+              </button>
 
               {/* Botón rápido salir sesión */}
               <button
@@ -765,6 +769,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
             </div>
           </div>
         )}
+
+        {/* Modal de Perfil para Móvil */}
+        <MusicianProfileModal
+          isOpen={showProfileModal}
+          onClose={() => setShowProfileModal(false)}
+        />
 
       </div>
     </div>

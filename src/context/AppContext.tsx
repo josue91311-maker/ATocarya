@@ -456,6 +456,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return m;
       })
     );
+    if (musicianUser && musicianUser.id === musicianId) {
+      setMusicianUser(prev => prev ? { ...prev, pin: newPin } : null);
+    }
   };
 
   const updateMusician = (

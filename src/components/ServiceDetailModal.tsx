@@ -284,19 +284,15 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
         {/* Sección de Repertorio de Canciones (Setlist) */}
         {(() => {
-          const isScheduledInThisService = Boolean(
-            musicianUser && Object.values(service.slots || {}).some(
-              slot => slot && slot.musicianId === musicianUser.id
-            )
-          );
-          const isVozDirector = Boolean(
+          const isDirector = Boolean(
             musicianUser && (
-              service.slots?.voz_director?.musicianId === musicianUser.id ||
-              (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
+              musicianUser.primaryInstrument === 'Voz Director' ||
+              musicianUser.primaryInstrument?.toLowerCase().includes('director') ||
+              service.slots?.voz_director?.musicianId === musicianUser.id
             )
           );
-          // El Administrador SIEMPRE puede gestionar canciones, o la Voz Director programada
-          const canManageSetlist = isAdminAuthenticated || isVozDirector;
+          // El Administrador SIEMPRE puede gestionar canciones, o el Director Musical
+          const canManageSetlist = isAdminAuthenticated || isDirector;
           const songs = service.songs || [];
           const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
           const publicUrl = `/#/repertorio/${service.id}`;

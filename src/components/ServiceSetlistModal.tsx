@@ -104,20 +104,15 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
   if (!isOpen) return null;
 
-  // Permisos: Si hay un músico en sesión, ÚNICAMENTE si dice Voz Director Y está programado ese día
-  const isScheduledInThisService = Boolean(
-    musicianUser && Object.values(service.slots || {}).some(
-      slot => slot && slot.musicianId === musicianUser.id
-    )
-  );
-  const isVozDirector = Boolean(
+  // Permisos: El Administrador o cualquier músico con rol Voz Director / Director puede gestionar, asignar y crear canciones libremente
+  const isDirector = Boolean(
     musicianUser && (
-      service.slots?.voz_director?.musicianId === musicianUser.id ||
-      (musicianUser.primaryInstrument === 'Voz Director' && isScheduledInThisService)
+      musicianUser.primaryInstrument === 'Voz Director' ||
+      musicianUser.primaryInstrument?.toLowerCase().includes('director') ||
+      service.slots?.voz_director?.musicianId === musicianUser.id
     )
   );
-  // El Administrador SIEMPRE tiene permiso para gestionar canciones, o la Voz Director asignada
-  const canEdit = isAdminAuthenticated || isVozDirector;
+  const canEdit = isAdminAuthenticated || isDirector;
 
   if (!canEdit) {
     return (
