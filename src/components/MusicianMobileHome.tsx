@@ -181,9 +181,9 @@ export const MusicianMobileHome: React.FC<Props> = ({
                 )}
               </div>
 
-              {/* Avatar inicial en círculo azul eléctrico / cian */}
+              {/* Avatar inicial en círculo mostaza editorial */}
               <div 
-                className="w-8 h-8 rounded-full bg-[#1E74FD] text-white font-black text-sm flex items-center justify-center shadow-sm border border-white/30"
+                className="w-8 h-8 rounded-full bg-[#E8B844] text-[#26313B] font-black text-sm flex items-center justify-center shadow-sm border border-white/30"
                 title={`${musicianUser.fullName} (${musicianUser.primaryInstrument})`}
               >
                 {userInitial}

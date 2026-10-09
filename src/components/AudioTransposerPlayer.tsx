@@ -314,28 +314,28 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         onClick={() => handleSemitoneChange(st)}
         className={`relative py-1.5 sm:py-2 px-0.5 text-center rounded-xl transition-all flex flex-col items-center justify-center min-h-[46px] sm:min-h-[50px] cursor-pointer ${
           isSelected
-            ? 'bg-[#1E74FD] text-white shadow-sm font-bold ring-2 ring-[#1E74FD]/40 scale-[1.02] z-10'
+            ? 'bg-[#315F6D] text-white shadow-card font-bold ring-2 ring-[#315F6D]/40 scale-[1.02] z-10'
             : isWorshipTarget
-            ? 'bg-blue-50/80 hover:bg-blue-100 text-[#1E74FD] border-2 border-[#1E74FD]/60 font-bold'
-            : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80 font-semibold'
+            ? 'bg-[#D9E9EB]/70 hover:bg-[#D9E9EB] text-[#315F6D] border-2 border-[#315F6D]/60 font-bold'
+            : 'bg-[#FAF9F6] hover:bg-[#F1F5F5] text-[#202C37] border border-[#E5E8EA] font-semibold'
         }`}
         title={`Transportar ${st === 0 ? 'tono original' : `${st > 0 ? `+${st}` : st} semitonos`} (${noteAtSt})${isWorshipTarget ? ' - Tono oficial del culto' : ''}`}
       >
         {isWorshipTarget && (
           <span
             className={`absolute -top-1.5 -right-1 px-1 py-0.2 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-tighter shadow-2xs ${
-              isSelected ? 'bg-amber-400 text-slate-950 font-black' : 'bg-[#1E74FD] text-white'
+              isSelected ? 'bg-[#E8B844] text-[#202C37] font-black' : 'bg-[#C96B65] text-white'
             }`}
           >
             Culto
           </span>
         )}
-        <span className="text-xs sm:text-sm font-black leading-tight">
+        <span className="text-xs sm:text-sm font-black leading-tight font-display">
           {noteAtSt || (st === 0 ? 'Orig' : st)}
         </span>
         <span
           className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 font-medium ${
-            isSelected ? 'text-blue-100' : isWorshipTarget ? 'text-[#1E74FD] font-bold' : 'text-slate-400'
+            isSelected ? 'text-white/80' : isWorshipTarget ? 'text-[#315F6D] font-bold' : 'text-[#89939C]'
           }`}
         >
           {label}
@@ -346,16 +346,16 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
 
   // Componente: Tarjeta del Transpositor
   const transpositorCard = (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col justify-between h-full">
+    <div className="bg-white border border-[#E5E8EA] rounded-2xl p-4 sm:p-5 shadow-card flex flex-col justify-between h-full">
       {/* 1. Header del Transpositor */}
-      <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+      <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#E5E8EA]">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-[#1E74FD]" />
-          <h3 className="text-xs sm:text-xs md:text-sm font-bold tracking-tight text-[#0B132B] uppercase">
+          <Activity className="w-4 h-4 text-[#315F6D]" />
+          <h3 className="text-xs sm:text-xs md:text-sm font-bold tracking-tight text-[#202C37] uppercase font-display">
             Transpositor de Afinación (WSOLA Alta Fidelidad)
           </h3>
         </div>
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#FF7E22]/10 text-[#FF7E22] border border-[#FF7E22]/20">
+        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F7E3DF] text-[#C96B65] border border-[#C96B65]/30">
           Pista: {audioOriginalKey} (Original)
         </span>
       </div>
@@ -363,27 +363,27 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
       {/* 2. Banner Grande: Tonalidad que se va a tocar en el Culto */}
       <div className={`p-3.5 sm:p-4 rounded-2xl my-3 border transition-all ${
         worshipDelta !== 0
-          ? 'bg-gradient-to-r from-blue-50/90 via-indigo-50/60 to-blue-50/30 border-[#1E74FD]/40 shadow-xs'
-          : 'bg-slate-50 border-slate-200/90'
+          ? 'bg-gradient-to-r from-[#D9E9EB]/60 via-[#F7F4EF] to-[#D9E9EB]/30 border-[#315F6D]/30 shadow-xs'
+          : 'bg-[#FAF9F6] border-[#E5E8EA]'
       }`}>
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className={`w-2.5 h-2.5 rounded-full ${worshipDelta !== 0 ? 'bg-[#1E74FD] animate-pulse' : 'bg-emerald-500'}`} />
-              <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider ${worshipDelta !== 0 ? 'text-[#1E74FD]' : 'text-slate-600'}`}>
+              <span className={`w-2.5 h-2.5 rounded-full ${worshipDelta !== 0 ? 'bg-[#315F6D] animate-pulse' : 'bg-[#315F6D]'}`} />
+              <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider ${worshipDelta !== 0 ? 'text-[#315F6D]' : 'text-[#64717C]'}`}>
                 {worshipDelta !== 0 ? 'Tono Requerido para el Culto' : 'Tono Oficial del Culto'}
               </span>
             </div>
             
             {worshipDelta !== 0 ? (
-              <p className="text-xs text-slate-700 mt-1 font-medium leading-snug">
-                Pista grabada en <strong className="text-slate-900 font-bold">{audioOriginalKey}</strong> ➔ Transportada{' '}
-                <span className="font-bold text-[#1E74FD]">
+              <p className="text-xs text-[#202C37] mt-1 font-medium leading-snug">
+                Pista grabada en <strong className="text-[#202C37] font-bold">{audioOriginalKey}</strong> ➔ Transportada{' '}
+                <span className="font-bold text-[#315F6D]">
                   {formatSemitoneShiftDescription(worshipDelta)}
                 </span>
               </p>
             ) : (
-              <p className="text-xs text-slate-500 mt-1">
+              <p className="text-xs text-[#64717C] mt-1">
                 Se cantará en la misma tonalidad original de la pista ({audioOriginalKey})
               </p>
             )}
@@ -391,13 +391,13 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
             {/* Aviso si el usuario alteró el transportador a otro tono */}
             {semitones !== worshipDelta && (
               <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] text-amber-800 bg-amber-100/90 px-2 py-0.5 rounded-md font-bold">
+                <span className="text-[11px] text-[#87621D] bg-[#FFF1CB] px-2 py-0.5 rounded-md font-bold">
                   Escuchando en {currentKeyDisplay}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleSemitoneChange(worshipDelta)}
-                  className="text-[11px] font-bold text-[#1E74FD] hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-[#315F6D] hover:underline cursor-pointer"
                 >
                   ↩ Restablecer a tono del culto ({worshipTargetKey})
                 </button>
@@ -406,11 +406,11 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
           </div>
 
           {/* GRAN VISUALIZACIÓN DE LA TONALIDAD A TOCAR */}
-          <div className="text-center shrink-0 bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border-2 border-[#1E74FD]/30 shadow-xs">
-            <span className="text-2xl sm:text-4xl font-black text-[#1E74FD] tracking-tight block leading-none">
+          <div className="text-center shrink-0 bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border-2 border-[#315F6D]/30 shadow-card">
+            <span className="text-2xl sm:text-4xl font-black text-[#315F6D] tracking-tight block leading-none font-display">
               {worshipTargetKey}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-black uppercase text-slate-500 tracking-wider block mt-1">
+            <span className="text-[9px] sm:text-[10px] font-black uppercase text-[#64717C] tracking-wider block mt-1">
               Tono a Tocar
             </span>
           </div>
@@ -420,8 +420,8 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
       {/* 3. Botones de Semitonos (-7 a +7) en dos filas */}
       <div className="py-1 space-y-2.5">
         {isLoading ? (
-          <div className="py-6 text-center text-xs text-slate-500">
-            <div className="w-6 h-6 border-2 border-[#1E74FD]/20 border-t-[#1E74FD] rounded-full animate-spin mx-auto mb-2" />
+          <div className="py-6 text-center text-xs text-[#64717C]">
+            <div className="w-6 h-6 border-2 border-[#315F6D]/20 border-t-[#315F6D] rounded-full animate-spin mx-auto mb-2" />
             {loadProgress}
           </div>
         ) : (
@@ -473,7 +473,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
               onClick={() => handleSpeedChange(spd)}
               className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${
                 playbackSpeed === spd
-                  ? 'bg-[#1E74FD] text-white shadow-xs'
+                  ? 'bg-[#315F6D] text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >
@@ -487,7 +487,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
 
   // Componente: Barra / Tarjeta del Reproductor de Audio
   const audioPlayerCard = (
-    <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
+    <div className="bg-white border border-[#E5E8EA] rounded-2xl p-4 sm:p-5 shadow-card space-y-3">
       {/* Encabezado del tema */}
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
@@ -503,14 +503,14 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
           </div>
 
           <div className="min-w-0">
-            <h4 className="text-sm sm:text-base font-bold text-[#0B132B] truncate leading-tight">
+            <h4 className="text-sm sm:text-base font-bold text-[#202C37] font-display truncate leading-tight">
               {songTitle}
             </h4>
             <div className="flex items-center gap-2 mt-1 flex-wrap">
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-black bg-[#1E74FD]/10 text-[#1E74FD]">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#D9E9EB] text-[#315F6D]">
                 TONO CULTO: {worshipTargetKey}
               </span>
-              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FF7E22]/10 text-[#FF7E22]">
+              <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#FFF1CB] text-[#BD8C29]">
                 SONANDO EN: {currentKeyDisplay}
               </span>
             </div>
@@ -545,7 +545,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
             value={currentTime}
             onChange={(e) => handleSeek(Number(e.target.value))}
             disabled={!audioUrl || duration === 0}
-            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1E74FD] focus:outline-none disabled:opacity-50"
+            className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#315F6D] focus:outline-none disabled:opacity-50"
           />
         </div>
         <span className="text-xs font-medium text-slate-400 tabular-nums w-10">
@@ -575,7 +575,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
             type="button"
             onClick={handleTogglePlay}
             disabled={!audioUrl || isLoading}
-            className="w-12 h-12 rounded-full bg-[#1E74FD] hover:bg-[#155de0] text-white flex items-center justify-center shadow-md shadow-[#1E74FD]/25 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-12 h-12 rounded-full bg-[#315F6D] hover:bg-[#234A57] text-white flex items-center justify-center shadow-card shadow-[#315F6D]/25 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             title={isPlaying ? 'Pausar' : 'Reproducir'}
           >
             {isPlaying ? (
@@ -606,7 +606,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
             title={isMuted ? 'Activar sonido' : 'Silenciar'}
           >
             {isMuted || volume === 0 ? (
-              <VolumeX className="w-4 h-4 text-[#FF7E22]" />
+              <VolumeX className="w-4 h-4 text-[#C96B65]" />
             ) : (
               <Volume2 className="w-4 h-4" />
             )}
@@ -621,7 +621,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
               setVolume(Number(e.target.value));
               setIsMuted(false);
             }}
-            className="w-14 sm:w-20 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#1E74FD]"
+            className="w-14 sm:w-20 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#315F6D]"
           />
         </div>
       </div>
