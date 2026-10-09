@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" fill="none" stroke="currentColor">
+  <!-- Minimalist Editorial Piano Keyboard in Perspective Line Art -->
+  <g opacity="0.9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Perspective outline of keyboard bed -->
+    <path d="M30 140 L110 50 L290 60 L230 160 Z" />
+    <path d="M30 140 V155 L230 175 V160" />
+    <path d="M230 175 L290 75 V60" />
+
+    <!-- Natural (White) keys lines in perspective -->
+    <line x1="50" y1="128" x2="130" y2="52" />
+    <line x1="70" y1="131" x2="150" y2="53" />
+    <line x1="90" y1="134" x2="170" y2="54" />
+    <line x1="110" y1="138" x2="190" y2="55" />
+    <line x1="130" y1="142" x2="210" y2="56" />
+    <line x1="150" y1="145" x2="230" y2="57" />
+    <line x1="170" y1="149" x2="250" y2="58" />
+    <line x1="190" y1="152" x2="270" y2="59" />
+    <line x1="210" y1="156" x2="280" y2="60" />
+
+    <!-- Accidental (Black) keys in isometric block projection -->
+    <path d="M60 115 L125 52 L133 52 L68 116 Z" fill="currentColor" opacity="0.8" />
+    <path d="M80 118 L145 53 L153 53 L88 119 Z" fill="currentColor" opacity="0.8" />
+    <path d="M120 125 L185 55 L193 55 L128 126 Z" fill="currentColor" opacity="0.8" />
+    <path d="M140 128 L205 56 L213 56 L148 129 Z" fill="currentColor" opacity="0.8" />
+    <path d="M160 132 L225 57 L233 57 L168 133 Z" fill="currentColor" opacity="0.8" />
+    <path d="M200 139 L265 59 L273 59 L208 140 Z" fill="currentColor" opacity="0.8" />
+
+    <!-- Sound waves radiating above keyboard -->
+    <path d="M180 35 C200 25, 230 40, 250 30" stroke-dasharray="3 3" opacity="0.5" />
+    <path d="M200 20 C220 10, 250 25, 270 15" stroke-dasharray="3 3" opacity="0.4" />
+  </g>
+</svg>

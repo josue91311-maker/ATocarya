@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" fill="none" stroke="currentColor">
+  <!-- Worship Silhouettes / Congregation with raised hands in line art -->
+  <g opacity="0.9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Center worship leader -->
+    <circle cx="200" cy="70" r="12" />
+    <path d="M200 82 V130" />
+    <path d="M200 95 L175 60 M200 95 L225 60" />
+    <!-- Congregation raised hands silhouette left -->
+    <circle cx="120" cy="90" r="10" />
+    <path d="M120 100 V150" />
+    <path d="M120 110 L100 80 M120 110 L135 78" />
+    
+    <circle cx="60" cy="105" r="9" />
+    <path d="M60 114 V160" />
+    <path d="M60 122 L45 92 M60 122 L72 90" />
+    
+    <!-- Congregation raised hands silhouette right -->
+    <circle cx="280" cy="85" r="11" />
+    <path d="M280 96 V150" />
+    <path d="M280 106 L260 72 M280 106 L305 70" />
+    
+    <circle cx="340" cy="100" r="9" />
+    <path d="M340 109 V160" />
+    <path d="M340 118 L325 88 M340 118 L355 85" />
+    
+    <!-- Ambient worship light rays -->
+    <path d="M140 20 L160 50 M200 10 L200 45 M260 20 L240 50" stroke-dasharray="4 4" />
+    <path d="M30 170 C100 160, 300 160, 370 170" stroke-width="1.5" />
+  </g>
+</svg>

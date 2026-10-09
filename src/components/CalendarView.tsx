@@ -141,211 +141,191 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       
-      {/* ⚡ TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC (MÓVIL FRIENDLY) */}
-      {nextService && musicianUser && (
-        <div>
-          {myAssignedSlotInNext ? (
-            <div className="bg-emerald-50 border-2 border-emerald-300 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm">
-              <div className="flex items-center gap-3.5">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
-                  <Check className="w-6 h-6 stroke-[3]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-emerald-600 text-white shadow-2xs">
-                      ✓ Confirmado
-                    </span>
-                    <span className="text-xs font-bold text-emerald-950">
-                      Próximo Culto: {nextService.date} ({nextService.time})
-                    </span>
-                  </div>
-                  <h3 className="text-sm sm:text-base font-bold text-emerald-950 mt-0.5 font-display">
-                    ¡{musicianUser.fullName}, estás anotado en {myAssignedSlotInNext.label}!
-                  </h3>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
-                {onOpenSetlist && (isAdminAuthenticated || Boolean(musicianUser && (nextService.slots?.voz_director?.musicianId === musicianUser.id || (musicianUser.primaryInstrument === 'Voz Director' && Boolean(myAssignedSlotInNext))))) && (
-                  <button
-                    type="button"
-                    onClick={() => onOpenSetlist(nextService)}
-                    className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
-                  >
-                    <Music className="w-3.5 h-3.5" />
-                    <span>Gestionar Canciones</span>
-                  </button>
-                )}
-                {nextService.isSongsPublished && nextService.songs && nextService.songs.length > 0 && (
-                  <a
-                    href={`/#/repertorio/${nextService.id}`}
-                    className="px-3.5 py-2 bg-white hover:bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-2xs"
-                  >
-                    <Music className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Ver Canciones ({nextService.songs.length})</span>
-                  </a>
-                )}
-                <button
-                  onClick={() => onSelectService(nextService)}
-                  className="px-4 py-2 bg-white hover:bg-emerald-100/50 border border-emerald-300 text-emerald-900 rounded-xl text-xs font-bold transition-all shadow-2xs text-center"
-                >
-                  Ver servicio completo
-                </button>
-              </div>
-            </div>
-          ) : recommendedSlotInNext ? (
-            <div className="bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white rounded-3xl p-5 sm:p-6 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-4">
-              <div className="flex items-start sm:items-center gap-3.5">
-                <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm border border-white/30 flex flex-col items-center justify-center text-white flex-shrink-0 shadow-inner">
-                  <span className="text-[10px] uppercase font-bold tracking-wider leading-none">
-                    {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { month: 'short' })}
-                  </span>
-                  <span className="text-2xl font-black font-display leading-tight tabular-nums">
-                    {new Date(nextService.date + 'T00:00:00').getDate()}
-                  </span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-white text-emerald-900 shadow-2xs">
-                      ⚡ Recomendación para ti
-                    </span>
-                    <span className="text-xs font-bold text-emerald-100">
-                      Próxima Fecha: {nextService.date} ({nextService.time})
-                    </span>
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold font-display text-white mt-1">
-                    {musicianUser.fullName}, ¿tocas este {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long' })}?
-                  </h3>
-                  <p className="text-xs text-emerald-100/90 mt-0.5">
-                    Tu instrumento es <strong>{musicianUser.primaryInstrument}</strong> y el puesto <strong>{recommendedSlotInNext.label}</strong> está disponible.
-                  </p>
-                </div>
-              </div>
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full md:w-auto flex-shrink-0">
-                <button
-                  onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
-                  className="w-full sm:w-auto px-5 py-3 bg-white hover:bg-emerald-50 text-emerald-900 rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-all hover:scale-105 active:scale-95"
-                >
-                  <Check className="w-4 h-4 stroke-[3] text-emerald-600" />
-                  <span>Anotarme en {recommendedSlotInNext.label} (1 Toque)</span>
-                </button>
-                <button
-                  onClick={() => onSelectService(nextService)}
-                  className="w-full sm:w-auto px-3.5 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-xs font-bold transition-colors text-center"
-                >
-                  Ver todos
-                </button>
-              </div>
-            </div>
-          ) : null}
+      {/* 0. HERO EDITORIAL BANNER (Desktop & Portal) */}
+      {musicianUser && (
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#C96B65] via-[#BD8C29] to-[#315F6D] text-white p-6 sm:p-8 shadow-card">
+          {/* Subtle line art of guitar on the right */}
+          <div className="absolute -right-4 -top-6 bottom-0 w-72 sm:w-96 pointer-events-none select-none opacity-20 filter invert">
+            <img 
+              src="/assets/music/guitar-line.svg" 
+              alt="" 
+              className="w-full h-full object-cover object-right"
+            />
+          </div>
+
+          <div className="relative z-10 max-w-xl">
+            <span className="text-[10px] sm:text-[11px] font-extrabold tracking-widest uppercase text-white/80 block">
+              FECHAS DE CULTO
+            </span>
+            <h1 className="font-serif text-3xl sm:text-4xl text-white font-normal mt-1 leading-tight">
+              Hola, {musicianUser.fullName.split(' ')[0]}
+            </h1>
+            <p className="text-xs sm:text-sm text-white/90 mt-1">
+              Aquí tienes un resumen de tus próximos cultos.
+            </p>
+          </div>
         </div>
       )}
 
-      {/* 1. TOP METRICS STRIP (Planning Center Quick Glance) */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            Próximos Cultos
-          </p>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-black font-display text-slate-900 tabular-nums">
-              {totalServices}
-            </span>
-            <span className="text-xs text-slate-500">fechas vigentes</span>
+      {/* ⚡ TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
+      {nextService && musicianUser && !myAssignedSlotInNext && recommendedSlotInNext && (
+        <div className="bg-[#D9E9EB]/60 border border-[#315F6D]/20 text-[#202C37] rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-3.5">
+            <div className="w-12 h-12 rounded-xl bg-[#315F6D] text-white flex flex-col items-center justify-center shrink-0 shadow-xs">
+              <span className="text-[9px] uppercase font-bold tracking-wider leading-none">
+                {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { month: 'short' })}
+              </span>
+              <span className="text-xl font-black font-display leading-tight tabular-nums">
+                {new Date(nextService.date + 'T00:00:00').getDate()}
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-[#315F6D] text-white shadow-2xs">
+                  ⚡ Sugerido para ti
+                </span>
+                <span className="text-xs font-bold text-[#64717C]">
+                  {nextService.date} ({nextService.time})
+                </span>
+              </div>
+              <h3 className="text-sm sm:text-base font-bold font-display text-[#202C37] mt-0.5">
+                {musicianUser.fullName}, toca tu instrumento ({musicianUser.primaryInstrument})
+              </h3>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
+              className="px-4 py-2.5 bg-[#315F6D] hover:bg-[#234A57] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
+            >
+              <Check className="w-4 h-4 stroke-[3]" />
+              <span>Anotarme en {recommendedSlotInNext.label}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 1. TOP METRICS STRIP EDITORIAL (3 Tarjetas) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        <div className="bg-[#F7EAE5] border border-[#EEF0F1] rounded-[18px] p-4 sm:p-5 shadow-card flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#C96B65]/15 text-[#C96B65] flex items-center justify-center shrink-0">
+            <CalendarIcon className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-[#64717C] uppercase tracking-wider">
+              PRÓXIMOS CULTOS
+            </p>
+            <div className="flex items-baseline gap-2 mt-0.5">
+              <span className="text-2xl sm:text-3xl font-black font-display text-[#202C37] tabular-nums">
+                {totalServices}
+              </span>
+              <span className="text-xs text-[#64717C]">fechas vigentes</span>
+            </div>
           </div>
         </div>
 
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            Mis Puestos
-          </p>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-black font-display text-emerald-700 tabular-nums">
-              {myServicesCount}
-            </span>
-            <span className="text-xs text-slate-500">confirmados</span>
+        <div className="bg-[#D9E9EB] border border-[#EEF0F1] rounded-[18px] p-4 sm:p-5 shadow-card flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#315F6D]/15 text-[#315F6D] flex items-center justify-center shrink-0">
+            <CheckCircle2 className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-[#64717C] uppercase tracking-wider">
+              MIS PUESTOS
+            </p>
+            <div className="flex items-baseline gap-2 mt-0.5">
+              <span className="text-2xl sm:text-3xl font-black font-display text-[#315F6D] tabular-nums">
+                {myServicesCount}
+              </span>
+              <span className="text-xs text-[#64717C]">confirmados</span>
+            </div>
           </div>
         </div>
 
-        <div className="col-span-2 sm:col-span-1 bg-white border border-slate-200/90 rounded-2xl p-4 shadow-2xs">
-          <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            Vacantes Abiertas
-          </p>
-          <div className="flex items-baseline gap-2 mt-1">
-            <span className="text-2xl font-black font-display text-emerald-800 tabular-nums">
-              {totalVacancies}
-            </span>
-            <span className="text-xs text-slate-500">cupos disponibles</span>
+        <div className="bg-[#FFF1CB] border border-[#EEF0F1] rounded-[18px] p-4 sm:p-5 shadow-card flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-[#BD8C29]/15 text-[#BD8C29] flex items-center justify-center shrink-0">
+            <Users className="w-6 h-6" />
+          </div>
+          <div>
+            <p className="text-[10px] font-bold text-[#64717C] uppercase tracking-wider">
+              VACANTES ABIERTAS
+            </p>
+            <div className="flex items-baseline gap-2 mt-0.5">
+              <span className="text-2xl sm:text-3xl font-black font-display text-[#87621D] tabular-nums">
+                {totalVacancies}
+              </span>
+              <span className="text-xs text-[#64717C]">cupos disponibles</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* 2. HEADER & CONTROLS TOOLBAR */}
-      <div className="bg-white border border-slate-200/90 rounded-3xl p-4 sm:p-5 shadow-2xs space-y-4">
+      <div className="bg-white border border-[#E5E8EA] rounded-[18px] p-4 sm:p-5 shadow-card space-y-4">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-lg sm:text-xl font-bold font-display text-slate-900 flex items-center gap-2">
-              <CalendarIcon className="w-5 h-5 text-emerald-600" />
+            <h2 className="text-lg sm:text-xl font-bold font-display text-[#202C37] flex items-center gap-2">
+              <CalendarIcon className="w-5 h-5 text-[#315F6D]" />
               <span>Cronograma & Fechas de Culto</span>
             </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-[#64717C] mt-0.5">
               Consulta las fechas en el <strong>Calendario Mensual</strong> o en <strong>Tarjetas</strong> y pon tu check en tu instrumento.
             </p>
           </div>
 
           {/* View Mode Toggle: Monthly Calendar / Cards / List */}
-          <div className="flex items-center p-1 bg-slate-100 rounded-2xl border border-slate-200/80 self-start sm:self-auto shadow-2xs">
+          <div className="flex items-center p-1 bg-[#F7F4EF] rounded-xl border border-[#E5E8EA] self-start sm:self-auto shadow-2xs">
             <button
               onClick={() => setViewMode('month')}
               title="Calendario Mensual Interactivo"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'month' 
-                  ? 'bg-white text-emerald-900 shadow-sm' 
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#315F6D] text-white shadow-xs' 
+                  : 'text-[#64717C] hover:text-[#202C37]'
               }`}
             >
-              <CalendarIcon className="w-3.5 h-3.5 text-emerald-600" />
+              <CalendarIcon className="w-3.5 h-3.5" />
               <span>Mes</span>
             </button>
             <button
               onClick={() => setViewMode('grid')}
               title="Vista Tarjetas"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'grid' 
-                  ? 'bg-white text-emerald-900 shadow-sm' 
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#315F6D] text-white shadow-xs' 
+                  : 'text-[#64717C] hover:text-[#202C37]'
               }`}
             >
-              <LayoutGrid className="w-3.5 h-3.5 text-emerald-600" />
+              <LayoutGrid className="w-3.5 h-3.5" />
               <span>Tarjetas</span>
             </button>
             <button
               onClick={() => setViewMode('list')}
               title="Vista Lista"
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                 viewMode === 'list' 
-                  ? 'bg-white text-emerald-900 shadow-sm' 
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#315F6D] text-white shadow-xs' 
+                  : 'text-[#64717C] hover:text-[#202C37]'
               }`}
             >
-              <LayoutList className="w-3.5 h-3.5 text-emerald-600" />
+              <LayoutList className="w-3.5 h-3.5" />
               <span>Lista</span>
             </button>
           </div>
         </div>
 
         {/* Controls Toolbar: Month filter, Search, Segmented status filter */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-3 border-t border-slate-100">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 pt-3 border-t border-[#EEF0F1]">
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 flex-1">
             
             {/* Filter by Month */}
-            <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 min-w-[180px]">
-              <CalendarIcon className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
+            <div className="flex items-center gap-2 bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl px-3 py-2 min-w-[180px]">
+              <CalendarIcon className="w-3.5 h-3.5 text-[#315F6D] shrink-0" />
               <select
                 value={selectedMonth}
                 onChange={(e) => setSelectedMonth(e.target.value)}
-                className="bg-transparent text-xs font-bold text-slate-800 focus:outline-none w-full cursor-pointer"
+                className="bg-transparent text-xs font-bold text-[#202C37] focus:outline-none w-full cursor-pointer"
               >
                 <option value="all">📅 Todos los meses</option>
                 {availableMonths.map((mKey) => (
@@ -363,21 +343,21 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Buscar fecha o instrumento..."
-                className="w-full pl-8 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100 transition-all"
+                className="w-full pl-8 pr-3 py-2 bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl text-xs text-[#202C37] placeholder-[#89939C] focus:bg-white focus:outline-none focus:border-[#315F6D] transition-all"
               />
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+              <Search className="w-3.5 h-3.5 text-[#89939C] absolute left-2.5 top-1/2 -translate-y-1/2" />
             </div>
 
           </div>
 
           {/* Segmented Filter Pills */}
-          <div className="flex items-center p-1 bg-slate-100/90 rounded-xl border border-slate-200/60 overflow-x-auto self-start lg:self-auto">
+          <div className="flex items-center p-1 bg-[#F7F4EF] rounded-xl border border-[#E5E8EA] overflow-x-auto self-start lg:self-auto">
             <button
               onClick={() => setFilterType('all')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                 filterType === 'all'
-                  ? 'bg-white text-slate-900 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#315F6D] text-white shadow-xs'
+                  : 'text-[#64717C] hover:text-[#202C37]'
               }`}
             >
               Todos ({activeUpcomingServices.length})
@@ -385,10 +365,10 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
 
             <button
               onClick={() => setFilterType('available')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                 filterType === 'available'
-                  ? 'bg-white text-emerald-950 shadow-2xs font-bold'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#315F6D] text-white shadow-xs'
+                  : 'text-[#64717C] hover:text-[#202C37]'
               }`}
             >
               Con Vacantes
@@ -397,10 +377,10 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
             {musicianUser && (
               <button
                 onClick={() => setFilterType('mine')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all whitespace-nowrap ${
                   filterType === 'mine'
-                    ? 'bg-white text-emerald-900 shadow-2xs font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
+                    ? 'bg-[#315F6D] text-white shadow-xs'
+                    : 'text-[#64717C] hover:text-[#202C37]'
                 }`}
               >
                 Mis Cultos ({myServicesCount})

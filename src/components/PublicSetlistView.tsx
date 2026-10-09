@@ -60,17 +60,17 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
   if (!service) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4 bg-[#f8fafc]">
-        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-xl border border-slate-200">
-          <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-          <h2 className="text-lg font-bold text-[#0B132B]">Culto no encontrado</h2>
-          <p className="text-xs text-slate-500 mt-1">
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#F7F4EF]">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-card border border-[#E5E8EA]">
+          <AlertCircle className="w-12 h-12 text-[#89939C] mx-auto mb-3" />
+          <h2 className="text-lg font-bold text-[#202C37] font-display">Culto no encontrado</h2>
+          <p className="text-xs text-[#64717C] mt-1">
             El enlace al repertorio no es válido o la fecha fue reprogramada.
           </p>
           {onGoToPortal && (
             <button
               onClick={onGoToPortal}
-              className="mt-5 px-5 py-2.5 bg-[#1E74FD] hover:bg-[#155de0] text-white text-xs font-bold rounded-xl transition-colors"
+              className="mt-5 px-5 py-2.5 bg-[#315F6D] hover:bg-[#264F5D] text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
             >
               Ir al Portal Principal
             </button>
@@ -222,10 +222,10 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   );
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 flex flex-col selection:bg-[#1E74FD]/20">
+    <div className="min-h-screen bg-[#F7F4EF] text-slate-900 flex flex-col selection:bg-[#315F6D]/20">
       
       {/* 1. Header Superior Moderno */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/90 shadow-2xs">
+      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E5E8EA] shadow-2xs">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           
           {/* Logo y Botón Volver */}
@@ -251,8 +251,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
           </div>
 
           {/* Badge Central Desktop */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-slate-100/90 text-slate-700 border border-slate-200 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#D9E9EB]/60 text-[#315F6D] border border-[#315F6D]/20 shadow-2xs">
+            <span className="w-2 h-2 rounded-full bg-[#E8B844] animate-pulse"></span>
             <span>REPERTORIO OFICIAL</span>
           </div>
 
@@ -269,7 +269,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
             <button
               onClick={handleShareWhatsApp}
-              className="px-3.5 py-1.5 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm shadow-blue-500/20"
+              className="px-3.5 py-1.5 bg-[#315F6D] hover:bg-[#264F5D] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
               title="Compartir por WhatsApp"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -292,7 +292,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
           <div className="sm:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-2 shadow-lg animate-in slide-in-from-top-2">
             <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pb-2 border-b border-slate-100">
               <span>{service.title}</span>
-              <span className="text-emerald-600 font-bold">Oficial</span>
+              <span className="text-[#315F6D] font-bold">Oficial</span>
             </div>
             <button
               onClick={() => {
@@ -310,7 +310,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   setMobileMenuOpen(false);
                   onGoToPortal();
                 }}
-                className="w-full text-left py-2 px-3 text-xs font-bold text-[#1E74FD] hover:bg-blue-50 rounded-xl flex items-center gap-2"
+                className="w-full text-left py-2 px-3 text-xs font-bold text-[#315F6D] hover:bg-[#FAF9F6] rounded-xl flex items-center gap-2"
               >
                 <span>Acceder al Portal de Músicos</span>
               </button>
@@ -322,42 +322,42 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-20 space-y-5 sm:space-y-6">
 
-        {/* 2. Hero Banner del Culto (Diseño Navy con Imagen de Fondo de Concierto) */}
-        <div className="relative rounded-3xl overflow-hidden bg-[#0B132B] text-white p-5 sm:p-7 shadow-lg border border-slate-800">
-          {/* Fondo sutil de concierto con siluetas de manos levantadas */}
+        {/* 2. Hero Banner del Culto (Diseño Petróleo Editorial) */}
+        <div className="relative rounded-3xl overflow-hidden bg-[#315F6D] text-white p-5 sm:p-7 shadow-card border border-[#234A57]">
+          {/* Fondo sutil de concierto */}
           <div 
-            className="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-luminosity pointer-events-none"
+            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-luminosity pointer-events-none"
             style={{ backgroundImage: 'url("/app-bg.jpg")' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#0B132B] via-[#0B132B]/90 to-[#0B132B]/60 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#234A57] via-[#315F6D]/95 to-[#315F6D]/80 pointer-events-none" />
 
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#1E74FD]/20 text-[#60a5fa] border border-[#1E74FD]/40">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-[#FFF1CB] border border-white/30 font-display">
                   REPERTORIO OFICIAL
                 </span>
-                <span className="text-xs font-semibold text-slate-300 capitalize">
+                <span className="text-xs font-semibold text-slate-200 capitalize">
                   {fullDateStr}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight font-display">
                 {service.title}
               </h1>
-              <div className="flex items-center gap-4 text-xs text-slate-300 pt-1 flex-wrap">
+              <div className="flex items-center gap-4 text-xs text-slate-200 pt-1 flex-wrap">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#1E74FD]" />
+                  <Clock className="w-3.5 h-3.5 text-[#E8B844]" />
                   Culto: <strong className="text-white">{service.time}</strong>
                 </span>
                 {service.rehearsalTime && (
                   <span className="flex items-center gap-1.5">
-                    <Headphones className="w-3.5 h-3.5 text-[#1E74FD]" />
+                    <Headphones className="w-3.5 h-3.5 text-[#E8B844]" />
                     Ensayo: <strong className="text-white">{service.rehearsalTime}</strong>
                   </span>
                 )}
                 {directorName && (
                   <span className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-[#1E74FD]" />
+                    <Users className="w-3.5 h-3.5 text-[#E8B844]" />
                     Director: <strong className="text-white">{directorName}</strong>
                   </span>
                 )}
@@ -366,12 +366,12 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
             {/* Tarjeta flotante glassmorphism con contador */}
             <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 sm:p-4 flex items-center gap-3 shrink-0 self-start sm:self-auto">
-              <Music className="w-7 h-7 sm:w-8 sm:h-8 text-[#1E74FD]" />
+              <Music className="w-7 h-7 sm:w-8 sm:h-8 text-[#E8B844]" />
               <div>
                 <span className="text-2xl sm:text-3xl font-black text-white leading-none block">
                   {songs.length}
                 </span>
-                <span className="text-[10px] sm:text-xs text-slate-300 font-medium block">
+                <span className="text-[10px] sm:text-xs text-slate-200 font-medium block">
                   alabanzas programadas
                 </span>
               </div>
@@ -382,8 +382,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
         {/* 3. Selector de Alabanzas */}
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <h2 className="text-sm sm:text-base font-bold text-[#0B132B] flex items-center gap-2">
-              <Music className="w-4 h-4 text-[#1E74FD]" />
+            <h2 className="text-sm sm:text-base font-bold text-[#202C37] flex items-center gap-2 font-display">
+              <Music className="w-4 h-4 text-[#315F6D]" />
               <span>Repertorio ({songs.length} alabanzas)</span>
             </h2>
             <div className="text-xs text-slate-500 font-semibold px-3 py-1 rounded-xl bg-white border border-slate-200/80 shadow-2xs">
@@ -411,8 +411,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   }}
                   className={`w-full p-3 sm:p-3.5 rounded-2xl border text-left transition-all flex items-center gap-3 cursor-pointer ${
                     isActive
-                      ? 'bg-[#F0F7FF] border-2 border-[#1E74FD] shadow-xs ring-1 ring-[#1E74FD]/30 scale-[1.01]'
-                      : 'bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50/50'
+                      ? 'bg-[#E4F0F0] border-2 border-[#315F6D] shadow-card ring-1 ring-[#315F6D]/30 scale-[1.01]'
+                      : 'bg-white border-[#E5E8EA] hover:border-slate-300 hover:bg-[#FAF9F6]'
                   }`}
                 >
                   {/* Thumbnail con icono play - Dimensiones fijas para móvil y PC */}
@@ -422,7 +422,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       alt={song.title}
                       className="w-full h-full object-cover"
                     />
-                    <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-[#1E74FD]/40' : 'bg-black/25'}`}>
+                    <div className={`absolute inset-0 flex items-center justify-center ${isActive ? 'bg-[#315F6D]/40' : 'bg-black/25'}`}>
                       <Play className="w-4 h-4 text-white fill-white" />
                     </div>
                   </div>
@@ -431,12 +431,12 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <span className={`w-5 h-5 rounded-md flex items-center justify-center text-xs font-bold ${
-                        isActive ? 'bg-[#1E74FD] text-white' : 'bg-slate-100 text-slate-700'
+                        isActive ? 'bg-[#315F6D] text-white' : 'bg-slate-100 text-slate-700'
                       }`}>
                         {index + 1}
                       </span>
                       <h3 className={`text-xs sm:text-sm font-bold truncate leading-tight ${
-                        isActive ? 'text-[#0B132B]' : 'text-slate-800'
+                        isActive ? 'text-[#202C37]' : 'text-[#202C37]'
                       }`}>
                         {song.title}
                       </h3>
@@ -446,8 +446,8 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                       {song.key && (
                         <span className={`text-[10px] font-black px-2 py-0.5 rounded ${
                           song.originalKey && song.key.trim().toLowerCase() !== song.originalKey.trim().toLowerCase()
-                            ? 'bg-[#1E74FD] text-white shadow-2xs'
-                            : 'bg-[#1E74FD]/10 text-[#1E74FD]'
+                            ? 'bg-[#315F6D] text-white shadow-2xs'
+                            : 'bg-[#D9E9EB] text-[#315F6D]'
                         }`}>
                           Tono: {song.key}
                         </span>
@@ -498,14 +498,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
           
           {/* VISTA ESCRITORIO (Tabs horizontales) */}
           <div className="hidden sm:block space-y-4">
-            <div className="flex items-center gap-2 p-1.5 bg-slate-100 rounded-2xl w-fit">
+            <div className="flex items-center gap-2 p-1.5 bg-[#FAF9F6] border border-[#E5E8EA] rounded-2xl w-fit">
               {hasLyrics && (
                 <button
                   type="button"
                   onClick={() => setActiveTab('lyrics')}
                   className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
                     activeTab === 'lyrics'
-                      ? 'bg-white text-[#1E74FD] shadow-xs'
+                      ? 'bg-white text-[#315F6D] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -520,7 +520,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   onClick={() => setActiveTab('pdf')}
                   className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
                     activeTab === 'pdf'
-                      ? 'bg-white text-[#1E74FD] shadow-xs'
+                      ? 'bg-white text-[#315F6D] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -535,7 +535,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   onClick={() => setActiveTab('chords')}
                   className={`px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2 transition-all ${
                     activeTab === 'chords'
-                      ? 'bg-white text-[#1E74FD] shadow-xs'
+                      ? 'bg-white text-[#315F6D] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -546,11 +546,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
             </div>
 
             {/* Contenedor del documento activo */}
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm">
+            <div className="bg-white border border-[#E5E8EA] rounded-2xl p-6 shadow-card">
               {activeTab === 'lyrics' && hasLyrics && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-[#0B132B] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-[#202C37] uppercase tracking-wider font-display">
                       Letra Oficial
                     </h3>
                     {isChordPro && (
@@ -560,7 +560,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           onClick={() => setChordProMode('with-chords')}
                           className={`px-2.5 py-1 rounded-lg transition-all ${
                             chordProMode === 'with-chords'
-                              ? 'bg-white text-[#1E74FD] shadow-xs'
+                              ? 'bg-white text-[#315F6D] shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
@@ -571,7 +571,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           onClick={() => setChordProMode('lyrics-only')}
                           className={`px-2.5 py-1 rounded-lg transition-all ${
                             chordProMode === 'lyrics-only'
-                              ? 'bg-white text-[#1E74FD] shadow-xs'
+                              ? 'bg-white text-[#315F6D] shadow-xs'
                               : 'text-slate-600 hover:text-slate-900'
                           }`}
                         >
@@ -588,7 +588,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         if (line.type === 'section') {
                           return (
                             <div key={lIdx} className="pt-2">
-                              <span className="text-xs font-black uppercase tracking-wider text-[#1E74FD] bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-lg inline-block font-sans">
+                              <span className="text-xs font-black uppercase tracking-wider text-[#315F6D] bg-[#D9E9EB]/60 border border-[#315F6D]/20 px-2.5 py-0.5 rounded-lg inline-block font-sans">
                                 {line.sectionTitle}
                               </span>
                             </div>
@@ -599,7 +599,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                             {line.segments?.map((seg, sIdx) => (
                               <span key={sIdx} className="inline-flex flex-col">
                                 {seg.chord ? (
-                                  <span className="text-xs font-black font-mono text-[#1E74FD] select-none pb-0.5 tracking-tight">
+                                  <span className="text-xs font-black font-mono text-[#315F6D] select-none pb-0.5 tracking-tight">
                                     {seg.chord}
                                   </span>
                                 ) : (
@@ -627,14 +627,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
               {activeTab === 'pdf' && effectiveChordsUrl && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-[#0B132B] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-[#202C37] uppercase tracking-wider font-display">
                       Partitura / Visor PDF
                     </h3>
                     <a
                       href={effectiveChordsUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 bg-[#1E74FD] hover:bg-[#155de0] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
+                      className="px-3 py-1.5 bg-[#315F6D] hover:bg-[#264F5D] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors shadow-xs"
                     >
                       <span>Abrir Completo</span>
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -660,7 +660,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
               {activeTab === 'chords' && hasChords && (
                 <div className="space-y-4">
                   <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                    <h3 className="text-sm font-bold text-[#0B132B] uppercase tracking-wider">
+                    <h3 className="text-sm font-bold text-[#202C37] uppercase tracking-wider font-display">
                       Estructura de Compases & Acordes
                     </h3>
                     <div className="flex items-center gap-2">
@@ -669,11 +669,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         onClick={() => setShowChordNotesAlways(!showChordNotesAlways)}
                         className={`px-3 py-1 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
                           showChordNotesAlways
-                            ? 'bg-[#1E74FD]/10 text-[#1E74FD] border-[#1E74FD]/30 shadow-xs'
-                            : 'bg-slate-50 text-slate-600 border-slate-200 hover:text-slate-900'
+                            ? 'bg-[#E4F0F0] text-[#315F6D] border-[#315F6D]/30 shadow-xs'
+                            : 'bg-[#FAF9F6] text-slate-600 border-[#E5E8EA] hover:text-slate-900'
                         }`}
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-[#1E74FD]" />
+                        <Sparkles className="w-3.5 h-3.5 text-[#315F6D]" />
                         <span>{showChordNotesAlways ? 'Ocultar Notas' : 'Ver Notas de Acordes'}</span>
                       </button>
                     </div>
@@ -684,7 +684,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     {parsedSections.map((sec, secIdx) => (
                       <div key={secIdx} className="space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="px-2.5 py-0.5 bg-blue-50 text-[#1E74FD] border border-blue-200 rounded-lg text-xs font-bold uppercase tracking-wider">
+                          <span className="px-2.5 py-0.5 bg-[#D9E9EB]/60 text-[#315F6D] border border-[#315F6D]/20 rounded-lg text-xs font-bold uppercase tracking-wider">
                             {sec.title}
                           </span>
                           {sec.timeSignature && (
@@ -700,11 +700,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                               {row.map((measure, mIdx) => (
                                 <div 
                                   key={mIdx}
-                                  className="p-3 rounded-xl border border-slate-200 bg-slate-50/70 text-center space-y-1"
+                                  className="p-3 rounded-xl border border-slate-200 bg-[#FAF9F6] text-center space-y-1"
                                 >
                                   <div className="flex flex-wrap items-baseline gap-2 justify-center py-1">
                                     {measure.chords.map((chord, cIdx) => (
-                                      <span key={cIdx} className="text-base sm:text-lg font-black font-mono text-[#0B132B]">
+                                      <span key={cIdx} className="text-base sm:text-lg font-black font-mono text-[#202C37]">
                                         {chord}
                                       </span>
                                     ))}
@@ -726,14 +726,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
           <div className="sm:hidden space-y-2.5">
             {/* Accordion 1: Letra */}
             {hasLyrics && (
-              <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+              <div className="bg-white border border-[#E5E8EA] rounded-2xl overflow-hidden shadow-card">
                 <button
                   type="button"
                   onClick={() => setMobileOpenAccordion(mobileOpenAccordion === 'lyrics' ? null : 'lyrics')}
-                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#0B132B]"
+                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#202C37]"
                 >
                   <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#1E74FD]" />
+                    <FileText className="w-4 h-4 text-[#315F6D]" />
                     <span>Letra</span>
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'lyrics' ? 'rotate-180' : ''}`} />
@@ -752,14 +752,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
             {/* Accordion 2: Visor PDF */}
             {hasPdf && (
-              <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+              <div className="bg-white border border-[#E5E8EA] rounded-2xl overflow-hidden shadow-card">
                 <button
                   type="button"
                   onClick={() => setMobileOpenAccordion(mobileOpenAccordion === 'pdf' ? null : 'pdf')}
-                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#0B132B]"
+                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#202C37]"
                 >
                   <span className="flex items-center gap-2">
-                    <FileCheck className="w-4 h-4 text-[#1E74FD]" />
+                    <FileCheck className="w-4 h-4 text-[#315F6D]" />
                     <span>Visor PDF</span>
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'pdf' ? 'rotate-180' : ''}`} />
@@ -771,7 +771,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         href={effectiveChordsUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="px-3 py-1.5 bg-[#1E74FD] text-white text-[11px] font-bold rounded-lg flex items-center gap-1"
+                        className="px-3 py-1.5 bg-[#315F6D] text-white text-[11px] font-bold rounded-lg flex items-center gap-1 shadow-sm"
                       >
                         <span>Abrir PDF Externo</span>
                         <ExternalLink className="w-3 h-3" />
@@ -797,14 +797,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
             {/* Accordion 3: Cifrado & Compases */}
             {hasChords && (
-              <div className="bg-white border border-slate-200/90 rounded-2xl overflow-hidden shadow-xs">
+              <div className="bg-white border border-[#E5E8EA] rounded-2xl overflow-hidden shadow-card">
                 <button
                   type="button"
                   onClick={() => setMobileOpenAccordion(mobileOpenAccordion === 'chords' ? null : 'chords')}
-                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#0B132B]"
+                  className="w-full p-4 flex items-center justify-between font-bold text-xs text-[#202C37]"
                 >
                   <span className="flex items-center gap-2">
-                    <Music className="w-4 h-4 text-[#1E74FD]" />
+                    <Music className="w-4 h-4 text-[#315F6D]" />
                     <span>Cifrado & Compases</span>
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'chords' ? 'rotate-180' : ''}`} />
@@ -813,13 +813,13 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   <div className="p-4 pt-0 border-t border-slate-100 space-y-3 pt-3">
                     {parsedSections.map((sec, secIdx) => (
                       <div key={secIdx} className="space-y-1.5">
-                        <span className="px-2 py-0.5 bg-blue-50 text-[#1E74FD] border border-blue-200 rounded text-[10px] font-bold uppercase">
+                        <span className="px-2 py-0.5 bg-[#D9E9EB]/60 text-[#315F6D] border border-[#315F6D]/20 rounded text-[10px] font-bold uppercase">
                           {sec.title}
                         </span>
                         <div className="grid grid-cols-2 gap-1.5">
                           {sec.measures.map((row) =>
                             row.map((measure, mIdx) => (
-                              <div key={mIdx} className="p-2 rounded-lg border border-slate-200 bg-slate-50 text-center font-mono font-bold text-xs text-[#0B132B]">
+                              <div key={mIdx} className="p-2 rounded-lg border border-[#E5E8EA] bg-[#FAF9F6] text-center font-mono font-bold text-xs text-[#202C37]">
                                 {measure.chords.join(' - ') || '—'}
                               </div>
                             ))
@@ -835,10 +835,10 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
         </div>
 
         {/* 6. Equipo Asignado */}
-        <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-sm">
+        <div className="bg-white border border-[#E5E8EA] rounded-2xl p-4 sm:p-5 shadow-card">
           <div className="flex items-center gap-2 mb-3">
-            <Users className="w-4 h-4 text-[#1E74FD]" />
-            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+            <Users className="w-4 h-4 text-[#315F6D]" />
+            <h3 className="text-xs font-bold uppercase tracking-wider text-[#202C37] font-display">
               Equipo de Músicos Asignados
             </h3>
           </div>
@@ -849,11 +849,11 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
               .map(slot => (
                 <div 
                   key={slot.key}
-                  className="px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs flex items-center gap-2"
+                  className="px-3 py-1.5 rounded-xl bg-[#FAF9F6] border border-[#E5E8EA] text-xs flex items-center gap-2"
                 >
-                  <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span className="font-semibold text-slate-800">{slot.musicianName}</span>
-                  <span className="text-[10px] text-slate-500">({slot.label})</span>
+                  <span className="w-2 h-2 rounded-full bg-[#315F6D]"></span>
+                  <span className="font-semibold text-[#202C37]">{slot.musicianName}</span>
+                  <span className="text-[10px] text-[#64717C]">({slot.label})</span>
                 </div>
               ))}
           </div>
@@ -862,14 +862,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
       </main>
 
       {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200/90 py-6 px-4 text-center bg-white">
-        <p className="text-xs text-slate-500">
+      <footer className="mt-auto border-t border-[#E5E8EA] py-6 px-4 text-center bg-white">
+        <p className="text-xs text-[#64717C]">
           AtocarYa · Coordinador de Músicos & Alabanza
         </p>
         {onGoToPortal && (
           <button
             onClick={onGoToPortal}
-            className="mt-2 text-[11px] text-[#1E74FD] hover:underline font-bold"
+            className="mt-2 text-[11px] text-[#315F6D] hover:underline font-bold"
           >
             ← Acceder al Portal de Músicos
           </button>

@@ -37,10 +37,10 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#F7F4EF] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
       {/* Subtle Ambient Background */}
       <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.24]"
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.08]"
         style={{ backgroundImage: 'url("/app-bg.jpg")' }}
         aria-hidden="true"
       />
@@ -53,20 +53,20 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
         </div>
 
         {/* Card */}
-        <div className="bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-3xl p-6 sm:p-8 shadow-xs">
+        <div className="bg-white border border-[#E5E8EA] rounded-[24px] p-6 sm:p-8 shadow-card">
           
           <div className="mb-6">
-            <h2 className="text-xl font-bold font-display text-slate-900">
+            <h2 className="text-xl font-bold font-display text-[#202C37]">
               Iniciar Sesión
             </h2>
-            <p className="text-xs text-slate-500 mt-1">
+            <p className="text-xs text-[#64717C] mt-1">
               Ingresa tu nombre y PIN de 4 números para acceder al cronograma.
             </p>
           </div>
 
           {error && (
-            <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-500" />
+            <div className="mb-5 p-3 rounded-xl bg-[#F7EAE5] border border-[#C96B65]/30 text-[#C96B65] text-xs flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#C96B65]" />
               <span>{error}</span>
             </div>
           )}
@@ -75,7 +75,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
             
             {/* Musician Select / Name */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label className="block text-xs font-bold text-[#202C37] mb-1.5">
                 Músico / Integrante
               </label>
               {musicians.length > 0 ? (
@@ -87,7 +87,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                       const m = musicians.find(item => item.id === e.target.value);
                       if (m) setTypedName(m.fullName);
                     }}
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all font-medium"
+                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl text-sm text-[#202C37] focus:bg-white focus:outline-none focus:border-[#315F6D] transition-all font-medium"
                   >
                     <option value="">-- Elige tu nombre de la lista --</option>
                     {musicians.map((m) => (
@@ -105,16 +105,16 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                     value={typedName}
                     onChange={(e) => setTypedName(e.target.value)}
                     placeholder="Tu nombre completo"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all"
+                    className="w-full px-4 py-3 bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl text-sm text-[#202C37] placeholder-[#89939C] focus:bg-white focus:outline-none focus:border-[#315F6D] transition-all"
                   />
-                  <User className="w-4 h-4 text-slate-400 absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <User className="w-4 h-4 text-[#89939C] absolute right-3.5 top-1/2 -translate-y-1/2" />
                 </div>
               )}
             </div>
 
             {/* PIN Input */}
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1.5">
+              <label className="block text-xs font-bold text-[#202C37] mb-1.5">
                 PIN de 4 dígitos
               </label>
               <div className="relative">
@@ -127,16 +127,16 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   placeholder="••••"
-                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-slate-50 border border-slate-200 rounded-xl text-blue-900 placeholder-slate-300 focus:bg-white focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all"
+                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl text-[#315F6D] placeholder-[#89939C] focus:bg-white focus:outline-none focus:border-[#315F6D] transition-all"
                 />
-                <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#89939C] absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
-            {/* Submit Button in Royal Blue (NO BLACK) */}
+            {/* Submit Button in Petróleo */}
             <button
               type="submit"
-              className="w-full mt-2 py-3 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-md shadow-blue-600/20"
+              className="w-full mt-2 py-3 px-4 bg-[#315F6D] hover:bg-[#234A57] text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-xs"
             >
               <span>Acceder al Calendario</span>
               <ArrowRight className="w-4 h-4" />
@@ -144,8 +144,8 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
           </form>
 
           {/* Institutional Note */}
-          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
-            <p className="text-xs text-slate-500 leading-relaxed">
+          <div className="mt-6 pt-5 border-t border-[#EEF0F1] text-center">
+            <p className="text-xs text-[#64717C] leading-relaxed">
               El registro de nuevos integrantes es realizado exclusivamente por el líder administrador. Si aún no tienes acceso, consulta con el director de alabanza.
             </p>
           </div>

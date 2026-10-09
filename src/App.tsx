@@ -118,24 +118,15 @@ const MainRouter: React.FC = () => {
     }
 
     return (
-      <div className="min-h-screen flex flex-col bg-[#f8fafc] text-slate-900 relative">
-        {/* Subtle Ambient Background */}
-        <div 
-          className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url("/app-bg.jpg")', opacity: 0.08 }}
-          aria-hidden="true"
-        />
-
-        <Navbar
-          portal="musician"
-          musicianTab={musicianTab}
-          setMusicianTab={setMusicianTab}
-          adminTab={adminTab}
-          setAdminTab={setAdminTab}
-          openShareModal={() => setShareOpen(true)}
-          onNavigatePortal={navigateTo}
-        />
-
+      <Navbar
+        portal="musician"
+        musicianTab={musicianTab}
+        setMusicianTab={setMusicianTab}
+        adminTab={adminTab}
+        setAdminTab={setAdminTab}
+        openShareModal={() => setShareOpen(true)}
+        onNavigatePortal={navigateTo}
+      >
         <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
           {musicianTab === 'calendar' && (
             <>
@@ -152,7 +143,7 @@ const MainRouter: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setMobileMusicianView('home')}
-                      className="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors"
+                      className="w-full py-2.5 px-4 bg-[#D9E9EB] hover:bg-[#315F6D]/20 text-[#315F6D] border border-[#315F6D]/30 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors"
                     >
                       <span>← Volver a Vista Rápida del Músico</span>
                     </button>
@@ -183,9 +174,9 @@ const MainRouter: React.FC = () => {
           )}
         </main>
 
-        <footer className="relative z-10 mt-auto border-t border-slate-200/80 py-5 px-4 text-center bg-white/80 backdrop-blur-sm hidden md:block">
-          <p className="text-xs text-slate-500">
-            AtocarYa · Coordinador de Músicos & Alabanza
+        <footer className="relative z-10 mt-auto border-t border-[#E5E8EA] py-5 px-4 text-center bg-white/80 backdrop-blur-sm hidden md:block">
+          <p className="text-xs text-[#64717C]">
+            ATocarYa · Coordinador de Músicos & Alabanza
           </p>
         </footer>
 
@@ -205,7 +196,7 @@ const MainRouter: React.FC = () => {
             onClose={() => setSetlistModalService(null)}
           />
         )}
-      </div>
+      </Navbar>
     );
   }
 
@@ -215,24 +206,15 @@ const MainRouter: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#f8fafc] text-slate-900 relative">
-      {/* Subtle Ambient Background */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url("/app-bg.jpg")', opacity: 0.08 }}
-        aria-hidden="true"
-      />
-
-      <Navbar
-        portal="admin"
-        musicianTab={musicianTab}
-        setMusicianTab={setMusicianTab}
-        adminTab={adminTab}
-        setAdminTab={setAdminTab}
-        openShareModal={() => setShareOpen(true)}
-        onNavigatePortal={navigateTo}
-      />
-
+    <Navbar
+      portal="admin"
+      musicianTab={musicianTab}
+      setMusicianTab={setMusicianTab}
+      adminTab={adminTab}
+      setAdminTab={setAdminTab}
+      openShareModal={() => setShareOpen(true)}
+      onNavigatePortal={navigateTo}
+    >
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
         {/* Vista Visual lista para descargar como Imagen o enviar a WhatsApp */}
         {adminTab === 'visual-board' && (
@@ -271,9 +253,9 @@ const MainRouter: React.FC = () => {
         )}
       </main>
 
-      <footer className="mt-auto border-t border-slate-200 py-6 px-4 text-center bg-white">
-        <p className="text-xs text-slate-500">
-          AtocarYa · Panel de Administración de Alabanza
+      <footer className="mt-auto border-t border-[#E5E8EA] py-6 px-4 text-center bg-white/80">
+        <p className="text-xs text-[#64717C]">
+          ATocarYa · Panel de Administración de Alabanza
         </p>
       </footer>
 
@@ -315,7 +297,7 @@ const MainRouter: React.FC = () => {
           onClose={() => setShareOpen(false)}
         />
       )}
-    </div>
+    </Navbar>
   );
 };
 

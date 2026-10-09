@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" fill="none" stroke="currentColor">
+  <!-- Minimalist Modern Audio Waves & Stave Rhythm Line Art -->
+  <g opacity="0.9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Musical stave waves -->
+    <path d="M20 70 C70 40, 120 110, 180 60 C240 10, 270 90, 310 65" opacity="0.6" />
+    <path d="M20 90 C70 60, 120 130, 180 80 C240 30, 270 110, 310 85" stroke-width="2.2" />
+    <path d="M20 110 C70 80, 120 150, 180 100 C240 50, 270 130, 310 105" opacity="0.6" />
+
+    <!-- Equalizer / harmonic bars rhythm -->
+    <line x1="50" y1="130" x2="50" y2="160" stroke-width="2.5" />
+    <line x1="70" y1="115" x2="70" y2="160" stroke-width="2.5" />
+    <line x1="90" y1="135" x2="90" y2="160" stroke-width="2.5" />
+    <line x1="110" y1="105" x2="110" y2="160" stroke-width="2.5" />
+    <line x1="130" y1="120" x2="130" y2="160" stroke-width="2.5" />
+    <line x1="150" y1="95" x2="150" y2="160" stroke-width="2.5" />
+    <line x1="170" y1="110" x2="170" y2="160" stroke-width="2.5" />
+    <line x1="190" y1="125" x2="190" y2="160" stroke-width="2.5" />
+    <line x1="210" y1="90" x2="210" y2="160" stroke-width="2.5" />
+    <line x1="230" y1="115" x2="230" y2="160" stroke-width="2.5" />
+    <line x1="250" y1="130" x2="250" y2="160" stroke-width="2.5" />
+    <line x1="270" y1="105" x2="270" y2="160" stroke-width="2.5" />
+
+    <!-- Musical note head & stem accents -->
+    <circle cx="160" cy="45" r="7" fill="currentColor" opacity="0.7" />
+    <line x1="167" y1="45" x2="167" y2="20" stroke-width="2" />
+    <path d="M167 20 C175 22, 180 28, 180 32" stroke-width="2" />
+
+    <circle cx="250" cy="50" r="6" fill="currentColor" opacity="0.7" />
+    <line x1="256" y1="50" x2="256" y2="25" stroke-width="2" />
+  </g>
+</svg>

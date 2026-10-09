@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 200" fill="none" stroke="currentColor">
+  <!-- Minimalist Dynamic Stage Microphone Line Art -->
+  <g opacity="0.9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Sound Waves from mic head -->
+    <path d="M190 40 C210 50, 210 70, 190 80" stroke-dasharray="3 3" opacity="0.5" />
+    <path d="M210 30 C240 45, 240 75, 210 90" stroke-dasharray="3 3" opacity="0.3" />
+
+    <!-- Mic Mesh Capsule (Center-Right tilted 45 deg) -->
+    <path d="M175 45 C185 55, 185 70, 175 80 C165 90, 150 90, 140 80 L130 70 C120 60, 120 45, 130 35 C140 25, 155 25, 165 35 Z" />
+    <!-- Mesh Grille lines -->
+    <line x1="145" y1="35" x2="170" y2="60" stroke-dasharray="2 2" opacity="0.6" />
+    <line x1="135" y1="50" x2="160" y2="75" stroke-dasharray="2 2" opacity="0.6" />
+
+    <!-- Collar band -->
+    <line x1="125" y1="75" x2="145" y2="95" stroke-width="3" />
+
+    <!-- Mic Body / Handle tapering down-left -->
+    <path d="M125 75 L80 135 C76 140, 70 136, 68 132 L58 122 C56 118, 60 112, 65 108 L145 95" />
+
+    <!-- Cable XLR or Stand connector -->
+    <path d="M68 132 L55 150 C50 157, 55 168, 65 170 C80 172, 90 160, 105 165 C120 170, 130 185, 145 185" stroke-dasharray="3 3" opacity="0.6" />
+
+    <!-- Decorative editorial accent stars / sparks -->
+    <path d="M210 110 L213 118 L221 121 L213 124 L210 132 L207 124 L199 121 L207 118 Z" fill="currentColor" opacity="0.4" />
+    <circle cx="235" cy="140" r="2.5" fill="currentColor" opacity="0.5" />
+  </g>
+</svg>

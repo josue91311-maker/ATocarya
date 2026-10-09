@@ -4,14 +4,20 @@
 
 @layer base {
   :root {
+    --font-serif: 'DM Serif Display', Georgia, serif;
     --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
   }
 
   body {
     font-family: var(--font-body);
-    @apply bg-[#f8fafc] text-slate-900 antialiased selection:bg-blue-600 selection:text-white min-h-screen;
+    @apply bg-[#F7F4EF] text-[#202C37] antialiased selection:bg-[#315F6D] selection:text-white min-h-screen;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  .font-serif {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, .font-display {
@@ -27,11 +33,11 @@
 
 /* Hairline border surface card */
 .saas-surface {
-  @apply bg-white border border-slate-200/90 rounded-2xl shadow-xs;
+  @apply bg-white border border-[#E5E8EA] rounded-[18px] shadow-card;
 }
 
 .saas-row {
-  @apply bg-white hover:bg-slate-50/70 border-b border-slate-100 transition-colors duration-150;
+  @apply bg-white hover:bg-[#FAF9F6] border-b border-[#EEF0F1] transition-colors duration-150;
 }
 
 /* Touch-optimized button target (min 44px) */
