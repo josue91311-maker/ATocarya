@@ -42,10 +42,14 @@ export const MusicianProfileModal: React.FC<Props> = ({ isOpen, onClose }) => {
     musicianUser.primaryInstrument?.toLowerCase().includes('director')
   );
 
-  // Servicios asignados al usuario
-  const myAssignedServices = services
-    .filter(s => Object.values(s.slots || {}).some(slot => slot && slot.musicianId === musicianUser.id))
-    .sort((a, b) => a.date.localeCompare(b.date));
+  // Todos los servicios asignados al usuario
+  const allAssigned = services
+    .filter(s => Object.values(s.slots || {}).some(slot => slot && slot.musicianId === musicianUser.id));
+
+  // Últimos 6 asignados (ordenados del más reciente al más antiguo)
+  const myAssignedServices = [...allAssigned]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 6);
 
   const handleSavePhone = () => {
     const res = updateMusician(musicianUser.id, {
@@ -281,10 +285,10 @@ export const MusicianProfileModal: React.FC<Props> = ({ isOpen, onClose }) => {
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-bold uppercase tracking-wider text-[#64717C] flex items-center gap-1.5">
                 <CalendarDays className="w-3.5 h-3.5 text-[#315F6D]" />
-                <span>Mis Cultos ({myAssignedServices.length})</span>
+                <span>Últimos Cultos Asignados ({myAssignedServices.length})</span>
               </h3>
               <span className="px-2 py-0.5 rounded-full bg-[#D9E9EB] text-[#315F6D] text-[10px] font-bold">
-                Confirmados
+                {allAssigned.length} confirmados
               </span>
             </div>
 

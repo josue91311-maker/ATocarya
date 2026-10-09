@@ -18,7 +18,6 @@ import {
   MapPin, 
   Bell, 
   LogOut,
-  Menu,
   X
 } from 'lucide-react';
 import { MusicianProfileModal } from './MusicianProfileModal';
@@ -153,17 +152,9 @@ export const MusicianMobileHome: React.FC<Props> = ({
         </div>
 
         <div className="relative z-10 space-y-4 max-w-lg mx-auto">
-          {/* Barra Superior del Hero: Menu + Logo con letras blancas + Campana de hoy + Avatar */}
+          {/* Barra Superior del Hero: Logo con letras blancas + Campana de hoy + Avatar */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={onGoToFullCalendar}
-                className="p-1 text-white/80 hover:text-white"
-                title="Menú"
-              >
-                <Menu className="w-5 h-5" />
-              </button>
+            <div className="flex items-center">
               <Logo lightText size="sm" showText />
             </div>
 
