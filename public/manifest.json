@@ -1,38 +1,38 @@
 {
-  "id": "/?source=pwa",
+  "id": "/?source=pwa&v=2.0",
   "name": "ATocarYa - Worship Team Scheduling",
   "short_name": "ATocarYa",
   "description": "Coordinador y Programación de Músicos, Cultos y Repertorio de Alabanza",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0B132B",
-  "theme_color": "#0B132B",
+  "background_color": "#F7F4EF",
+  "theme_color": "#315F6D",
   "orientation": "portrait-primary",
   "scope": "/",
   "lang": "es",
   "categories": ["music", "productivity", "utilities"],
   "icons": [
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "/icons/icon-192x192.png?v=2",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "/icons/icon-512x512.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/icons/icon-maskable-512x512.png",
+      "src": "/icons/icon-maskable-512x512.png?v=2",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/logooficial.png",
-      "sizes": "885x325",
+      "src": "/favicon.png?v=2",
+      "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     }
