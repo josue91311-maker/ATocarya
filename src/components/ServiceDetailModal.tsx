@@ -14,7 +14,10 @@ import {
   Lock,
   Music,
   Share2,
-  ExternalLink
+  ExternalLink,
+  UserX,
+  UserCheck,
+  Search
 } from 'lucide-react';
 import { InstrumentIcon } from './InstrumentIcon';
 import { ConfirmModal, ConfirmDialogOptions } from './ConfirmModal';
@@ -41,14 +44,39 @@ export const ServiceDetailModal: React.FC<Props> = ({
     releaseSlot, 
     adminAssignSlot, 
     adminClearSlot, 
+    toggleBlockMusicianInService,
     musicians 
   } = useApp();
 
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogOptions | null>(null);
+  const [showBlockedUsersPanel, setShowBlockedUsersPanel] = useState(false);
+  const [blockedSearch, setBlockedSearch] = useState('');
 
   if (!service) return null;
+
+  // Si el músico actual está bloqueado en este culto, no permitir acceso
+  const isMusicianBlocked = Boolean(musicianUser && service.blockedMusicianIds?.includes(musicianUser.id));
+  if (isMusicianView && isMusicianBlocked) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+        <div className="bg-white rounded-3xl p-6 max-w-md w-full text-center shadow-xl border border-slate-200">
+          <Lock className="w-12 h-12 text-[#C96B65] mx-auto mb-3" />
+          <h3 className="text-lg font-bold text-[#202C37] font-display">Acceso Restringido</h3>
+          <p className="text-xs text-[#64717C] mt-2">
+            No tienes permiso para ver los detalles ni postularte a este culto.
+          </p>
+          <button
+            onClick={onClose}
+            className="mt-5 px-5 py-2.5 bg-[#315F6D] text-white text-xs font-bold rounded-xl"
+          >
+            Cerrar
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const isExpired = isServiceExpired(service);
 
@@ -380,6 +408,112 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
           return null;
         })()}
+
+        {/* Panel de Gestión de Bloqueo de Músicos por Culto (Exclusivo Administrador) */}
+        {showAdminControls && (
+          <div className="mx-5 sm:mx-6 mt-3 bg-white border border-[#E5E8EA] rounded-2xl overflow-hidden shadow-xs">
+            <div 
+              onClick={() => setShowBlockedUsersPanel(!showBlockedUsersPanel)}
+              className="p-3 sm:p-3.5 bg-[#FAF9F6] flex items-center justify-between cursor-pointer hover:bg-[#F1F5F5] transition-colors"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
+                  (service.blockedMusicianIds || []).length > 0 
+                    ? 'bg-[#F7E3DF] text-[#C96B65]' 
+                    : 'bg-[#D9E9EB] text-[#315F6D]'
+                }`}>
+                  <UserX className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-[#202C37] flex items-center gap-2 flex-wrap">
+                    <span>Bloqueo de Músicos para este Culto</span>
+                    {(service.blockedMusicianIds || []).length > 0 && (
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F7E3DF] text-[#C96B65] border border-[#C96B65]/30">
+                        {(service.blockedMusicianIds || []).length} bloqueado(s)
+                      </span>
+                    )}
+                  </h4>
+                  <p className="text-[11px] text-[#64717C]">
+                    Los músicos bloqueados no verán este culto disponible ni tendrán acceso a sus canciones publicadas.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E8EA] text-xs font-bold text-[#315F6D] hover:bg-slate-50 transition-colors shadow-2xs shrink-0"
+              >
+                {showBlockedUsersPanel ? 'Ocultar' : 'Gestionar'}
+              </button>
+            </div>
+
+            {showBlockedUsersPanel && (
+              <div className="p-3.5 sm:p-4 border-t border-[#E5E8EA] bg-white space-y-3">
+                <div className="relative">
+                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    placeholder="Buscar músico por nombre o instrumento..."
+                    value={blockedSearch}
+                    onChange={(e) => setBlockedSearch(e.target.value)}
+                    className="w-full pl-8 pr-3 py-2 text-xs bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl focus:outline-none focus:border-[#315F6D] text-[#202C37]"
+                  />
+                </div>
+
+                <div className="max-h-56 overflow-y-auto space-y-1.5 custom-scrollbar pr-0.5">
+                  {musicians
+                    .filter(m => !blockedSearch || m.fullName.toLowerCase().includes(blockedSearch.toLowerCase()) || m.primaryInstrument.toLowerCase().includes(blockedSearch.toLowerCase()))
+                    .map(m => {
+                      const isBlocked = (service.blockedMusicianIds || []).includes(m.id);
+                      return (
+                        <div 
+                          key={m.id}
+                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-all ${
+                            isBlocked 
+                              ? 'bg-[#F7E3DF]/50 border-[#C96B65]/50' 
+                              : 'bg-white border-[#E5E8EA] hover:bg-[#FAF9F6]'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                              isBlocked ? 'bg-[#C96B65] text-white' : 'bg-[#D9E9EB] text-[#315F6D]'
+                            }`}>
+                              {m.fullName.charAt(0).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-[#202C37] truncate">{m.fullName}</p>
+                              <p className="text-[10px] text-[#64717C] truncate">{m.primaryInstrument}</p>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => toggleBlockMusicianInService(service.id, m.id)}
+                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                              isBlocked
+                                ? 'bg-[#C96B65] text-white hover:bg-[#B95752] shadow-2xs'
+                                : 'bg-[#FAF9F6] text-[#64717C] hover:text-[#C96B65] hover:bg-[#F7E3DF] border border-[#E5E8EA]'
+                            }`}
+                          >
+                            {isBlocked ? (
+                              <>
+                                <UserX className="w-3.5 h-3.5" />
+                                <span>Bloqueado</span>
+                              </>
+                            ) : (
+                              <>
+                                <UserCheck className="w-3.5 h-3.5" />
+                                <span>Permitido</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      );
+                    })}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Slots Content Area */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">

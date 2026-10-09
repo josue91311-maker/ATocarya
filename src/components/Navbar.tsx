@@ -86,7 +86,7 @@ export const Navbar: React.FC<Props> = ({
   };
 
   const peruToday = getPeruDateStr();
-  const servicesToday = services.filter(s => s.date === peruToday);
+  const servicesToday = services.filter(s => s.date === peruToday && !(s.blockedMusicianIds || []).includes(musicianUser?.id || ''));
 
   // Mis servicios de hoy (músico)
   const myAssignedToday = musicianUser
@@ -94,7 +94,7 @@ export const Navbar: React.FC<Props> = ({
     : [];
 
   const assignedCount = musicianUser
-    ? services.filter(s => Object.values(s.slots).some(slot => slot.musicianId === musicianUser.id)).length
+    ? services.filter(s => !(s.blockedMusicianIds || []).includes(musicianUser.id) && Object.values(s.slots).some(slot => slot.musicianId === musicianUser.id)).length
     : 0;
 
   // Contador de notificaciones

@@ -87,6 +87,7 @@ export interface ServiceDate {
   slots: Record<SlotKey, SlotConfig>;
   songs?: SongItem[]; // Repertorio oficial de canciones
   isSongsPublished?: boolean; // Solo publicado es visible en el link oficial
+  blockedMusicianIds?: string[]; // IDs de músicos bloqueados específicamente para este culto
   createdAt: string;
 }
 

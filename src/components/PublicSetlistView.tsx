@@ -45,7 +45,7 @@ interface Props {
 }
 
 export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) => {
-  const { services, songBank } = useApp();
+  const { services, songBank, musicianUser } = useApp();
   const service = services.find(s => s.id === serviceId) || null;
 
   const [activeSongIndex, setActiveSongIndex] = useState<number>(0);
@@ -66,6 +66,29 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
           <h2 className="text-lg font-bold text-[#202C37] font-display">Culto no encontrado</h2>
           <p className="text-xs text-[#64717C] mt-1">
             El enlace al repertorio no es válido o la fecha fue reprogramada.
+          </p>
+          {onGoToPortal && (
+            <button
+              onClick={onGoToPortal}
+              className="mt-5 px-5 py-2.5 bg-[#315F6D] hover:bg-[#264F5D] text-white text-xs font-bold rounded-xl transition-colors shadow-sm"
+            >
+              Ir al Portal Principal
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Validación de usuario bloqueado para este culto
+  if (musicianUser && (service.blockedMusicianIds || []).includes(musicianUser.id)) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4 bg-[#F7F4EF]">
+        <div className="bg-white rounded-3xl p-8 max-w-md w-full text-center shadow-card border border-[#E5E8EA]">
+          <AlertCircle className="w-12 h-12 text-[#C96B65] mx-auto mb-3" />
+          <h2 className="text-lg font-bold text-[#202C37] font-display">Acceso Restringido</h2>
+          <p className="text-xs text-[#64717C] mt-2">
+            No tienes permiso para ver el repertorio ni las canciones publicadas de este culto.
           </p>
           {onGoToPortal && (
             <button

@@ -17,7 +17,7 @@ export const MyServicesView: React.FC<Props> = ({ onSelectService }) => {
   }
 
   const myServices = services
-    .filter(s => !isServicePast(s.date) && Object.values(s.slots).some(slot => slot.musicianId === musicianUser.id))
+    .filter(s => !isServicePast(s.date) && !(s.blockedMusicianIds || []).includes(musicianUser.id) && Object.values(s.slots).some(slot => slot.musicianId === musicianUser.id))
     .sort((a, b) => a.date.localeCompare(b.date));
 
   return (

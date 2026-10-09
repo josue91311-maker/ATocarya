@@ -139,6 +139,14 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
         } catch (e) {}
       }
 
+      let parsedBlockedMusicians: string[] = [];
+      if ((r as any).blocked_musicians) {
+        try {
+          const bm = JSON.parse(String((r as any).blocked_musicians));
+          if (Array.isArray(bm)) parsedBlockedMusicians = bm;
+        } catch (e) {}
+      }
+
       return {
         id: String(r.id),
         date: String(r.date),
@@ -151,6 +159,7 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
         slots: normalizeServiceSlots(parsed),
         songs: parsedSongs,
         isSongsPublished: Boolean(r.is_songs_published),
+        blockedMusicianIds: parsedBlockedMusicians,
         createdAt: String(r.created_at),
       };
     });
@@ -160,9 +169,16 @@ export const tursoGetServices = async (): Promise<ServiceDate[] | null> => {
   }
 };
 
+let isBlockedColumnMigrated = false;
+
 export const tursoSaveService = async (service: ServiceDate): Promise<boolean> => {
   try {
     const db = getTursoClient();
+
+    if (!isBlockedColumnMigrated) {
+      await db.execute('ALTER TABLE services ADD COLUMN blocked_musicians TEXT').catch(() => {});
+      isBlockedColumnMigrated = true;
+    }
 
     // Si ya existe un servicio para esta misma fecha y hora, reutilizar su ID para evitar duplicados
     const existing = await db.execute({
@@ -171,25 +187,49 @@ export const tursoSaveService = async (service: ServiceDate): Promise<boolean> =
     });
     const targetId = existing.rows.length > 0 ? String(existing.rows[0].id) : service.id;
 
-    await db.execute({
-      sql: `INSERT OR REPLACE INTO services (id, date, time, title, rehearsal_time, notes, is_open, registration_deadline, slots, songs, is_songs_published, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      args: [
-        targetId,
-        service.date,
-        service.time,
-        service.title,
-        service.rehearsalTime || null,
-        service.notes || null,
-        service.isOpen ? 1 : 0,
-        service.registrationDeadline || null,
-        JSON.stringify(service.slots),
-        JSON.stringify(service.songs || []),
-        service.isSongsPublished ? 1 : 0,
-        service.createdAt,
-      ],
-    });
-    return true;
+    try {
+      await db.execute({
+        sql: `INSERT OR REPLACE INTO services (id, date, time, title, rehearsal_time, notes, is_open, registration_deadline, slots, songs, is_songs_published, blocked_musicians, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          targetId,
+          service.date,
+          service.time,
+          service.title,
+          service.rehearsalTime || null,
+          service.notes || null,
+          service.isOpen ? 1 : 0,
+          service.registrationDeadline || null,
+          JSON.stringify(service.slots),
+          JSON.stringify(service.songs || []),
+          service.isSongsPublished ? 1 : 0,
+          JSON.stringify(service.blockedMusicianIds || []),
+          service.createdAt,
+        ],
+      });
+      return true;
+    } catch {
+      // Fallback si la columna no existe en SQLite
+      await db.execute({
+        sql: `INSERT OR REPLACE INTO services (id, date, time, title, rehearsal_time, notes, is_open, registration_deadline, slots, songs, is_songs_published, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          targetId,
+          service.date,
+          service.time,
+          service.title,
+          service.rehearsalTime || null,
+          service.notes || null,
+          service.isOpen ? 1 : 0,
+          service.registrationDeadline || null,
+          JSON.stringify(service.slots),
+          JSON.stringify(service.songs || []),
+          service.isSongsPublished ? 1 : 0,
+          service.createdAt,
+        ],
+      });
+      return true;
+    }
   } catch (err) {
     logWarn('Error al guardar servicio en Turso:', err);
     return false;

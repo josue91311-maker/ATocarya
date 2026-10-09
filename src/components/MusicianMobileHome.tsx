@@ -62,9 +62,9 @@ export const MusicianMobileHome: React.FC<Props> = ({
     }
   };
 
-  // 1. Filtrar servicios futuros
+  // 1. Filtrar servicios futuros (excluyendo aquellos donde el músico esté bloqueado por el administrador)
   const upcomingServices = services
-    .filter(s => !isServicePast(s.date))
+    .filter(s => !isServicePast(s.date) && !(s.blockedMusicianIds || []).includes(musicianUser.id))
     .sort((a, b) => a.date.localeCompare(b.date));
 
   // 2. Mis servicios asignados

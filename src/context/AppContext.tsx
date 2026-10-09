@@ -61,6 +61,7 @@ interface AppContextType {
   updateServiceConfig: (serviceId: string, updates: { date?: string; time?: string; title?: string; rehearsalTime?: string; notes?: string; enabledSlots?: Record<SlotKey, boolean>; registrationDeadline?: string }) => { success: boolean; message?: string };
   adminAssignSlot: (serviceId: string, slotKey: SlotKey, musicianId: string) => void;
   adminClearSlot: (serviceId: string, slotKey: SlotKey) => void;
+  toggleBlockMusicianInService: (serviceId: string, musicianId: string) => Promise<void>;
 
   // Repertorio de Canciones (Admin y Voz Director asignado)
   updateServiceSongs: (serviceId: string, songs: SongItem[], isPublished: boolean) => Promise<{ success: boolean; message?: string }>;
@@ -855,6 +856,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
   };
 
+  const toggleBlockMusicianInService = async (serviceId: string, musicianId: string) => {
+    let targetUpdated: ServiceDate | null = null;
+
+    setServices(prev =>
+      prev.map(s => {
+        if (s.id !== serviceId) return s;
+
+        const currentBlocked = s.blockedMusicianIds || [];
+        const isCurrentlyBlocked = currentBlocked.includes(musicianId);
+        const newBlocked = isCurrentlyBlocked
+          ? currentBlocked.filter(id => id !== musicianId)
+          : [...currentBlocked, musicianId];
+
+        const updatedSlots = { ...s.slots };
+        // Si acabamos de bloquear al músico y estaba asignado en este culto, liberar su puesto
+        if (!isCurrentlyBlocked) {
+          (Object.keys(updatedSlots) as SlotKey[]).forEach(k => {
+            if (updatedSlots[k].musicianId === musicianId) {
+              updatedSlots[k] = {
+                ...updatedSlots[k],
+                musicianId: null,
+                musicianName: undefined,
+                assignedAt: undefined,
+              };
+            }
+          });
+        }
+
+        targetUpdated = {
+          ...s,
+          slots: updatedSlots,
+          blockedMusicianIds: newBlocked,
+        };
+        return targetUpdated;
+      })
+    );
+
+    if (targetUpdated) {
+      await apiSaveWholeService(targetUpdated);
+    }
+  };
+
   const updateServiceSongs = async (
     serviceId: string,
     songs: SongItem[],
@@ -1075,6 +1118,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateServiceConfig,
         adminAssignSlot,
         adminClearSlot,
+        toggleBlockMusicianInService,
         updateServiceSongs,
         songBank,
         saveBankSong,

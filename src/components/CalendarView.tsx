@@ -41,8 +41,10 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
 
   // Interactive Month Calendar Navigation State
   const today = new Date();
-  // Initialize calendar month based on earliest active service or current month
-  const activeUpcomingServices = services.filter(service => !isServicePast(service.date));
+  // Initialize calendar month based on earliest active service or current month (excluyendo cultos bloqueados para el músico)
+  const activeUpcomingServices = services.filter(
+    service => !isServicePast(service.date) && (!musicianUser || !service.blockedMusicianIds?.includes(musicianUser.id))
+  );
   const defaultYear = activeUpcomingServices.length > 0
     ? Number(activeUpcomingServices[0].date.split('-')[0])
     : today.getFullYear();
