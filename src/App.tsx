@@ -126,6 +126,8 @@ const MainRouter: React.FC = () => {
         setAdminTab={setAdminTab}
         openShareModal={() => setShareOpen(true)}
         onNavigatePortal={navigateTo}
+        onOpenService={(s) => setSelectedService(s)}
+        onOpenSetlist={(s) => setSetlistModalService(s)}
       >
         <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
           {musicianTab === 'calendar' && (
@@ -214,6 +216,8 @@ const MainRouter: React.FC = () => {
       setAdminTab={setAdminTab}
       openShareModal={() => setShareOpen(true)}
       onNavigatePortal={navigateTo}
+      onOpenService={(s) => setSelectedService(s)}
+      onOpenSetlist={(s) => setSetlistModalService(s)}
     >
       <main className="relative z-10 flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-24 md:pb-12">
         {/* Vista Visual lista para descargar como Imagen o enviar a WhatsApp */}

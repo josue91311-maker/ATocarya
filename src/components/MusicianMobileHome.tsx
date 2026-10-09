@@ -18,7 +18,8 @@ import {
   MapPin, 
   Bell, 
   LogOut,
-  Menu
+  Menu,
+  X
 } from 'lucide-react';
 
 interface Props {
@@ -35,6 +36,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
   const { musicianUser, services, claimSlot, releaseSlot, isAdminAuthenticated, logoutMusician } = useApp();
   const [claimingSlotKey, setClaimingSlotKey] = useState<string | null>(null);
   const [feedbackMsg, setFeedbackMsg] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
+  const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   if (!musicianUser) return null;
 
   // Primer nombre para saludo amigable
@@ -165,11 +167,13 @@ export const MusicianMobileHome: React.FC<Props> = ({
 
             <div className="flex items-center gap-2.5">
               {/* Notificación Campana: Solo activa si tiene culto el día de HOY (Hora Perú) */}
-              <div 
-                className={`relative p-2 rounded-xl border transition-all ${
+              <button 
+                type="button"
+                onClick={() => setShowNotificationsModal(true)}
+                className={`relative p-2 rounded-xl border transition-all cursor-pointer ${
                   hasCultoToday 
-                    ? 'bg-[#C96B65] border-[#C96B65] text-white' 
-                    : 'bg-white/10 border-white/15 text-white/80'
+                    ? 'bg-[#C96B65] border-[#C96B65] text-white shadow-2xs' 
+                    : 'bg-white/10 border-white/15 text-white/80 hover:bg-white/15'
                 }`}
                 title={hasCultoToday ? `¡Hoy tienes ${cultosToday.length} culto(s) programado(s)!` : 'Sin cultos para hoy (Hora Perú)'}
               >
@@ -179,7 +183,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
                     {cultosToday.length}
                   </span>
                 )}
-              </div>
+              </button>
 
               {/* Avatar inicial en círculo mostaza editorial */}
               <div 
@@ -649,6 +653,116 @@ export const MusicianMobileHome: React.FC<Props> = ({
               <CalendarDays className="w-4 h-4 text-[#64717C]" />
               <span>Ver Modo Calendario Mensual Completo</span>
             </button>
+          </div>
+        )}
+
+        {/* Modal de Notificaciones para Móvil */}
+        {showNotificationsModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in">
+            <div className="w-full max-w-sm bg-white rounded-2xl shadow-modal border border-[#E5E8EA] overflow-hidden animate-in zoom-in-95 duration-150">
+              {/* Header */}
+              <div className="p-4 bg-[#315F6D] text-white flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Bell className="w-4 h-4 text-[#E8B844]" />
+                  <h3 className="text-sm font-bold">Tus Notificaciones</h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowNotificationsModal(false)}
+                  className="p-1 text-white/70 hover:text-white rounded-lg transition-colors cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <div className="px-4 py-2 bg-[#FAF9F6] border-b border-[#EEF0F1] flex items-center justify-between text-[11px] text-[#64717C]">
+                <span className="font-semibold flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-[#315F6D]" />
+                  Hora Oficial Perú
+                </span>
+                <span className="font-bold text-[#315F6D]">{peruTodayStr}</span>
+              </div>
+
+              {/* Contenido */}
+              <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
+                <p className="text-[11px] font-bold uppercase tracking-wider text-[#64717C] flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5 text-[#315F6D]" />
+                  <span>Cultos de Hoy (Perú)</span>
+                </p>
+
+                {cultosToday.length > 0 ? (
+                  <div className="space-y-2">
+                    {cultosToday.map(service => {
+                      const mySlot = Object.entries(service.slots || {}).find(([_, sl]) => (sl as any)?.musicianId === musicianUser.id);
+                      return (
+                        <div key={service.id} className="p-3 rounded-xl bg-[#FAF9F6] border border-[#E5E8EA] space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-bold text-[#202C37]">{service.title || 'Culto de Hoy'}</span>
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C96B65] text-white">¡Hoy!</span>
+                          </div>
+                          <p className="text-[11px] text-[#64717C] flex items-center gap-1">
+                            <Clock className="w-3 h-3 text-[#E8B844]" />
+                            <span>Hora: {service.time || '19:30'}</span>
+                          </p>
+                          {mySlot && (
+                            <div className="p-2 rounded-lg bg-[#F7E3DF] text-[11px] font-bold text-[#C96B65]">
+                              Asignado como: {(mySlot[1] as any)?.label || mySlot[0]}
+                            </div>
+                          )}
+                          {service.isSongsPublished && service.songs && service.songs.length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowNotificationsModal(false);
+                                if (onOpenSetlist) {
+                                  onOpenSetlist(service);
+                                } else {
+                                  window.location.hash = `#/repertorio/${service.id}`;
+                                }
+                              }}
+                              className="w-full py-2 bg-[#315F6D] hover:bg-[#234A57] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                            >
+                              🎵 Ver Canciones del Culto
+                            </button>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="p-3.5 rounded-xl bg-[#FAF9F6] border border-dashed border-[#E5E8EA] text-center">
+                    <p className="text-xs text-[#64717C] font-semibold">
+                      No tienes cultos programados para hoy en Perú.
+                    </p>
+                    <p className="text-[10px] text-[#89939C] mt-0.5">
+                      ¡Estás libre el día de hoy!
+                    </p>
+                  </div>
+                )}
+
+                {myAssignedServices.length > 0 && (
+                  <div className="pt-2 border-t border-[#EEF0F1]">
+                    <p className="text-[11px] font-bold uppercase tracking-wider text-[#64717C] mb-1">
+                      Agenda Próxima
+                    </p>
+                    <p className="text-xs text-[#202C37]">
+                      Tienes <span className="font-bold text-[#315F6D]">{myAssignedServices.length}</span> culto(s) confirmado(s) en total.
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="p-3 bg-[#FAF9F6] border-t border-[#EEF0F1] flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowNotificationsModal(false)}
+                  className="px-4 py-1.5 bg-[#315F6D] hover:bg-[#234A57] text-white text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
