@@ -1,5 +1,5 @@
 // ATocarYa Service Worker for PWA / Android APK (PWABuilder)
-const CACHE_NAME = 'atocarya-cache-v3';
+const CACHE_NAME = 'atocarya-cache-v4';
 const PRECACHE_ASSETS = [
   '/',
   '/index.html',

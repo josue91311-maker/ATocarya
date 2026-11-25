@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { Logo } from './Logo';
 import { AudioTransposerPlayer } from './AudioTransposerPlayer';
+import { StageLyricsPrompter } from './StageLyricsPrompter';
 import { 
   getYouTubeEmbedUrl, 
   getYouTubeThumbnailUrl, 
@@ -604,46 +605,13 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                     )}
                   </div>
 
-                  {isChordPro && parsedChordPro && chordProMode === 'with-chords' ? (
-                    <div className="space-y-3 font-mono text-sm leading-relaxed overflow-x-auto pb-2">
-                      {parsedChordPro.map((line, lIdx) => {
-                        if (line.type === 'empty') return <div key={lIdx} className="h-2" />;
-                        if (line.type === 'section') {
-                          return (
-                            <div key={lIdx} className="pt-2">
-                              <span className="text-xs font-black uppercase tracking-wider text-[#315F6D] bg-[#D9E9EB]/60 border border-[#315F6D]/20 px-2.5 py-0.5 rounded-lg inline-block font-sans">
-                                {line.sectionTitle}
-                              </span>
-                            </div>
-                          );
-                        }
-                        return (
-                          <div key={lIdx} className="flex flex-wrap items-end leading-none py-1 gap-x-1 gap-y-2">
-                            {line.segments?.map((seg, sIdx) => (
-                              <span key={sIdx} className="inline-flex flex-col">
-                                {seg.chord ? (
-                                  <span className="text-xs font-black font-mono text-[#315F6D] select-none pb-0.5 tracking-tight">
-                                    {seg.chord}
-                                  </span>
-                                ) : (
-                                  <span className="text-xs invisible select-none pb-0.5">_</span>
-                                )}
-                                <span className="text-sm font-sans font-medium text-slate-800 whitespace-pre">
-                                  {seg.text || ' '}
-                                </span>
-                              </span>
-                            ))}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <div className="whitespace-pre-wrap text-sm text-slate-800 leading-relaxed font-sans">
-                      {isChordPro && chordProMode === 'lyrics-only'
-                        ? effectiveLyrics?.replace(/\[[A-G](?:#|b)?[^\]]*\]/g, '').replace(/\{[^}]*\}/g, '').trim()
-                        : effectiveLyrics}
-                    </div>
-                  )}
+                  <StageLyricsPrompter
+                    lyrics={effectiveLyrics || ''}
+                    songTitle={activeSong?.title}
+                    isChordPro={isChordPro}
+                    chordProMode={chordProMode}
+                    parsedChordPro={parsedChordPro}
+                  />
                 </div>
               )}
 
@@ -761,13 +729,41 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   </span>
                   <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${mobileOpenAccordion === 'lyrics' ? 'rotate-180' : ''}`} />
                 </button>
-                {mobileOpenAccordion === 'lyrics' && (
-                  <div className="p-4 pt-0 border-t border-slate-100">
-                    <div className="whitespace-pre-wrap text-xs text-slate-700 leading-relaxed font-sans pt-3">
-                      {isChordPro
-                        ? effectiveLyrics?.replace(/\[[A-G](?:#|b)?[^\]]*\]/g, '').replace(/\{[^}]*\}/g, '').trim()
-                        : effectiveLyrics}
-                    </div>
+                {mobileOpenAccordion === 'lyrics' && effectiveLyrics && (
+                  <div className="p-4 pt-3 border-t border-slate-100 space-y-3">
+                    {isChordPro && (
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setChordProMode('with-chords')}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                            chordProMode === 'with-chords'
+                              ? 'bg-[#D8B28A] text-[#0D0D10]'
+                              : 'bg-[#1F1F26] text-[#B4B4BE]'
+                          }`}
+                        >
+                          Con Acordes
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setChordProMode('lyrics-only')}
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                            chordProMode === 'lyrics-only'
+                              ? 'bg-[#D8B28A] text-[#0D0D10]'
+                              : 'bg-[#1F1F26] text-[#B4B4BE]'
+                          }`}
+                        >
+                          Solo Letra
+                        </button>
+                      </div>
+                    )}
+                    <StageLyricsPrompter
+                      lyrics={effectiveLyrics}
+                      songTitle={activeSong?.title}
+                      isChordPro={isChordPro}
+                      chordProMode={chordProMode}
+                      parsedChordPro={parsedChordPro}
+                    />
                   </div>
                 )}
               </div>

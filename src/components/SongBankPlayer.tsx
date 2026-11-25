@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { AudioTransposerPlayer } from './AudioTransposerPlayer';
+import { StageLyricsPrompter } from './StageLyricsPrompter';
 import { BankSong } from '../types';
 import { 
   Search, 
@@ -345,9 +346,10 @@ export const SongBankPlayer: React.FC = () => {
               </button>
               {showLyrics && (
                 <div className="p-4 bg-white border-t border-[#E5E8EA]">
-                  <pre className="whitespace-pre-wrap font-sans text-sm text-[#202C37] max-h-[350px] overflow-y-auto custom-scrollbar leading-relaxed">
-                    {selectedSong.lyrics}
-                  </pre>
+                  <StageLyricsPrompter
+                    lyrics={selectedSong.lyrics}
+                    songTitle={selectedSong.title}
+                  />
                 </div>
               )}
             </div>
