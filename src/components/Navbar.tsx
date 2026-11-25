@@ -117,12 +117,12 @@ export const Navbar: React.FC<Props> = ({
   const canAccessTracks = isAdminAuthenticated || isDirector;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#1D2B44] text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#0D0D10] text-white">
       {/* ========================================================================= */}
-      {/* 1. DESKTOP SIDEBAR (MIDNIGHT CONCERT STAGE #080E1D)                       */}
+      {/* 1. DESKTOP SIDEBAR (MIDNIGHT CONCERT STAGE #111115)                       */}
       {/* ========================================================================= */}
       <aside 
-        className={`hidden md:flex flex-col justify-between min-h-screen bg-[#17233A] border-r border-white/15 text-white sticky top-0 shrink-0 shadow-modal z-30 select-none transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex flex-col justify-between min-h-screen bg-[#141418] border-r border-white/15 text-white sticky top-0 shrink-0 shadow-modal z-30 select-none transition-all duration-300 ease-in-out ${
           isSidebarCollapsed ? 'w-20 p-3' : 'w-64 p-5'
         }`}
       >
@@ -156,14 +156,14 @@ export const Navbar: React.FC<Props> = ({
 
             {/* Badge Administrador */}
             {!isSidebarCollapsed && portal === 'admin' && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#FACC15]/10 border border-[#FACC15]/25 text-[10px] font-display font-bold uppercase tracking-widest text-[#FACC15]">
-                <span className="w-2 h-2 rounded-full bg-[#FACC15] animate-pulse shrink-0" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E08E45]/10 border border-[#E08E45]/25 text-[10px] font-display font-bold uppercase tracking-widest text-[#E08E45]">
+                <span className="w-2 h-2 rounded-full bg-[#E08E45] animate-pulse shrink-0" />
                 <span>Panel Administrador</span>
               </div>
             )}
             {isSidebarCollapsed && portal === 'admin' && (
               <div className="flex justify-center mt-1" title="Panel Administrador">
-                <span className="w-2 h-2 rounded-full bg-[#FACC15] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#E08E45] animate-pulse" />
               </div>
             )}
           </div>
@@ -177,7 +177,7 @@ export const Navbar: React.FC<Props> = ({
                 title="Fechas de Culto"
                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   musicianTab === 'calendar'
-                    ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                     : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
               >
@@ -191,7 +191,7 @@ export const Navbar: React.FC<Props> = ({
                 title="Mis Asignaciones"
                 className={`relative w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-3.5'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   musicianTab === 'my-services'
-                    ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                     : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
               >
@@ -200,7 +200,7 @@ export const Navbar: React.FC<Props> = ({
                   {!isSidebarCollapsed && <span>Mis Asignaciones</span>}
                 </div>
                 {assignedCount > 0 && (
-                  <span className={`${isSidebarCollapsed ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'} rounded-full bg-[#FACC15] text-[#0B1120] font-black flex items-center justify-center tabular-nums`}>
+                  <span className={`${isSidebarCollapsed ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'} rounded-full bg-[#E08E45] text-[#0D0D10] font-black flex items-center justify-center tabular-nums`}>
                     {assignedCount}
                   </span>
                 )}
@@ -214,7 +214,7 @@ export const Navbar: React.FC<Props> = ({
                   title="Repertorio Musical"
                   className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     musicianTab === 'tracks'
-                      ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                      ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                       : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                   }`}
                 >
@@ -245,7 +245,7 @@ export const Navbar: React.FC<Props> = ({
                 title="Matriz de Planes"
                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'schedule'
-                    ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                     : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
               >
@@ -259,7 +259,7 @@ export const Navbar: React.FC<Props> = ({
                 title="Fotos / WhatsApp"
                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'visual-board'
-                    ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                     : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
               >
@@ -273,7 +273,7 @@ export const Navbar: React.FC<Props> = ({
                 title="Equipo de Músicos"
                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'musicians'
-                    ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                     : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
               >
@@ -287,7 +287,7 @@ export const Navbar: React.FC<Props> = ({
                 title="Banco Canciones"
                 className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'songs-bank'
-                    ? 'bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/35 shadow-glow'
+                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
                     : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
                 }`}
               >
@@ -342,7 +342,7 @@ export const Navbar: React.FC<Props> = ({
       {/* ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Desktop Top Header Bar */}
-        <header className="hidden md:flex items-center justify-between h-16 px-6 sm:px-8 bg-[#17233A]/90 border-b border-white/15 sticky top-0 z-20 backdrop-blur-xl">
+        <header className="hidden md:flex items-center justify-between h-16 px-6 sm:px-8 bg-[#141418]/90 border-b border-white/15 sticky top-0 z-20 backdrop-blur-xl">
           {/* Input Buscador General */}
           <div className="relative w-80 max-w-sm">
             <input
@@ -350,7 +350,7 @@ export const Navbar: React.FC<Props> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar fecha, instrumento o canción..."
-              className="w-full pl-9 pr-4 py-2 bg-[#131D35]/90 border border-white/10 rounded-full text-xs text-white placeholder-[#64748B] focus:bg-[#131D35] focus:outline-none focus:border-[#38BDF8] transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-[#16161B]/90 border border-white/10 rounded-full text-xs text-white placeholder-[#64748B] focus:bg-[#16161B] focus:outline-none focus:border-[#D8B28A] transition-all"
             />
             <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
           </div>
@@ -360,7 +360,7 @@ export const Navbar: React.FC<Props> = ({
             {portal === 'admin' && isAdminAuthenticated && (
               <button
                 onClick={openShareModal}
-                className="flex items-center gap-1.5 px-4 py-2 bg-[#38BDF8] hover:bg-[#7DD3FC] text-[#0B1120] rounded-full text-[11px] font-display font-extrabold uppercase tracking-wider transition-all shadow-glow"
+                className="flex items-center gap-1.5 px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-full text-[11px] font-display font-extrabold uppercase tracking-wider transition-all shadow-glow"
               >
                 <Share2 className="w-3.5 h-3.5" />
                 <span>Compartir WhatsApp</span>
@@ -374,7 +374,7 @@ export const Navbar: React.FC<Props> = ({
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 className={`p-2 rounded-full transition-all relative cursor-pointer ${
                   hasNotificationsToday 
-                    ? 'text-[#FACC15] bg-[#FACC15]/15 hover:bg-[#FACC15]/25 border border-[#FACC15]/30' 
+                    ? 'text-[#E08E45] bg-[#E08E45]/15 hover:bg-[#E08E45]/25 border border-[#E08E45]/30' 
                     : 'text-[#94A3B8] hover:text-white hover:bg-white/10'
                 }`}
                 title="Notificaciones de Culto (Hora Perú)"
@@ -395,10 +395,10 @@ export const Navbar: React.FC<Props> = ({
                     onClick={() => setNotificationsOpen(false)} 
                   />
 
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#131D35] rounded-2xl shadow-modal border border-white/15 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                    <div className="p-4 bg-[#080E1D] border-b border-white/10 text-white flex items-center justify-between">
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#16161B] rounded-2xl shadow-modal border border-white/15 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                    <div className="p-4 bg-[#111115] border-b border-white/10 text-white flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Bell className="w-4 h-4 text-[#FACC15]" />
+                        <Bell className="w-4 h-4 text-[#E08E45]" />
                         <h3 className="text-xs font-display font-bold uppercase tracking-wider">Notificaciones de Culto</h3>
                       </div>
                       <button
@@ -411,18 +411,18 @@ export const Navbar: React.FC<Props> = ({
                       </button>
                     </div>
 
-                    <div className="px-4 py-2 bg-[#0E1629] border-b border-white/10 flex items-center justify-between text-[11px] text-[#94A3B8]">
+                    <div className="px-4 py-2 bg-[#111115] border-b border-white/10 flex items-center justify-between text-[11px] text-[#94A3B8]">
                       <span className="font-semibold flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-[#38BDF8]" />
+                        <Clock className="w-3 h-3 text-[#D8B28A]" />
                         Hora Oficial Perú (UTC-5)
                       </span>
-                      <span className="font-bold text-[#38BDF8] tabular-nums">{peruToday}</span>
+                      <span className="font-bold text-[#D8B28A] tabular-nums">{peruToday}</span>
                     </div>
 
                     <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
                       <div>
                         <p className="text-[10px] font-display font-bold uppercase tracking-widest text-[#94A3B8] mb-2 flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-[#38BDF8]" />
+                          <Calendar className="w-3.5 h-3.5 text-[#D8B28A]" />
                           <span>Cultos Programados Hoy</span>
                         </p>
 
@@ -436,7 +436,7 @@ export const Navbar: React.FC<Props> = ({
                               return (
                                 <div 
                                   key={service.id}
-                                  className="p-3 rounded-xl bg-[#182442] border border-white/10 hover:border-[#38BDF8]/40 transition-colors space-y-2"
+                                  className="p-3 rounded-xl bg-[#1F1F26] border border-white/10 hover:border-[#D8B28A]/40 transition-colors space-y-2"
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div>
@@ -444,18 +444,18 @@ export const Navbar: React.FC<Props> = ({
                                         {service.title || 'Culto de Adoración'}
                                       </p>
                                       <p className="text-[11px] text-[#94A3B8] flex items-center gap-1 mt-0.5">
-                                        <Clock className="w-3 h-3 text-[#FACC15]" />
+                                        <Clock className="w-3 h-3 text-[#E08E45]" />
                                         <span>Hora: {service.time || '19:30'}</span>
                                       </p>
                                     </div>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/30">
                                       Hoy
                                     </span>
                                   </div>
 
                                   {mySlot && (
-                                    <div className="p-2 rounded-lg bg-[#FACC15]/12 border border-[#FACC15]/30 flex items-center justify-between">
-                                      <span className="text-[11px] font-bold text-[#FACC15]">
+                                    <div className="p-2 rounded-lg bg-[#E08E45]/12 border border-[#E08E45]/30 flex items-center justify-between">
+                                      <span className="text-[11px] font-bold text-[#E08E45]">
                                         Asignado: {mySlot[1].label || mySlot[0]}
                                       </span>
                                       {service.isSongsPublished && service.songs && service.songs.length > 0 && onOpenSetlist && (
@@ -465,7 +465,7 @@ export const Navbar: React.FC<Props> = ({
                                             setNotificationsOpen(false);
                                             onOpenSetlist(service);
                                           }}
-                                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0B1120] bg-[#38BDF8] hover:bg-[#7DD3FC] px-2.5 py-1 rounded-full transition-colors cursor-pointer"
+                                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0D0D10] bg-[#D8B28A] hover:bg-[#E5C6A4] px-2.5 py-1 rounded-full transition-colors cursor-pointer"
                                         >
                                           <Music className="w-3 h-3" />
                                           <span>Canciones</span>
@@ -481,7 +481,7 @@ export const Navbar: React.FC<Props> = ({
                                         setNotificationsOpen(false);
                                         onOpenService(service);
                                       }}
-                                      className="w-full text-center text-[11px] font-bold text-[#38BDF8] hover:text-[#7DD3FC] hover:underline pt-1 cursor-pointer"
+                                      className="w-full text-center text-[11px] font-bold text-[#D8B28A] hover:text-[#E5C6A4] hover:underline pt-1 cursor-pointer"
                                     >
                                       Ver detalles del equipo →
                                     </button>
@@ -491,7 +491,7 @@ export const Navbar: React.FC<Props> = ({
                             })}
                           </div>
                         ) : (
-                          <div className="p-3.5 rounded-xl bg-[#0E1629] border border-dashed border-white/15 text-center">
+                          <div className="p-3.5 rounded-xl bg-[#111115] border border-dashed border-white/15 text-center">
                             <p className="text-xs text-[#CBD5E1] font-semibold">
                               No hay cultos programados para hoy (Hora Perú).
                             </p>
@@ -508,20 +508,20 @@ export const Navbar: React.FC<Props> = ({
                             Tus Asignaciones Confirmadas
                           </p>
                           <p className="text-xs text-[#CBD5E1]">
-                            Tienes <span className="font-bold text-[#38BDF8]">{assignedCount}</span> culto(s) programado(s) en tu agenda.
+                            Tienes <span className="font-bold text-[#D8B28A]">{assignedCount}</span> culto(s) programado(s) en tu agenda.
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div className="p-3 bg-[#080E1D] border-t border-white/10 flex items-center justify-between">
+                    <div className="p-3 bg-[#111115] border-t border-white/10 flex items-center justify-between">
                       <span className="text-[10px] text-[#64748B]">
                         ATocarYa · Notificaciones activas
                       </span>
                       <button
                         type="button"
                         onClick={() => setNotificationsOpen(false)}
-                        className="text-xs font-bold text-[#38BDF8] hover:underline cursor-pointer"
+                        className="text-xs font-bold text-[#D8B28A] hover:underline cursor-pointer"
                       >
                         Entendido
                       </button>
@@ -537,16 +537,16 @@ export const Navbar: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-3 pl-1 pr-2.5 py-1 rounded-full hover:bg-white/5 transition-colors cursor-pointer border border-white/10 hover:border-[#38BDF8]/40"
+                  className="flex items-center gap-3 pl-1 pr-2.5 py-1 rounded-full hover:bg-white/5 transition-colors cursor-pointer border border-white/10 hover:border-[#D8B28A]/40"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#38BDF8] to-[#0284C7] text-[#0B1120] flex items-center justify-center text-xs font-black shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D8B28A] to-[#0284C7] text-[#0D0D10] flex items-center justify-center text-xs font-black shadow-xs">
                     {musicianUser.fullName.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left hidden lg:block">
                     <p className="text-xs font-bold text-white leading-tight">
                       {musicianUser.fullName.split(' ')[0]}
                     </p>
-                    <p className="text-[10px] text-[#38BDF8] font-semibold leading-none mt-0.5">
+                    <p className="text-[10px] text-[#D8B28A] font-semibold leading-none mt-0.5">
                       {musicianUser.primaryInstrument}
                     </p>
                   </div>
@@ -554,10 +554,10 @@ export const Navbar: React.FC<Props> = ({
                 </button>
 
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-[#131D35] border border-white/15 rounded-2xl shadow-modal py-2 z-50">
+                  <div className="absolute right-0 mt-2 w-48 bg-[#16161B] border border-white/15 rounded-2xl shadow-modal py-2 z-50">
                     <div className="px-3.5 py-2 border-b border-white/10">
                       <p className="text-xs font-bold text-white">{musicianUser.fullName}</p>
-                      <p className="text-[10px] text-[#38BDF8]">{musicianUser.primaryInstrument}</p>
+                      <p className="text-[10px] text-[#D8B28A]">{musicianUser.primaryInstrument}</p>
                     </div>
                     <button
                       type="button"
@@ -567,7 +567,7 @@ export const Navbar: React.FC<Props> = ({
                       }}
                       className="w-full text-left px-3.5 py-2 text-xs text-white hover:bg-white/5 font-semibold flex items-center gap-2 cursor-pointer"
                     >
-                      <UserRound className="w-3.5 h-3.5 text-[#38BDF8]" />
+                      <UserRound className="w-3.5 h-3.5 text-[#D8B28A]" />
                       <span>Ver Mi Perfil</span>
                     </button>
                     <button
@@ -578,7 +578,7 @@ export const Navbar: React.FC<Props> = ({
                       }}
                       className="w-full text-left px-3.5 py-2 text-xs text-[#94A3B8] hover:bg-white/5 hover:text-white font-semibold flex items-center gap-2 cursor-pointer"
                     >
-                      <Shield className="w-3.5 h-3.5 text-[#FACC15]" />
+                      <Shield className="w-3.5 h-3.5 text-[#E08E45]" />
                       <span>Acceso Administrador</span>
                     </button>
                     <button
@@ -600,12 +600,12 @@ export const Navbar: React.FC<Props> = ({
             {/* Chip Administrador */}
             {portal === 'admin' && isAdminAuthenticated && (
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#FACC15] text-[#0B1120] flex items-center justify-center text-xs font-black shadow-glow-yellow">
+                <div className="w-8 h-8 rounded-full bg-[#E08E45] text-[#0D0D10] flex items-center justify-center text-xs font-black shadow-glow-yellow">
                   A
                 </div>
                 <div className="text-left hidden lg:block">
                   <p className="text-xs font-bold text-white">Administrador</p>
-                  <p className="text-[10px] text-[#FACC15] font-bold uppercase tracking-wider">Líder General</p>
+                  <p className="text-[10px] text-[#E08E45] font-bold uppercase tracking-wider">Líder General</p>
                 </div>
                 <button
                   type="button"
@@ -629,7 +629,7 @@ export const Navbar: React.FC<Props> = ({
       {/* ========================================================================= */}
       {/* 3. MOBILE BOTTOM NAVIGATION BAR (FIXED EN CELULAR < 768px)                */}
       {/* ========================================================================= */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#17233A]/95 backdrop-blur-xl border-t border-white/15 py-2 px-3 flex items-center justify-around shadow-modal">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#141418]/95 backdrop-blur-xl border-t border-white/15 py-2 px-3 flex items-center justify-around shadow-modal">
         {portal === 'musician' && (
           <>
             {/* 1. Inicio */}
@@ -637,12 +637,12 @@ export const Navbar: React.FC<Props> = ({
               onClick={() => setMusicianTab('calendar')}
               className={`relative flex flex-col items-center justify-center min-w-[66px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'calendar'
-                  ? 'text-[#38BDF8] font-bold'
+                  ? 'text-[#D8B28A] font-bold'
                   : 'text-[#64748B] hover:text-white font-medium'
               }`}
             >
               {musicianTab === 'calendar' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
               )}
               <Home className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Inicio</span>
@@ -653,17 +653,17 @@ export const Navbar: React.FC<Props> = ({
               onClick={() => setMusicianTab('my-services')}
               className={`relative flex flex-col items-center justify-center min-w-[66px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'my-services'
-                  ? 'text-[#38BDF8] font-bold'
+                  ? 'text-[#D8B28A] font-bold'
                   : 'text-[#64748B] hover:text-white font-medium'
               }`}
             >
               {musicianTab === 'my-services' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
               )}
               <CalendarDays className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Cultos</span>
               {assignedCount > 0 && (
-                <span className="absolute top-0 right-1.5 w-4 h-4 rounded-full bg-[#FACC15] text-[#0B1120] text-[9px] font-black flex items-center justify-center tabular-nums">
+                <span className="absolute top-0 right-1.5 w-4 h-4 rounded-full bg-[#E08E45] text-[#0D0D10] text-[9px] font-black flex items-center justify-center tabular-nums">
                   {assignedCount}
                 </span>
               )}
@@ -675,12 +675,12 @@ export const Navbar: React.FC<Props> = ({
                 onClick={() => setMusicianTab('tracks')}
                 className={`relative flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
                   musicianTab === 'tracks'
-                    ? 'text-[#38BDF8] font-bold'
+                    ? 'text-[#D8B28A] font-bold'
                     : 'text-[#64748B] hover:text-white font-medium'
                 }`}
               >
                 {musicianTab === 'tracks' && (
-                  <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                  <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
                 )}
                 <Music className="w-5 h-5 mb-0.5" />
                 <span className="text-[10px] font-display uppercase tracking-wider">Pistas</span>
@@ -690,7 +690,7 @@ export const Navbar: React.FC<Props> = ({
             {/* 4. Mi Perfil */}
             <button
               onClick={() => setProfileModalOpen(true)}
-              className="flex flex-col items-center justify-center min-w-[62px] py-1 px-2 rounded-xl text-[#64748B] hover:text-[#38BDF8] font-medium transition-all cursor-pointer"
+              className="flex flex-col items-center justify-center min-w-[62px] py-1 px-2 rounded-xl text-[#64748B] hover:text-[#D8B28A] font-medium transition-all cursor-pointer"
             >
               <UserRound className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Perfil</span>
@@ -714,12 +714,12 @@ export const Navbar: React.FC<Props> = ({
               onClick={() => setAdminTab('schedule')}
               className={`relative flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-colors ${
                 adminTab === 'schedule'
-                  ? 'text-[#38BDF8] font-bold'
+                  ? 'text-[#D8B28A] font-bold'
                   : 'text-[#64748B] hover:text-white font-medium'
               }`}
             >
               {adminTab === 'schedule' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
               )}
               <Table className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Matriz</span>
@@ -729,12 +729,12 @@ export const Navbar: React.FC<Props> = ({
               onClick={() => setAdminTab('visual-board')}
               className={`relative flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-colors ${
                 adminTab === 'visual-board'
-                  ? 'text-[#38BDF8] font-bold'
+                  ? 'text-[#D8B28A] font-bold'
                   : 'text-[#64748B] hover:text-white font-medium'
               }`}
             >
               {adminTab === 'visual-board' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
               )}
               <Camera className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Fotos</span>
@@ -744,12 +744,12 @@ export const Navbar: React.FC<Props> = ({
               onClick={() => setAdminTab('musicians')}
               className={`relative flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-colors ${
                 adminTab === 'musicians'
-                  ? 'text-[#38BDF8] font-bold'
+                  ? 'text-[#D8B28A] font-bold'
                   : 'text-[#64748B] hover:text-white font-medium'
               }`}
             >
               {adminTab === 'musicians' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
               )}
               <UsersRound className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Músicos</span>
@@ -759,12 +759,12 @@ export const Navbar: React.FC<Props> = ({
               onClick={() => setAdminTab('songs-bank')}
               className={`relative flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-colors ${
                 adminTab === 'songs-bank'
-                  ? 'text-[#38BDF8] font-bold'
+                  ? 'text-[#D8B28A] font-bold'
                   : 'text-[#64748B] hover:text-white font-medium'
               }`}
             >
               {adminTab === 'songs-bank' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#38BDF8] rounded-full" />
+                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
               )}
               <Music2 className="w-5 h-5 mb-0.5" />
               <span className="text-[10px] font-display uppercase tracking-wider">Banco</span>

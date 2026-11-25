@@ -49,19 +49,19 @@ interface ColumnConfig {
 }
 
 const SLOT_COLUMNS: ColumnConfig[] = [
-  { key: 'piano_1', label: 'PIANO 1', iconKey: 'piano', colorClass: 'text-[#C96B65]', bgClass: 'bg-[#F7E3DF] border-[#C96B65]/30', badgeBg: 'bg-[#F7E3DF] border-[#C96B65]/30 text-[#C96B65]' },
-  { key: 'piano_2', label: 'PIANO 2', iconKey: 'piano', colorClass: 'text-[#C96B65]', bgClass: 'bg-[#F7E3DF] border-[#C96B65]/30', badgeBg: 'bg-[#F7E3DF] border-[#C96B65]/30 text-[#C96B65]' },
-  { key: 'guitarra_1', label: 'GUIT. ELÉC 1', iconKey: 'guitarra_1', colorClass: 'text-[#315F6D]', bgClass: 'bg-[#D9E9EB]/60 border-[#315F6D]/20', badgeBg: 'bg-[#D9E9EB]/60 border-[#315F6D]/20 text-[#315F6D]' },
-  { key: 'guitarra_2', label: 'GUIT. ELÉC 2', iconKey: 'guitarra_2', colorClass: 'text-[#315F6D]', bgClass: 'bg-[#D9E9EB]/60 border-[#315F6D]/20', badgeBg: 'bg-[#D9E9EB]/60 border-[#315F6D]/20 text-[#315F6D]' },
-  { key: 'guitarra_acustica', label: 'GUIT. ACÚS', iconKey: 'guitarra_acustica', colorClass: 'text-[#BD8C29]', bgClass: 'bg-[#FFF1CB] border-[#BD8C29]/30', badgeBg: 'bg-[#FFF1CB] border-[#BD8C29]/30 text-[#BD8C29]' },
-  { key: 'bateria', label: 'BATERÍA', iconKey: 'bateria', colorClass: 'text-[#BD8C29]', bgClass: 'bg-[#FFF1CB] border-[#BD8C29]/30', badgeBg: 'bg-[#FFF1CB] border-[#BD8C29]/30 text-[#BD8C29]' },
-  { key: 'bajo', label: 'BAJO', iconKey: 'bajo', colorClass: 'text-[#46516F]', bgClass: 'bg-[#E5E8F0] border-[#46516F]/30', badgeBg: 'bg-[#E5E8F0] border-[#46516F]/30 text-[#46516F]' },
-  { key: 'voz_director', label: 'VOZ DIRECTOR', iconKey: 'voz_director', colorClass: 'text-[#315F6D]', bgClass: 'bg-[#D9E9EB] border-[#315F6D]/40', badgeBg: 'bg-[#D9E9EB] border-[#315F6D]/40 text-[#315F6D]' },
-  { key: 'voz_coro_1', label: 'CORO 1', iconKey: 'voz_coro_1', colorClass: 'text-[#C96B65]', bgClass: 'bg-[#F7E3DF] border-[#C96B65]/30', badgeBg: 'bg-[#F7E3DF] border-[#C96B65]/30 text-[#C96B65]' },
-  { key: 'voz_coro_2', label: 'CORO 2', iconKey: 'voz_coro_2', colorClass: 'text-[#C96B65]', bgClass: 'bg-[#F7E3DF] border-[#C96B65]/30', badgeBg: 'bg-[#F7E3DF] border-[#C96B65]/30 text-[#C96B65]' },
-  { key: 'voz_coro_3', label: 'CORO 3', iconKey: 'voz_coro_3', colorClass: 'text-[#C96B65]', bgClass: 'bg-[#F7E3DF] border-[#C96B65]/30', badgeBg: 'bg-[#F7E3DF] border-[#C96B65]/30 text-[#C96B65]' },
-  { key: 'voz_coro_4', label: 'CORO 4', iconKey: 'voz_coro_4', colorClass: 'text-[#C96B65]', bgClass: 'bg-[#F7E3DF] border-[#C96B65]/30', badgeBg: 'bg-[#F7E3DF] border-[#C96B65]/30 text-[#C96B65]' },
-  { key: 'sonido', label: 'SONIDO', iconKey: 'sonido', colorClass: 'text-[#46516F]', bgClass: 'bg-[#E5E8F0] border-[#46516F]/30', badgeBg: 'bg-[#E5E8F0] border-[#46516F]/30 text-[#46516F]' },
+  { key: 'piano_1', label: 'PIANO 1', iconKey: 'piano', colorClass: 'text-[#FDA4AF]', bgClass: 'bg-[#FB7185]/15 border border-[#FB7185]/35', badgeBg: 'bg-[#FB7185]/15 border border-[#FB7185]/35 text-[#FDA4AF]' },
+  { key: 'piano_2', label: 'PIANO 2', iconKey: 'piano', colorClass: 'text-[#FDA4AF]', bgClass: 'bg-[#FB7185]/15 border border-[#FB7185]/35', badgeBg: 'bg-[#FB7185]/15 border border-[#FB7185]/35 text-[#FDA4AF]' },
+  { key: 'guitarra_1', label: 'GUIT. ELÉC 1', iconKey: 'guitarra_1', colorClass: 'text-[#7DD3FC]', bgClass: 'bg-[#38BDF8]/15 border border-[#38BDF8]/35', badgeBg: 'bg-[#38BDF8]/15 border border-[#38BDF8]/35 text-[#7DD3FC]' },
+  { key: 'guitarra_2', label: 'GUIT. ELÉC 2', iconKey: 'guitarra_2', colorClass: 'text-[#7DD3FC]', bgClass: 'bg-[#38BDF8]/15 border border-[#38BDF8]/35', badgeBg: 'bg-[#38BDF8]/15 border border-[#38BDF8]/35 text-[#7DD3FC]' },
+  { key: 'guitarra_acustica', label: 'GUIT. ACÚS', iconKey: 'guitarra_acustica', colorClass: 'text-[#F3B36C]', bgClass: 'bg-[#E08E45]/15 border border-[#E08E45]/35', badgeBg: 'bg-[#E08E45]/15 border border-[#E08E45]/35 text-[#F3B36C]' },
+  { key: 'bateria', label: 'BATERÍA', iconKey: 'bateria', colorClass: 'text-[#F3B36C]', bgClass: 'bg-[#E08E45]/15 border border-[#E08E45]/35', badgeBg: 'bg-[#E08E45]/15 border border-[#E08E45]/35 text-[#F3B36C]' },
+  { key: 'bajo', label: 'BAJO', iconKey: 'bajo', colorClass: 'text-[#D8B28A]', bgClass: 'bg-[#D8B28A]/15 border border-[#D8B28A]/35', badgeBg: 'bg-[#D8B28A]/15 border border-[#D8B28A]/35 text-[#E5C6A4]' },
+  { key: 'voz_director', label: 'VOZ DIRECTOR', iconKey: 'voz_director', colorClass: 'text-[#6EE7B7]', bgClass: 'bg-[#34D399]/15 border border-[#34D399]/35', badgeBg: 'bg-[#34D399]/15 border border-[#34D399]/35 text-[#6EE7B7]' },
+  { key: 'voz_coro_1', label: 'CORO 1', iconKey: 'voz_coro_1', colorClass: 'text-[#FDA4AF]', bgClass: 'bg-[#FB7185]/15 border border-[#FB7185]/35', badgeBg: 'bg-[#FB7185]/15 border border-[#FB7185]/35 text-[#FDA4AF]' },
+  { key: 'voz_coro_2', label: 'CORO 2', iconKey: 'voz_coro_2', colorClass: 'text-[#FDA4AF]', bgClass: 'bg-[#FB7185]/15 border border-[#FB7185]/35', badgeBg: 'bg-[#FB7185]/15 border border-[#FB7185]/35 text-[#FDA4AF]' },
+  { key: 'voz_coro_3', label: 'CORO 3', iconKey: 'voz_coro_3', colorClass: 'text-[#FDA4AF]', bgClass: 'bg-[#FB7185]/15 border border-[#FB7185]/35', badgeBg: 'bg-[#FB7185]/15 border border-[#FB7185]/35 text-[#FDA4AF]' },
+  { key: 'voz_coro_4', label: 'CORO 4', iconKey: 'voz_coro_4', colorClass: 'text-[#FDA4AF]', bgClass: 'bg-[#FB7185]/15 border border-[#FB7185]/35', badgeBg: 'bg-[#FB7185]/15 border border-[#FB7185]/35 text-[#FDA4AF]' },
+  { key: 'sonido', label: 'SONIDO', iconKey: 'sonido', colorClass: 'text-[#D8B28A]', bgClass: 'bg-[#D8B28A]/15 border border-[#D8B28A]/35', badgeBg: 'bg-[#D8B28A]/15 border border-[#D8B28A]/35 text-[#E5C6A4]' },
 ];
 
 export const AdminScheduleTable: React.FC<Props> = ({
@@ -582,31 +582,31 @@ export const AdminScheduleTable: React.FC<Props> = ({
           </div>
 
           {/* 6. VISTA ESCRITORIO (>= md): Matriz de Tabla Completa Estilizada */}
-          <div className="hidden md:block bg-white border border-slate-200/90 rounded-2xl shadow-sm overflow-hidden">
+          <div className="hidden md:block bg-[#16161B] border border-white/10 rounded-2xl shadow-card overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50/80 border-b border-slate-200/90 text-slate-600 uppercase tracking-wider text-[10px]">
+                <thead className="bg-[#1F1F26] border-b border-white/10 text-white uppercase tracking-wider text-[10px]">
                   <tr>
-                    <th className="py-3 px-4 sticky left-0 bg-slate-50 z-20 border-r border-slate-200 whitespace-nowrap font-bold">
+                    <th className="py-3.5 px-4 sticky left-0 bg-[#1F1F26] z-20 border-r border-white/10 whitespace-nowrap font-bold text-white">
                       FECHA & CULTO
                     </th>
-                    <th className="py-3 px-3 text-center whitespace-nowrap font-bold">
+                    <th className="py-3.5 px-3 text-center whitespace-nowrap font-bold text-white">
                       HORA
                     </th>
                     {SLOT_COLUMNS.map((col) => (
-                      <th key={col.key} className="py-3 px-2 text-center whitespace-nowrap font-bold">
+                      <th key={col.key} className="py-3.5 px-2 text-center whitespace-nowrap font-bold">
                         <div className={`w-6 h-6 rounded-lg ${col.bgClass} flex items-center justify-center ${col.colorClass} mx-auto mb-1`}>
                           <InstrumentIcon instrument={col.iconKey} size={14} />
                         </div>
-                        <span className="text-[9px] text-slate-600 block tracking-tight">
+                        <span className="text-[9px] text-white/90 block tracking-tight font-bold">
                           {col.label}
                         </span>
                       </th>
                     ))}
-                    <th className="py-3 px-3 text-center whitespace-nowrap font-bold">
+                    <th className="py-3.5 px-3 text-center whitespace-nowrap font-bold text-white">
                       INSCRIPCIÓN
                     </th>
-                    <th className="py-3 px-3 text-center whitespace-nowrap font-bold">
+                    <th className="py-3.5 px-3 text-center whitespace-nowrap font-bold text-white">
                       ACCIONES
                     </th>
                   </tr>

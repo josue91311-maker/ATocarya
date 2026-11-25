@@ -226,7 +226,7 @@ export const SongBankPlayer: React.FC = () => {
               <svg
                 viewBox="0 0 1200 120"
                 preserveAspectRatio="none"
-                className="relative block w-full h-8 text-[#1D2B44] fill-current"
+                className="relative block w-full h-8 text-[#0D0D10] fill-current"
               >
                 <path d="M0,0 C150,80 350,-30 500,40 C650,110 900,10 1200,45 L1200,120 L0,120 Z" />
               </svg>

@@ -135,12 +135,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
   };
 
   return (
-    <div className="-mx-4 -mt-6 sm:mx-0 sm:mt-0 pb-24 animate-in fade-in select-none bg-[#1D2B44]">
+    <div className="-mx-4 -mt-6 sm:mx-0 sm:mt-0 pb-24 animate-in fade-in select-none bg-[#0D0D10]">
       
       {/* ========================================================================= */}
       {/* 1. HERO HEADER ATMOSFÉRICO DE ESCENARIO (ESTILO CONCIERTO / LIVE)         */}
       {/* ========================================================================= */}
-      <div className="relative bg-[#1D2B44] text-white pt-4 pb-10 px-4 sm:px-6 overflow-hidden">
+      <div className="relative bg-[#0D0D10] text-white pt-4 pb-10 px-4 sm:px-6 overflow-hidden">
         {/* Foto de ambiente de adoración con spotlight azul profundo */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
@@ -153,7 +153,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              'linear-gradient(180deg, rgba(11,17,32,0.72) 0%, rgba(28,46,84,0.62) 45%, rgba(11,17,32,0.98) 100%)',
+              'linear-gradient(180deg, rgba(13,13,16,0.78) 0%, rgba(32,26,22,0.72) 45%, rgba(13,13,16,0.98) 100%)',
           }}
         />
 
@@ -171,7 +171,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
                 onClick={() => setShowNotificationsModal(true)}
                 className={`relative p-2 rounded-full border transition-all cursor-pointer ${
                   hasCultoToday 
-                    ? 'bg-[#FACC15] border-[#FACC15] text-[#0B1120] shadow-glow-yellow' 
+                    ? 'bg-[#E08E45] border-[#E08E45] text-[#0D0D10] shadow-glow-yellow' 
                     : 'bg-white/10 border-white/15 text-white/85 hover:bg-white/20'
                 }`}
                 title={hasCultoToday ? `Hoy tienes ${cultosToday.length} culto(s) programado(s)` : 'Sin cultos para hoy (Hora Perú)'}
@@ -188,7 +188,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
               <button 
                 type="button"
                 onClick={() => setShowProfileModal(true)}
-                className="w-8 h-8 rounded-full bg-[#FACC15] hover:bg-[#FDE047] text-[#0B1120] font-black text-sm flex items-center justify-center shadow-glow-yellow border border-white/20 transition-transform active:scale-95 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-[#E08E45] hover:bg-[#F3B36C] text-[#0D0D10] font-black text-sm flex items-center justify-center shadow-glow-yellow border border-white/20 transition-transform active:scale-95 cursor-pointer"
                 title={`Ver perfil de ${musicianUser.fullName}`}
               >
                 {userInitial}
@@ -208,7 +208,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
 
           {/* Saludo Principal en Tipografía Script Manuscrita (Inspirado en diseño de escenario) */}
           <div className="pt-3 text-center">
-            <p className="text-[10px] font-display font-bold uppercase tracking-[0.28em] text-[#38BDF8]">
+            <p className="text-[10px] font-display font-bold uppercase tracking-[0.28em] text-[#D8B28A]">
               {musicianUser.primaryInstrument} · MINISTERIO DE ALABANZA
             </p>
             <h1 className="font-script text-4xl sm:text-5xl font-bold text-white tracking-wide leading-tight mt-1 drop-shadow-md">
@@ -235,12 +235,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
           {/* 2 Tarjetas Estadísticas en Dark Glass */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             {/* Card 1: Asignados */}
-            <div className="bg-[#243554]/90 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
+            <div className="bg-[#16161B]/90 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
               <div className="flex items-center justify-between">
-                <div className="w-8 h-8 rounded-xl bg-[#38BDF8]/15 border border-[#38BDF8]/30 text-[#38BDF8] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#D8B28A]/15 border border-[#D8B28A]/30 text-[#D8B28A] flex items-center justify-center">
                   <Calendar className="w-4 h-4" />
                 </div>
-                <span className="w-2 h-2 rounded-full bg-[#38BDF8]" />
+                <span className="w-2 h-2 rounded-full bg-[#D8B28A]" />
               </div>
               <div className="mt-2">
                 <span className="text-2xl sm:text-3xl font-black font-display leading-none block tabular-nums text-white">
@@ -253,12 +253,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
             </div>
 
             {/* Card 2: Total Cultos en Calendario */}
-            <div className="bg-[#243554]/90 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
+            <div className="bg-[#16161B]/90 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
               <div className="flex items-center justify-between">
-                <div className="w-8 h-8 rounded-xl bg-[#FACC15]/15 border border-[#FACC15]/30 text-[#FACC15] flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-[#E08E45]/15 border border-[#E08E45]/30 text-[#E08E45] flex items-center justify-center">
                   <Users className="w-4 h-4" />
                 </div>
-                <span className="w-2 h-2 rounded-full bg-[#FACC15]" />
+                <span className="w-2 h-2 rounded-full bg-[#E08E45]" />
               </div>
               <div className="mt-2">
                 <span className="text-2xl sm:text-3xl font-black font-display leading-none block tabular-nums text-white">
@@ -276,13 +276,13 @@ export const MusicianMobileHome: React.FC<Props> = ({
       {/* ========================================================================= */}
       {/* 2. CONTENEDOR PRINCIPAL DE EVENTOS (ESTILO FEATURED EVENT)                */}
       {/* ========================================================================= */}
-      <div className="bg-[#1D2B44] border-t border-white/10 rounded-t-[28px] -mt-4 pt-6 pb-6 px-4 sm:px-6 relative z-10 space-y-6 max-w-lg mx-auto min-h-screen">
+      <div className="bg-[#0D0D10] border-t border-white/10 rounded-t-[28px] -mt-4 pt-6 pb-6 px-4 sm:px-6 relative z-10 space-y-6 max-w-lg mx-auto min-h-screen">
         
         {/* Notificación flotante de feedback */}
         {feedbackMsg && (
           <div className={`p-3.5 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-modal animate-in slide-in-from-top duration-200 ${
             feedbackMsg.type === 'success' 
-              ? 'bg-[#38BDF8] text-[#0B1120]' 
+              ? 'bg-[#D8B28A] text-[#0D0D10]' 
               : 'bg-[#F43F5E] text-white'
           }`}>
             {feedbackMsg.type === 'success' ? <Check className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
@@ -300,18 +300,18 @@ export const MusicianMobileHome: React.FC<Props> = ({
                 <h2 className="text-xs font-bold font-display uppercase tracking-[0.2em] text-white">
                   Mis Próximos Cultos
                 </h2>
-                <span className="px-2 py-0.5 rounded-full bg-[#38BDF8]/15 text-[#38BDF8] border border-[#38BDF8]/30 text-[10px] font-black tabular-nums">
+                <span className="px-2 py-0.5 rounded-full bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/30 text-[10px] font-black tabular-nums">
                   {myAssignedServices.length}
                 </span>
               </div>
-              <div className="w-8 h-0.5 bg-[#38BDF8] mt-1.5 rounded-full" />
+              <div className="w-8 h-0.5 bg-[#D8B28A] mt-1.5 rounded-full" />
             </div>
 
             {onGoToFullCalendar && (
               <button
                 type="button"
                 onClick={onGoToFullCalendar}
-                className="text-[11px] font-display font-bold uppercase tracking-wider text-[#94A3B8] hover:text-[#38BDF8] flex items-center gap-0.5 cursor-pointer"
+                className="text-[11px] font-display font-bold uppercase tracking-wider text-[#94A3B8] hover:text-[#D8B28A] flex items-center gap-0.5 cursor-pointer"
               >
                 <span>Calendario</span>
                 <ChevronRight className="w-3.5 h-3.5" />

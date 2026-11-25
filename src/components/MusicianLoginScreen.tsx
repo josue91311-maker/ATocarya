@@ -37,7 +37,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#1D2B44] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#0D0D10] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
       {/* Atmospheric Concert Stage Backdrop (inspired by live spotlight crowd) */}
       <div
         className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-30 scale-105"
@@ -51,7 +51,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
         className="fixed inset-0 pointer-events-none z-0"
         style={{
           background:
-            'radial-gradient(ellipse 75% 55% at 50% 15%, rgba(56, 98, 168, 0.45), rgba(11, 17, 32, 0.92) 70%, #070B16 100%)',
+            'radial-gradient(ellipse 75% 55% at 50% 15%, rgba(216, 178, 138, 0.16), rgba(13, 13, 16, 0.92) 70%, #09090B 100%)',
         }}
         aria-hidden="true"
       />
@@ -61,7 +61,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
         <div className="text-center mb-8 flex flex-col items-center">
           <Logo size="lg" subtitle="MÚSICOS" />
           <p className="mt-5 text-[10px] font-display font-semibold uppercase tracking-[0.32em] text-[#94A3B8] flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <Radio className="w-3.5 h-3.5 text-[#D8B28A]" />
             <span>MÚSICA PARA SENTIR Y ADORAR</span>
           </p>
           <h1 className="font-script text-4xl sm:text-5xl text-white mt-1 drop-shadow-md">
@@ -70,12 +70,12 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
         </div>
 
         {/* Sleek Midnight Glass Card */}
-        <div className="bg-[#243554]/90 backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-modal">
+        <div className="bg-[#16161B]/90 backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-modal">
           <div className="mb-6">
             <h2 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-white">
               Iniciar Sesión
             </h2>
-            <div className="w-10 h-0.5 bg-[#38BDF8] mt-2 rounded-full" />
+            <div className="w-10 h-0.5 bg-[#D8B28A] mt-2 rounded-full" />
             <p className="text-xs text-[#94A3B8] mt-2.5 leading-relaxed">
               Ingresa tu nombre y PIN de 4 dígitos para acceder a tus fechas y repertorio.
             </p>
@@ -103,7 +103,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                       const m = musicians.find(item => item.id === e.target.value);
                       if (m) setTypedName(m.fullName);
                     }}
-                    className="w-full px-4 py-3 bg-[#1D2B44]/80 border border-white/15 rounded-xl text-sm text-white focus:bg-[#1D2B44] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all font-medium"
+                    className="w-full px-4 py-3 bg-[#0D0D10]/80 border border-white/15 rounded-xl text-sm text-white focus:bg-[#0D0D10] focus:outline-none focus:border-[#D8B28A] focus:ring-2 focus:ring-[#D8B28A]/20 transition-all font-medium"
                   >
                     <option value="">-- Elige tu nombre de la lista --</option>
                     {musicians.map((m) => (
@@ -121,7 +121,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                     value={typedName}
                     onChange={(e) => setTypedName(e.target.value)}
                     placeholder="Tu nombre completo"
-                    className="w-full px-4 py-3 bg-[#1D2B44]/80 border border-white/15 rounded-xl text-sm text-white placeholder-[#64748B] focus:bg-[#1D2B44] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all"
+                    className="w-full px-4 py-3 bg-[#0D0D10]/80 border border-white/15 rounded-xl text-sm text-white placeholder-[#64748B] focus:bg-[#0D0D10] focus:outline-none focus:border-[#D8B28A] focus:ring-2 focus:ring-[#D8B28A]/20 transition-all"
                   />
                   <User className="w-4 h-4 text-[#64748B] absolute right-3.5 top-1/2 -translate-y-1/2" />
                 </div>
@@ -143,7 +143,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   placeholder="••••"
-                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#1D2B44]/80 border border-white/15 rounded-xl text-[#38BDF8] placeholder-[#64748B] focus:bg-[#1D2B44] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all"
+                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#0D0D10]/80 border border-white/15 rounded-xl text-[#D8B28A] placeholder-[#64748B] focus:bg-[#0D0D10] focus:outline-none focus:border-[#D8B28A] focus:ring-2 focus:ring-[#D8B28A]/20 transition-all"
                 />
                 <Lock className="w-4 h-4 text-[#64748B] absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
@@ -152,7 +152,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
             {/* Pill CTA Button */}
             <button
               type="submit"
-              className="w-full mt-3 py-3.5 px-6 bg-[#38BDF8] hover:bg-[#7DD3FC] text-[#0B1120] text-xs font-display font-extrabold uppercase tracking-[0.18em] rounded-full flex items-center justify-center gap-2 transition-all shadow-glow active:scale-[0.98]"
+              className="w-full mt-3 py-3.5 px-6 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] text-xs font-display font-extrabold uppercase tracking-[0.18em] rounded-full flex items-center justify-center gap-2 transition-all shadow-glow active:scale-[0.98]"
             >
               <span>Acceder al Calendario</span>
               <ArrowRight className="w-4 h-4" />

@@ -4,42 +4,42 @@
 
 @layer base {
   :root {
-    --font-script: 'Caveat', cursive;
-    --font-display: 'Montserrat', system-ui, -apple-system, sans-serif;
+    --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-studio: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-    --stage-bg: #1D2B44;
-    --stage-surface: #243554;
-    --stage-elevated: #2D4166;
-    --stage-border: rgba(255, 255, 255, 0.14);
-    --stage-cyan: #38BDF8;
-    --stage-yellow: #FACC15;
+    --studio-bg: #0D0D10;
+    --studio-surface: #16161B;
+    --studio-elevated: #1F1F26;
+    --studio-border: rgba(255, 255, 255, 0.10);
+    --studio-gold: #D8B28A;
+    --studio-amber: #E08E45;
   }
 
   body {
     font-family: var(--font-body);
-    background-color: #1D2B44;
+    background-color: #0D0D10;
     background-image:
-      radial-gradient(ellipse 85% 55% at 50% -10%, rgba(100, 145, 215, 0.42), transparent 68%),
-      radial-gradient(ellipse 65% 45% at 85% 15%, rgba(56, 189, 248, 0.16), transparent 60%);
+      radial-gradient(ellipse 80% 45% at 50% -10%, rgba(216, 178, 138, 0.14), transparent 65%),
+      radial-gradient(ellipse 50% 35% at 85% 15%, rgba(224, 142, 69, 0.08), transparent 60%);
     background-attachment: fixed;
-    @apply text-white antialiased selection:bg-[#38BDF8] selection:text-[#0F1B2E] min-h-screen;
+    @apply text-white antialiased selection:bg-[#D8B28A] selection:text-[#0D0D10] min-h-screen;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   .font-serif,
   .font-script {
-    font-family: var(--font-script);
-    letter-spacing: 0.01em;
+    font-family: var(--font-studio);
+    letter-spacing: -0.025em;
   }
 
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.015em;
+    letter-spacing: -0.025em;
   }
 
-  /* Native form controls in luminous twilight blue theme */
+  /* Native form controls in obsidian studio theme */
   select option {
-    background-color: #243554;
+    background-color: #16161B;
     color: #FFFFFF;
   }
 }
@@ -49,19 +49,19 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Atmospheric luminous twilight surface card */
+/* Modern Obsidian Studio Card */
 .saas-surface,
 .stage-card {
-  @apply bg-[#243554]/90 backdrop-blur-md border border-white/15 rounded-2xl shadow-card;
+  @apply bg-[#16161B]/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-card;
 }
 
 .saas-row {
-  @apply bg-[#243554]/80 hover:bg-[#2D4166] border-b border-white/10 transition-colors duration-150;
+  @apply bg-[#16161B] hover:bg-[#1F1F26] border-b border-white/10 transition-colors duration-150;
 }
 
-/* Pill outline CTA button inspired by live stage hero */
+/* Modern Studio CTA button (inspired by RESONATE) */
 .stage-pill-btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/50 px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-200 hover:bg-white hover:text-[#17233A] hover:border-white active:scale-[0.98];
+  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-5 py-2.5 text-xs font-display font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#D8B28A] hover:text-[#0D0D10] hover:border-[#D8B28A] active:scale-[0.98];
 }
 
 /* Touch-optimized button target (min 44px) */
@@ -70,20 +70,20 @@
   min-width: 44px;
 }
 
-/* Subtle scrollbar */
+/* Clean dark scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(23, 35, 58, 0.45);
+  background: #0D0D10;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.35);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.65);
+  background: rgba(216, 178, 138, 0.55);
 }
 
 /* Hide horizontal scrollbar on pill filter strips */
@@ -96,12 +96,12 @@
 }
 
 /* ==========================================================================
-   Global Luminous Twilight Stage Harmonization
-   Ensures consistent brighter slate-blue surfaces with zero white header clashes.
+   Global RESONATE Obsidian Studio Harmonization
+   Guarantees crisp white text on deep charcoal-black surfaces everywhere.
    ========================================================================== */
 .bg-\[\#F7F4EF\]:not(.visual-export-canvas),
 .bg-\[\#FAF9F6\]:not(.visual-export-canvas) {
-  background-color: #1D2B44 !important;
+  background-color: #111115 !important;
 }
 
 .bg-white:not(.visual-export-canvas):not(.keep-light),
@@ -109,30 +109,42 @@
 .bg-white\/98:not(.visual-export-canvas):not(.keep-light),
 .bg-white\/90:not(.visual-export-canvas):not(.keep-light),
 .bg-white\/80:not(.visual-export-canvas):not(.keep-light) {
-  background-color: #243554 !important;
+  background-color: #16161B !important;
   color: #FFFFFF;
 }
 
 .bg-slate-50:not(.visual-export-canvas),
-.bg-slate-100:not(.visual-export-canvas) {
-  background-color: #2B3F63 !important;
+.bg-slate-50\/80:not(.visual-export-canvas),
+.bg-slate-50\/40:not(.visual-export-canvas),
+.bg-slate-100:not(.visual-export-canvas),
+.bg-slate-200:not(.visual-export-canvas),
+.bg-\[\#E5E8F0\]:not(.visual-export-canvas),
+.bg-\[\#E5E8EA\]:not(.visual-export-canvas) {
+  background-color: #1F1F26 !important;
 }
 
 .hover\:bg-slate-50:hover:not(.visual-export-canvas),
 .hover\:bg-slate-100:hover:not(.visual-export-canvas),
 .hover\:bg-slate-200:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#FAF9F6\]:hover:not(.visual-export-canvas),
-.hover\:bg-\[\#F1F5F5\]:hover:not(.visual-export-canvas) {
-  background-color: #344B75 !important;
+.hover\:bg-\[\#F1F5F5\]:hover:not(.visual-export-canvas),
+.hover\:bg-\[\#E5E8EA\]:hover:not(.visual-export-canvas) {
+  background-color: #272730 !important;
 }
 
 .border-\[\#E5E8EA\]:not(.visual-export-canvas),
 .border-\[\#EEF0F1\]:not(.visual-export-canvas),
 .border-slate-200:not(.visual-export-canvas),
 .border-slate-200\/80:not(.visual-export-canvas),
+.border-slate-200\/90:not(.visual-export-canvas),
 .border-slate-100:not(.visual-export-canvas),
 .border-slate-300:not(.visual-export-canvas) {
-  border-color: rgba(255, 255, 255, 0.14) !important;
+  border-color: rgba(255, 255, 255, 0.10) !important;
+}
+
+.divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+.divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: rgba(255, 255, 255, 0.08) !important;
 }
 
 .text-\[\#202C37\]:not(.visual-export-canvas),
@@ -146,49 +158,50 @@
 .text-\[\#46516F\]:not(.visual-export-canvas),
 .text-slate-600:not(.visual-export-canvas),
 .text-slate-500:not(.visual-export-canvas) {
-  color: #CBD5E1 !important;
+  color: #B4B4BE !important;
 }
 
 .text-\[\#89939C\]:not(.visual-export-canvas),
 .text-slate-400:not(.visual-export-canvas) {
-  color: #9FB3D1 !important;
+  color: #8E8E9A !important;
 }
 
+/* Primary Buttons -> Warm Studio Champagne Gold with crisp Obsidian text */
 .bg-\[\#315F6D\]:not(.visual-export-canvas) {
-  background-color: #38BDF8 !important;
-  color: #0F1B2E !important;
+  background-color: #D8B28A !important;
+  color: #0D0D10 !important;
 }
 
 .hover\:bg-\[\#234A57\]:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#264F5D\]:hover:not(.visual-export-canvas) {
-  background-color: #7DD3FC !important;
-  color: #0F1B2E !important;
+  background-color: #E5C6A4 !important;
+  color: #0D0D10 !important;
 }
 
 .text-\[\#315F6D\]:not(.visual-export-canvas) {
-  color: #56CCF2 !important;
+  color: #D8B28A !important;
 }
 
 .bg-\[\#D9E9EB\]:not(.visual-export-canvas),
 .bg-\[\#E4F0F0\]:not(.visual-export-canvas),
 .bg-\[\#E4F0F0\]\/50:not(.visual-export-canvas),
 .bg-\[\#D9E9EB\]\/60:not(.visual-export-canvas) {
-  background-color: rgba(56, 189, 248, 0.18) !important;
+  background-color: rgba(216, 178, 138, 0.16) !important;
 }
 
 .bg-\[\#FFF1CB\]:not(.visual-export-canvas) {
-  background-color: rgba(250, 204, 21, 0.2) !important;
+  background-color: rgba(224, 142, 69, 0.18) !important;
 }
 
 .text-\[\#BD8C29\]:not(.visual-export-canvas),
 .text-\[\#87621D\]:not(.visual-export-canvas) {
-  color: #FDE047 !important;
+  color: #F3B36C !important;
 }
 
 .bg-\[\#F7E3DF\]:not(.visual-export-canvas),
 .bg-\[\#F7EAE5\]:not(.visual-export-canvas),
 .bg-\[\#F7E3DF\]\/50:not(.visual-export-canvas) {
-  background-color: rgba(251, 113, 133, 0.18) !important;
+  background-color: rgba(251, 113, 133, 0.16) !important;
 }
 
 .text-\[\#C96B65\]:not(.visual-export-canvas) {
@@ -196,7 +209,7 @@
 }
 
 .bg-\[\#C96B65\]:not(.visual-export-canvas) {
-  background-color: #F43F5E !important;
+  background-color: #E11D48 !important;
   color: #FFFFFF !important;
 }
 
@@ -204,13 +217,13 @@
 .bg-emerald-50\/70:not(.visual-export-canvas),
 .bg-emerald-50\/90:not(.visual-export-canvas),
 .bg-emerald-100:not(.visual-export-canvas) {
-  background-color: rgba(52, 211, 153, 0.18) !important;
+  background-color: rgba(52, 211, 153, 0.16) !important;
 }
 
 .border-emerald-200:not(.visual-export-canvas),
 .border-emerald-200\/90:not(.visual-export-canvas),
 .border-emerald-300:not(.visual-export-canvas) {
-  border-color: rgba(52, 211, 153, 0.4) !important;
+  border-color: rgba(52, 211, 153, 0.35) !important;
 }
 
 .text-emerald-950:not(.visual-export-canvas),

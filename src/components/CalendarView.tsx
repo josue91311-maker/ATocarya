@@ -145,7 +145,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
       
       {/* 0. HERO ATMOSFÉRICO DE ESCENARIO (Desktop & Portal) */}
       {musicianUser && (
-        <div className="relative rounded-3xl overflow-hidden bg-[#243554] border border-white/15 text-white p-7 sm:p-10 shadow-modal">
+        <div className="relative rounded-3xl overflow-hidden bg-[#16161B] border border-white/15 text-white p-7 sm:p-10 shadow-modal">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
             style={{
@@ -157,12 +157,12 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                'linear-gradient(120deg, rgba(11,17,32,0.92) 0%, rgba(28,48,88,0.65) 55%, rgba(11,17,32,0.88) 100%)',
+                'linear-gradient(120deg, rgba(13,13,16,0.92) 0%, rgba(42,34,26,0.70) 55%, rgba(13,13,16,0.90) 100%)',
             }}
           />
 
           <div className="relative z-10 max-w-xl">
-            <span className="text-[10px] sm:text-[11px] font-display font-bold tracking-[0.28em] uppercase text-[#38BDF8] block">
+            <span className="text-[10px] sm:text-[11px] font-display font-bold tracking-[0.28em] uppercase text-[#D8B28A] block">
               FECHAS DE CULTO · {musicianUser.primaryInstrument}
             </span>
             <h1 className="font-script text-4xl sm:text-5xl text-white font-bold mt-1.5 leading-tight drop-shadow-md">
@@ -177,9 +177,9 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
 
       {/* TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
       {nextService && musicianUser && !myAssignedSlotInNext && recommendedSlotInNext && (
-        <div className="bg-[#131D35]/90 border border-[#38BDF8]/30 text-white rounded-2xl p-4 sm:p-5 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-[#16161B]/90 border border-[#D8B28A]/30 text-white rounded-2xl p-4 sm:p-5 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-[#38BDF8] text-[#0B1120] flex flex-col items-center justify-center shrink-0 shadow-glow">
+            <div className="w-12 h-12 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex flex-col items-center justify-center shrink-0 shadow-glow">
               <span className="text-[9px] uppercase font-black tracking-wider leading-none">
                 {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { month: 'short' })}
               </span>
@@ -189,7 +189,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-display uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-[#FACC15] text-[#0B1120]">
+                <span className="text-[10px] font-display uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-[#E08E45] text-[#0D0D10]">
                   Sugerido para ti
                 </span>
                 <span className="text-xs font-bold text-[#94A3B8] tabular-nums">
@@ -204,7 +204,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
           <div className="flex items-center gap-2">
             <button
               onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
-              className="px-5 py-2.5 bg-[#38BDF8] hover:bg-[#7DD3FC] text-[#0B1120] rounded-full text-xs font-display font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow transition-all"
+              className="px-5 py-2.5 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-full text-xs font-display font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow transition-all"
             >
               <Check className="w-4 h-4 stroke-[3]" />
               <span>Anotarme en {recommendedSlotInNext.label}</span>
