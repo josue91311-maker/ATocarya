@@ -117,12 +117,12 @@ export const Navbar: React.FC<Props> = ({
   const canAccessTracks = isAdminAuthenticated || isDirector;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#0B1120] text-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#1D2B44] text-white">
       {/* ========================================================================= */}
       {/* 1. DESKTOP SIDEBAR (MIDNIGHT CONCERT STAGE #080E1D)                       */}
       {/* ========================================================================= */}
       <aside 
-        className={`hidden md:flex flex-col justify-between min-h-screen bg-[#080E1D] border-r border-white/10 text-white sticky top-0 shrink-0 shadow-modal z-30 select-none transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex flex-col justify-between min-h-screen bg-[#17233A] border-r border-white/15 text-white sticky top-0 shrink-0 shadow-modal z-30 select-none transition-all duration-300 ease-in-out ${
           isSidebarCollapsed ? 'w-20 p-3' : 'w-64 p-5'
         }`}
       >
@@ -342,7 +342,7 @@ export const Navbar: React.FC<Props> = ({
       {/* ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Desktop Top Header Bar */}
-        <header className="hidden md:flex items-center justify-between h-16 px-6 sm:px-8 bg-[#0B1120]/85 border-b border-white/10 sticky top-0 z-20 backdrop-blur-xl">
+        <header className="hidden md:flex items-center justify-between h-16 px-6 sm:px-8 bg-[#17233A]/90 border-b border-white/15 sticky top-0 z-20 backdrop-blur-xl">
           {/* Input Buscador General */}
           <div className="relative w-80 max-w-sm">
             <input
@@ -629,7 +629,7 @@ export const Navbar: React.FC<Props> = ({
       {/* ========================================================================= */}
       {/* 3. MOBILE BOTTOM NAVIGATION BAR (FIXED EN CELULAR < 768px)                */}
       {/* ========================================================================= */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#080E1D]/95 backdrop-blur-xl border-t border-white/10 py-2 px-3 flex items-center justify-around shadow-modal">
+      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#17233A]/95 backdrop-blur-xl border-t border-white/15 py-2 px-3 flex items-center justify-around shadow-modal">
         {portal === 'musician' && (
           <>
             {/* 1. Inicio */}

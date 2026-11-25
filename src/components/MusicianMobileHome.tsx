@@ -135,12 +135,12 @@ export const MusicianMobileHome: React.FC<Props> = ({
   };
 
   return (
-    <div className="-mx-4 -mt-6 sm:mx-0 sm:mt-0 pb-24 animate-in fade-in select-none bg-[#0B1120]">
+    <div className="-mx-4 -mt-6 sm:mx-0 sm:mt-0 pb-24 animate-in fade-in select-none bg-[#1D2B44]">
       
       {/* ========================================================================= */}
       {/* 1. HERO HEADER ATMOSFÉRICO DE ESCENARIO (ESTILO CONCIERTO / LIVE)         */}
       {/* ========================================================================= */}
-      <div className="relative bg-[#0B1120] text-white pt-4 pb-10 px-4 sm:px-6 overflow-hidden">
+      <div className="relative bg-[#1D2B44] text-white pt-4 pb-10 px-4 sm:px-6 overflow-hidden">
         {/* Foto de ambiente de adoración con spotlight azul profundo */}
         <div
           className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
@@ -235,7 +235,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
           {/* 2 Tarjetas Estadísticas en Dark Glass */}
           <div className="grid grid-cols-2 gap-3 pt-2">
             {/* Card 1: Asignados */}
-            <div className="bg-[#131D35]/85 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
+            <div className="bg-[#243554]/90 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
               <div className="flex items-center justify-between">
                 <div className="w-8 h-8 rounded-xl bg-[#38BDF8]/15 border border-[#38BDF8]/30 text-[#38BDF8] flex items-center justify-center">
                   <Calendar className="w-4 h-4" />
@@ -253,7 +253,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
             </div>
 
             {/* Card 2: Total Cultos en Calendario */}
-            <div className="bg-[#131D35]/85 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
+            <div className="bg-[#243554]/90 backdrop-blur-md text-white rounded-2xl p-3.5 shadow-card flex flex-col justify-between min-h-[88px] border border-white/10">
               <div className="flex items-center justify-between">
                 <div className="w-8 h-8 rounded-xl bg-[#FACC15]/15 border border-[#FACC15]/30 text-[#FACC15] flex items-center justify-center">
                   <Users className="w-4 h-4" />
@@ -276,7 +276,7 @@ export const MusicianMobileHome: React.FC<Props> = ({
       {/* ========================================================================= */}
       {/* 2. CONTENEDOR PRINCIPAL DE EVENTOS (ESTILO FEATURED EVENT)                */}
       {/* ========================================================================= */}
-      <div className="bg-[#0B1120] border-t border-white/10 rounded-t-[28px] -mt-4 pt-6 pb-6 px-4 sm:px-6 relative z-10 space-y-6 max-w-lg mx-auto min-h-screen">
+      <div className="bg-[#1D2B44] border-t border-white/10 rounded-t-[28px] -mt-4 pt-6 pb-6 px-4 sm:px-6 relative z-10 space-y-6 max-w-lg mx-auto min-h-screen">
         
         {/* Notificación flotante de feedback */}
         {feedbackMsg && (

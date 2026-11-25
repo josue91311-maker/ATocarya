@@ -176,7 +176,7 @@ const MainRouter: React.FC = () => {
           )}
         </main>
 
-        <footer className="relative z-10 mt-auto border-t border-white/10 py-5 px-4 text-center bg-[#080E1D]/80 backdrop-blur-sm hidden md:block">
+        <footer className="relative z-10 mt-auto border-t border-white/10 py-5 px-4 text-center bg-[#17233A]/90 backdrop-blur-sm hidden md:block">
           <p className="text-[11px] font-display uppercase tracking-widest text-[#64748B]">
             ATocarYa · Coordinador de Músicos & Alabanza
           </p>
@@ -257,7 +257,7 @@ const MainRouter: React.FC = () => {
         )}
       </main>
 
-      <footer className="mt-auto border-t border-white/10 py-6 px-4 text-center bg-[#080E1D]/80">
+      <footer className="mt-auto border-t border-white/10 py-6 px-4 text-center bg-[#17233A]/90">
         <p className="text-[11px] font-display uppercase tracking-widest text-[#64748B]">
           ATocarYa · Panel de Administración de Alabanza
         </p>

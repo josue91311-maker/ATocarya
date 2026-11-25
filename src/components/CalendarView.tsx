@@ -145,7 +145,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
       
       {/* 0. HERO ATMOSFÉRICO DE ESCENARIO (Desktop & Portal) */}
       {musicianUser && (
-        <div className="relative rounded-3xl overflow-hidden bg-[#0B1120] border border-white/10 text-white p-7 sm:p-10 shadow-modal">
+        <div className="relative rounded-3xl overflow-hidden bg-[#243554] border border-white/15 text-white p-7 sm:p-10 shadow-modal">
           <div
             className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
             style={{

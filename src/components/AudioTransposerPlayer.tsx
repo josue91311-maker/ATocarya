@@ -317,7 +317,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
             ? 'bg-[#38BDF8] text-[#0B1120] shadow-glow font-bold ring-2 ring-[#38BDF8]/40 scale-[1.02] z-10'
             : isWorshipTarget
             ? 'bg-[#38BDF8]/15 hover:bg-[#38BDF8]/25 text-[#38BDF8] border-2 border-[#38BDF8]/60 font-bold'
-            : 'bg-[#0E1629] hover:bg-[#1C2A4A] text-white border border-white/10 font-semibold'
+            : 'bg-[#1D2B44] hover:bg-[#2D4166] text-white border border-white/15 font-semibold'
         }`}
         title={`Transportar ${st === 0 ? 'tono original' : `${st > 0 ? `+${st}` : st} semitonos`} (${noteAtSt})${isWorshipTarget ? ' - Tono oficial del culto' : ''}`}
       >

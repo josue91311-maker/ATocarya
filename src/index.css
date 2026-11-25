@@ -7,22 +7,22 @@
     --font-script: 'Caveat', cursive;
     --font-display: 'Montserrat', system-ui, -apple-system, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-    --stage-bg: #0B1120;
-    --stage-surface: #131D35;
-    --stage-elevated: #1A2644;
-    --stage-border: rgba(255, 255, 255, 0.09);
+    --stage-bg: #1D2B44;
+    --stage-surface: #243554;
+    --stage-elevated: #2D4166;
+    --stage-border: rgba(255, 255, 255, 0.14);
     --stage-cyan: #38BDF8;
     --stage-yellow: #FACC15;
   }
 
   body {
     font-family: var(--font-body);
-    background-color: #0B1120;
+    background-color: #1D2B44;
     background-image:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(45, 76, 134, 0.38), transparent 65%),
-      radial-gradient(ellipse 60% 40% at 85% 20%, rgba(56, 189, 248, 0.10), transparent 60%);
+      radial-gradient(ellipse 85% 55% at 50% -10%, rgba(100, 145, 215, 0.42), transparent 68%),
+      radial-gradient(ellipse 65% 45% at 85% 15%, rgba(56, 189, 248, 0.16), transparent 60%);
     background-attachment: fixed;
-    @apply text-[#F8FAFC] antialiased selection:bg-[#38BDF8] selection:text-[#0B1120] min-h-screen;
+    @apply text-white antialiased selection:bg-[#38BDF8] selection:text-[#0F1B2E] min-h-screen;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
@@ -37,10 +37,10 @@
     letter-spacing: -0.015em;
   }
 
-  /* Native form controls in dark stage theme */
+  /* Native form controls in luminous twilight blue theme */
   select option {
-    background-color: #131D35;
-    color: #F8FAFC;
+    background-color: #243554;
+    color: #FFFFFF;
   }
 }
 
@@ -49,19 +49,19 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Atmospheric dark concert surface card */
+/* Atmospheric luminous twilight surface card */
 .saas-surface,
 .stage-card {
-  @apply bg-[#131D35]/90 backdrop-blur-md border border-white/10 rounded-2xl shadow-card;
+  @apply bg-[#243554]/90 backdrop-blur-md border border-white/15 rounded-2xl shadow-card;
 }
 
 .saas-row {
-  @apply bg-[#131D35]/80 hover:bg-[#1A2746] border-b border-white/10 transition-colors duration-150;
+  @apply bg-[#243554]/80 hover:bg-[#2D4166] border-b border-white/10 transition-colors duration-150;
 }
 
 /* Pill outline CTA button inspired by live stage hero */
 .stage-pill-btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/35 px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-200 hover:bg-white hover:text-[#0B1120] hover:border-white active:scale-[0.98];
+  @apply inline-flex items-center justify-center gap-2 rounded-full border border-white/50 px-6 py-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white transition-all duration-200 hover:bg-white hover:text-[#17233A] hover:border-white active:scale-[0.98];
 }
 
 /* Touch-optimized button target (min 44px) */
@@ -70,20 +70,20 @@
   min-width: 44px;
 }
 
-/* Subtle dark scrollbar */
+/* Subtle scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(11, 17, 32, 0.5);
+  background: rgba(23, 35, 58, 0.45);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.28);
+  background: rgba(148, 163, 184, 0.35);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(56, 189, 248, 0.55);
+  background: rgba(56, 189, 248, 0.65);
 }
 
 /* Hide horizontal scrollbar on pill filter strips */
@@ -96,30 +96,34 @@
 }
 
 /* ==========================================================================
-   Global Midnight Stage Harmonization for Secondary Modals & Legacy Classes
-   Ensures zero light-mode flashes across all 30 components while preserving
-   exportable light-background print canvas (.visual-export-canvas).
+   Global Luminous Twilight Stage Harmonization
+   Ensures consistent brighter slate-blue surfaces with zero white header clashes.
    ========================================================================== */
 .bg-\[\#F7F4EF\]:not(.visual-export-canvas),
 .bg-\[\#FAF9F6\]:not(.visual-export-canvas) {
-  background-color: #0E1629 !important;
+  background-color: #1D2B44 !important;
 }
 
-.bg-white:not(.visual-export-canvas):not(.keep-light) {
-  background-color: #131D35 !important;
-  color: #F8FAFC;
+.bg-white:not(.visual-export-canvas):not(.keep-light),
+.bg-white\/95:not(.visual-export-canvas):not(.keep-light),
+.bg-white\/98:not(.visual-export-canvas):not(.keep-light),
+.bg-white\/90:not(.visual-export-canvas):not(.keep-light),
+.bg-white\/80:not(.visual-export-canvas):not(.keep-light) {
+  background-color: #243554 !important;
+  color: #FFFFFF;
 }
 
 .bg-slate-50:not(.visual-export-canvas),
 .bg-slate-100:not(.visual-export-canvas) {
-  background-color: #182442 !important;
+  background-color: #2B3F63 !important;
 }
 
 .hover\:bg-slate-50:hover:not(.visual-export-canvas),
 .hover\:bg-slate-100:hover:not(.visual-export-canvas),
+.hover\:bg-slate-200:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#FAF9F6\]:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#F1F5F5\]:hover:not(.visual-export-canvas) {
-  background-color: #1E2D52 !important;
+  background-color: #344B75 !important;
 }
 
 .border-\[\#E5E8EA\]:not(.visual-export-canvas),
@@ -128,67 +132,67 @@
 .border-slate-200\/80:not(.visual-export-canvas),
 .border-slate-100:not(.visual-export-canvas),
 .border-slate-300:not(.visual-export-canvas) {
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 .text-\[\#202C37\]:not(.visual-export-canvas),
 .text-slate-900:not(.visual-export-canvas),
 .text-slate-800:not(.visual-export-canvas),
 .text-slate-700:not(.visual-export-canvas) {
-  color: #F8FAFC !important;
+  color: #FFFFFF !important;
 }
 
 .text-\[\#64717C\]:not(.visual-export-canvas),
 .text-\[\#46516F\]:not(.visual-export-canvas),
 .text-slate-600:not(.visual-export-canvas),
 .text-slate-500:not(.visual-export-canvas) {
-  color: #94A3B8 !important;
+  color: #CBD5E1 !important;
 }
 
 .text-\[\#89939C\]:not(.visual-export-canvas),
 .text-slate-400:not(.visual-export-canvas) {
-  color: #7E92B2 !important;
+  color: #9FB3D1 !important;
 }
 
 .bg-\[\#315F6D\]:not(.visual-export-canvas) {
   background-color: #38BDF8 !important;
-  color: #0B1120 !important;
+  color: #0F1B2E !important;
 }
 
 .hover\:bg-\[\#234A57\]:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#264F5D\]:hover:not(.visual-export-canvas) {
   background-color: #7DD3FC !important;
-  color: #0B1120 !important;
+  color: #0F1B2E !important;
 }
 
 .text-\[\#315F6D\]:not(.visual-export-canvas) {
-  color: #38BDF8 !important;
+  color: #56CCF2 !important;
 }
 
 .bg-\[\#D9E9EB\]:not(.visual-export-canvas),
 .bg-\[\#E4F0F0\]:not(.visual-export-canvas),
 .bg-\[\#E4F0F0\]\/50:not(.visual-export-canvas),
 .bg-\[\#D9E9EB\]\/60:not(.visual-export-canvas) {
-  background-color: rgba(56, 189, 248, 0.14) !important;
+  background-color: rgba(56, 189, 248, 0.18) !important;
 }
 
 .bg-\[\#FFF1CB\]:not(.visual-export-canvas) {
-  background-color: rgba(250, 204, 21, 0.16) !important;
+  background-color: rgba(250, 204, 21, 0.2) !important;
 }
 
 .text-\[\#BD8C29\]:not(.visual-export-canvas),
 .text-\[\#87621D\]:not(.visual-export-canvas) {
-  color: #FACC15 !important;
+  color: #FDE047 !important;
 }
 
 .bg-\[\#F7E3DF\]:not(.visual-export-canvas),
 .bg-\[\#F7EAE5\]:not(.visual-export-canvas),
 .bg-\[\#F7E3DF\]\/50:not(.visual-export-canvas) {
-  background-color: rgba(251, 113, 133, 0.14) !important;
+  background-color: rgba(251, 113, 133, 0.18) !important;
 }
 
 .text-\[\#C96B65\]:not(.visual-export-canvas) {
-  color: #FB7185 !important;
+  color: #FDA4AF !important;
 }
 
 .bg-\[\#C96B65\]:not(.visual-export-canvas) {
@@ -200,13 +204,13 @@
 .bg-emerald-50\/70:not(.visual-export-canvas),
 .bg-emerald-50\/90:not(.visual-export-canvas),
 .bg-emerald-100:not(.visual-export-canvas) {
-  background-color: rgba(52, 211, 153, 0.14) !important;
+  background-color: rgba(52, 211, 153, 0.18) !important;
 }
 
 .border-emerald-200:not(.visual-export-canvas),
 .border-emerald-200\/90:not(.visual-export-canvas),
 .border-emerald-300:not(.visual-export-canvas) {
-  border-color: rgba(52, 211, 153, 0.35) !important;
+  border-color: rgba(52, 211, 153, 0.4) !important;
 }
 
 .text-emerald-950:not(.visual-export-canvas),

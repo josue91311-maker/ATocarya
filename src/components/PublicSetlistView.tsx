@@ -245,14 +245,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   );
 
   return (
-    <div className="min-h-screen bg-[#F7F4EF] text-slate-900 flex flex-col selection:bg-[#315F6D]/20">
+    <div className="min-h-screen bg-[#1D2B44] text-white flex flex-col selection:bg-[#38BDF8]/30">
       
-      {/* 1. Header Superior Moderno */}
-      <header className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-[#E5E8EA] shadow-2xs">
+      {/* 1. Header Superior Moderno (Azul Atmosférico con alto contraste) */}
+      <header className="sticky top-0 z-30 bg-[#17233A]/95 backdrop-blur-xl border-b border-white/15 shadow-card">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
           
           {/* Logo y Botón Volver */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3.5">
             <button
               type="button"
               onClick={() => {
@@ -264,18 +264,18 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   window.location.hash = '#/';
                 }
               }}
-              className="p-1.5 sm:px-3 sm:py-1.5 text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="p-1.5 sm:px-3.5 sm:py-1.5 text-white hover:text-[#38BDF8] bg-[#243554] hover:bg-[#2D4166] border border-white/15 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Volver"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Volver</span>
             </button>
-            <Logo size="sm" showText={true} />
+            <Logo size="sm" showText={true} lightText={true} />
           </div>
 
           {/* Badge Central Desktop */}
-          <div className="hidden md:flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold bg-[#D9E9EB]/60 text-[#315F6D] border border-[#315F6D]/20 shadow-2xs">
-            <span className="w-2 h-2 rounded-full bg-[#E8B844] animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-widest bg-[#243554] text-[#56CCF2] border border-[#38BDF8]/30">
+            <span className="w-2 h-2 rounded-full bg-[#FACC15] animate-pulse"></span>
             <span>REPERTORIO OFICIAL</span>
           </div>
 
@@ -283,16 +283,16 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
           <div className="flex items-center gap-2">
             <button
               onClick={handleCopyLink}
-              className="hidden sm:flex px-3.5 py-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold items-center gap-1.5 transition-colors shadow-2xs"
+              className="hidden sm:flex px-3.5 py-1.5 bg-[#243554] hover:bg-[#2D4166] text-white border border-white/15 rounded-full text-xs font-bold items-center gap-1.5 transition-colors"
               title="Copiar enlace del repertorio"
             >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5 text-slate-500" />}
+              {copiedLink ? <Check className="w-3.5 h-3.5 text-[#34D399]" /> : <Copy className="w-3.5 h-3.5 text-[#CBD5E1]" />}
               <span>{copiedLink ? '¡Copiado!' : 'Copiar Link'}</span>
             </button>
 
             <button
               onClick={handleShareWhatsApp}
-              className="px-3.5 py-1.5 bg-[#315F6D] hover:bg-[#264F5D] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all shadow-sm"
+              className="px-4 py-1.5 bg-[#38BDF8] hover:bg-[#7DD3FC] text-[#0F1B2E] rounded-full text-xs font-display font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-glow"
               title="Compartir por WhatsApp"
             >
               <Share2 className="w-3.5 h-3.5" />
@@ -302,7 +302,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
             <button
               type="button"
               onClick={handleCopyLink}
-              className="sm:hidden p-1.5 text-slate-600 hover:text-slate-900 rounded-lg hover:bg-slate-100"
+              className="sm:hidden p-1.5 text-[#CBD5E1] hover:text-white rounded-lg hover:bg-white/10"
               title="Copiar enlace"
             >
               <MoreVertical className="w-5 h-5" />

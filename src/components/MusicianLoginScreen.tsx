@@ -37,7 +37,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1120] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+    <div className="min-h-screen bg-[#1D2B44] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
       {/* Atmospheric Concert Stage Backdrop (inspired by live spotlight crowd) */}
       <div
         className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-30 scale-105"
@@ -70,7 +70,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
         </div>
 
         {/* Sleek Midnight Glass Card */}
-        <div className="bg-[#131D35]/85 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-modal">
+        <div className="bg-[#243554]/90 backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-modal">
           <div className="mb-6">
             <h2 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-white">
               Iniciar Sesión
@@ -103,7 +103,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                       const m = musicians.find(item => item.id === e.target.value);
                       if (m) setTypedName(m.fullName);
                     }}
-                    className="w-full px-4 py-3 bg-[#0B1120]/80 border border-white/15 rounded-xl text-sm text-white focus:bg-[#0B1120] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all font-medium"
+                    className="w-full px-4 py-3 bg-[#1D2B44]/80 border border-white/15 rounded-xl text-sm text-white focus:bg-[#1D2B44] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all font-medium"
                   >
                     <option value="">-- Elige tu nombre de la lista --</option>
                     {musicians.map((m) => (
@@ -121,7 +121,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                     value={typedName}
                     onChange={(e) => setTypedName(e.target.value)}
                     placeholder="Tu nombre completo"
-                    className="w-full px-4 py-3 bg-[#0B1120]/80 border border-white/15 rounded-xl text-sm text-white placeholder-[#64748B] focus:bg-[#0B1120] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all"
+                    className="w-full px-4 py-3 bg-[#1D2B44]/80 border border-white/15 rounded-xl text-sm text-white placeholder-[#64748B] focus:bg-[#1D2B44] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all"
                   />
                   <User className="w-4 h-4 text-[#64748B] absolute right-3.5 top-1/2 -translate-y-1/2" />
                 </div>
@@ -143,7 +143,7 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
                   value={pin}
                   onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   placeholder="••••"
-                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#0B1120]/80 border border-white/15 rounded-xl text-[#38BDF8] placeholder-[#64748B] focus:bg-[#0B1120] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all"
+                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#1D2B44]/80 border border-white/15 rounded-xl text-[#38BDF8] placeholder-[#64748B] focus:bg-[#1D2B44] focus:outline-none focus:border-[#38BDF8] focus:ring-2 focus:ring-[#38BDF8]/20 transition-all"
                 />
                 <Lock className="w-4 h-4 text-[#64748B] absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
