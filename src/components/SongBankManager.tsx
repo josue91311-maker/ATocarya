@@ -355,7 +355,7 @@ export const SongBankManager: React.FC = () => {
                         activeTab === 'chords' ? 'bg-white text-emerald-950 shadow-xs' : 'text-slate-600'
                       }`}
                     >
-                      🎸 Cifrado & Compases
+                      Cifrado & Compases
                     </button>
                     <button
                       type="button"
@@ -364,7 +364,7 @@ export const SongBankManager: React.FC = () => {
                         activeTab === 'lyrics' ? 'bg-white text-emerald-950 shadow-xs' : 'text-slate-600'
                       }`}
                     >
-                      🎤 Letra
+                      Letra
                     </button>
                   </div>
 
@@ -515,7 +515,7 @@ export const SongBankManager: React.FC = () => {
                   )}
                   {song.audioUrl && (
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-md flex items-center gap-1">
-                      🎧 Audio
+                      Audio
                     </span>
                   )}
                   {song.chordsUrl && (
@@ -526,17 +526,17 @@ export const SongBankManager: React.FC = () => {
                   )}
                   {song.chordChart && (
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-700 rounded-md">
-                      🎸 Compases
+                      Compases
                     </span>
                   )}
                   {song.lyrics && (
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md">
-                      🎤 Letra
+                      Letra
                     </span>
                   )}
                   {song.youtubeUrl && (
                     <span className="text-[10px] font-bold px-2 py-0.5 bg-red-50 text-red-700 rounded-md">
-                      ▶️ YouTube
+                      YouTube
                     </span>
                   )}
                 </div>
@@ -559,7 +559,7 @@ export const SongBankManager: React.FC = () => {
                       className="text-emerald-700 hover:text-emerald-900 text-[11px] font-bold flex items-center gap-1"
                       title="Abrir pista de audio"
                     >
-                      <span>🎧 Audio</span>
+                      <span>Audio</span>
                       <ExternalLink className="w-3 h-3" />
                     </a>
                   )}

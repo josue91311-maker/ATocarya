@@ -221,12 +221,12 @@ export const SongBankPlayer: React.FC = () => {
               </div>
             </div>
 
-            {/* Curva decorativa tipo ola en la parte inferior para fusionar con la tarjeta */}
+            {/* Curva decorativa tipo ola en la parte inferior para fusionar con el fondo oscuro */}
             <div className="absolute -bottom-1 left-0 right-0 overflow-hidden leading-none z-10 pointer-events-none">
               <svg
                 viewBox="0 0 1200 120"
                 preserveAspectRatio="none"
-                className="relative block w-full h-8 text-[#FAF9F6] fill-current"
+                className="relative block w-full h-8 text-[#0B1120] fill-current"
               >
                 <path d="M0,0 C150,80 350,-30 500,40 C650,110 900,10 1200,45 L1200,120 L0,120 Z" />
               </svg>

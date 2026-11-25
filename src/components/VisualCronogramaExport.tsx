@@ -238,7 +238,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
             className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors shadow-sm disabled:opacity-50"
           >
             <Camera className="w-4 h-4" />
-            <span>{isDownloading ? 'Generando imagen...' : '📸 Descargar Todo el Mes (PNG)'}</span>
+            <span>{isDownloading ? 'Generando imagen...' : 'Descargar Todo el Mes (PNG)'}</span>
           </button>
         </div>
       </div>
@@ -253,7 +253,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
             onChange={(e) => setSelectedMonth(e.target.value)}
             className="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-900 focus:outline-none focus:border-blue-600 cursor-pointer"
           >
-            <option value="all">📅 Todos los meses ({services.length})</option>
+            <option value="all">Todos los meses ({services.length})</option>
             {availableMonths.map((m) => (
               <option key={m} value={m}>
                 {getMonthLabel(m)}
@@ -451,7 +451,7 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
                           className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs transition-colors"
                           title="Configurar dinámicamente qué instrumentos participarán ese día"
                         >
-                          <span>⚙️ Editar Instrumentos</span>
+                          <span>Editar Instrumentos</span>
                         </button>
                       )}
 
@@ -507,9 +507,9 @@ export const VisualCronogramaExport: React.FC<Props> = ({ onOpenService, onEditS
               <div className="flex items-center gap-4 mt-2 text-xs text-blue-100 font-medium">
                 <span>⏰ Culto: <strong className="text-white">{exportingDate.time}</strong></span>
                 {exportingDate.rehearsalTime && (
-                  <span>· 🎼 Ensayo: <strong className="text-white">{exportingDate.rehearsalTime}</strong></span>
+                  <span>· Ensayo: <strong className="text-white">{exportingDate.rehearsalTime}</strong></span>
                 )}
-                <span>· 📖 {exportingDate.title}</span>
+                <span>· {exportingDate.title}</span>
               </div>
             </div>
 

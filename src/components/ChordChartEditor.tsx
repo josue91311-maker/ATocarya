@@ -177,7 +177,7 @@ export const ChordChartEditor: React.FC<Props> = ({
         {/* Fila 3: Notas con Bajo (Inversiones / Slash Chords) y Tiempos */}
         <div className="flex flex-wrap items-center gap-1.5 pt-1.5 border-t border-slate-200/70">
           <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 mr-0.5">
-            🎸 Notas con Bajo:
+            Notas con Bajo:
           </span>
 
           {['D/F#', 'C/E', 'G/B', 'A/C#', 'Am/G', 'F/A'].map((slashChord) => (

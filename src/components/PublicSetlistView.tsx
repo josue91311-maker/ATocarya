@@ -712,7 +712,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                           </span>
                           {sec.timeSignature && (
                             <span className="px-2 py-0.5 bg-slate-100 text-slate-700 border border-slate-200 rounded-lg text-xs font-mono font-bold">
-                              ⏱️ {sec.timeSignature}
+                              {sec.timeSignature}
                             </span>
                           )}
                         </div>

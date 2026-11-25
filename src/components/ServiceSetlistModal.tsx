@@ -570,7 +570,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                                       ? 'bg-amber-100 text-amber-900 border border-amber-200' 
                                       : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                   }`}>
-                                    🎤 {times === 0 ? '0 veces (Nueva)' : `Cantada ${times} ${times === 1 ? 'vez' : 'veces'}`}
+                                    {times === 0 ? '0 veces (Nueva)' : `Cantada ${times} ${times === 1 ? 'vez' : 'veces'}`}
                                   </span>
                                 );
                               })()}
@@ -583,7 +583,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                                       ? 'bg-amber-50 text-amber-800 border-amber-200' 
                                       : 'bg-teal-50 text-teal-800 border-teal-200'
                                   }`}>
-                                    {diff < 0 ? `⬇️ ${Math.abs(diff)} semitono${Math.abs(diff) > 1 ? 's' : ''} abajo` : `⬆️ +${diff} semitono${diff > 1 ? 's' : ''} arriba`}
+                                    {diff < 0 ? `↓ ${Math.abs(diff)} semitono${Math.abs(diff) > 1 ? 's' : ''} abajo` : `↑ +${diff} semitono${diff > 1 ? 's' : ''} arriba`}
                                   </span>
                                 );
                               })()}
@@ -594,14 +594,14 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                               )}
                               {song.audioUrl && (
                                 <span className="text-[10px] font-bold px-1.5 py-0.5 bg-teal-50 text-teal-700 border border-teal-200 rounded">
-                                  🎧 Pista
+                                  Pista
                                 </span>
                               )}
                             </div>
 
                             {song.notes && (
                               <p className="text-[11px] text-slate-600 mt-1 italic line-clamp-2">
-                                💬 {song.notes}
+                                {song.notes}
                               </p>
                             )}
                           </div>
@@ -748,7 +748,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                     }`}
                   >
                     <Zap className="w-3.5 h-3.5 text-amber-600" />
-                    <span>⚡ Nueva Rápida</span>
+                    <span>Nueva Rápida</span>
                   </button>
                 </div>
               </div>
@@ -770,7 +770,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
                   {songBank.length === 0 ? (
                     <div className="p-4 text-center border border-dashed border-amber-300 rounded-xl bg-amber-50/60 text-xs text-amber-900">
-                      <p className="font-bold">⚠️ El Banco Central está vacío</p>
+                      <p className="font-bold">El Banco Central está vacío</p>
                       <button
                         type="button"
                         onClick={() => setAddMode('quick-new')}
@@ -841,12 +841,12 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                                     ? 'bg-amber-100 text-amber-900 border border-amber-200' 
                                     : 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                                 }`}>
-                                  🎤 {times === 0 ? '0 veces (Nueva)' : `Cantada ${times} ${times === 1 ? 'vez' : 'veces'}`}
+                                  {times === 0 ? '0 veces (Nueva)' : `Cantada ${times} ${times === 1 ? 'vez' : 'veces'}`}
                                 </span>
 
                                 <div className="flex items-center gap-2 text-slate-400">
                                   {item.bpm && <span className="font-mono">{item.bpm} BPM</span>}
-                                  {item.audioUrl && <span className="text-teal-700 font-bold">🎧 Pista</span>}
+                                  {item.audioUrl && <span className="text-teal-700 font-bold">Pista</span>}
                                   {item.youtubeUrl && <span className="text-rose-600 font-bold">▶ Video</span>}
                                 </div>
                               </div>
@@ -1127,7 +1127,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>🎸 Cifrado & Compases</span>
+                  <span>Cifrado & Compases</span>
                   {newChordChart.trim() && <span className="w-2 h-2 rounded-full bg-emerald-500"></span>}
                 </button>
 
@@ -1140,7 +1140,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>🎤 Letra de la Canción</span>
+                  <span>Letra de la Canción</span>
                   {newLyrics.trim() && <span className="w-2 h-2 rounded-full bg-blue-500"></span>}
                 </button>
 
@@ -1153,7 +1153,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>📄 URL Cifrado / PDF</span>
+                  <span>URL Cifrado / PDF</span>
                   {newChordsUrl.trim() && <span className="w-2 h-2 rounded-full bg-indigo-500"></span>}
                 </button>
               </div>

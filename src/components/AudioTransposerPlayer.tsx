@@ -314,17 +314,17 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         onClick={() => handleSemitoneChange(st)}
         className={`relative py-1.5 sm:py-2 px-0.5 text-center rounded-xl transition-all flex flex-col items-center justify-center min-h-[46px] sm:min-h-[50px] cursor-pointer ${
           isSelected
-            ? 'bg-[#315F6D] text-white shadow-card font-bold ring-2 ring-[#315F6D]/40 scale-[1.02] z-10'
+            ? 'bg-[#38BDF8] text-[#0B1120] shadow-glow font-bold ring-2 ring-[#38BDF8]/40 scale-[1.02] z-10'
             : isWorshipTarget
-            ? 'bg-[#D9E9EB]/70 hover:bg-[#D9E9EB] text-[#315F6D] border-2 border-[#315F6D]/60 font-bold'
-            : 'bg-[#FAF9F6] hover:bg-[#F1F5F5] text-[#202C37] border border-[#E5E8EA] font-semibold'
+            ? 'bg-[#38BDF8]/15 hover:bg-[#38BDF8]/25 text-[#38BDF8] border-2 border-[#38BDF8]/60 font-bold'
+            : 'bg-[#0E1629] hover:bg-[#1C2A4A] text-white border border-white/10 font-semibold'
         }`}
         title={`Transportar ${st === 0 ? 'tono original' : `${st > 0 ? `+${st}` : st} semitonos`} (${noteAtSt})${isWorshipTarget ? ' - Tono oficial del culto' : ''}`}
       >
         {isWorshipTarget && (
           <span
             className={`absolute -top-1.5 -right-1 px-1 py-0.2 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-tighter shadow-2xs ${
-              isSelected ? 'bg-[#E8B844] text-[#202C37] font-black' : 'bg-[#C96B65] text-white'
+              isSelected ? 'bg-[#FACC15] text-[#0B1120] font-black' : 'bg-[#FACC15] text-[#0B1120]'
             }`}
           >
             Culto
@@ -335,7 +335,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         </span>
         <span
           className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 font-medium ${
-            isSelected ? 'text-white/80' : isWorshipTarget ? 'text-[#315F6D] font-bold' : 'text-[#89939C]'
+            isSelected ? 'text-[#0B1120]/80' : isWorshipTarget ? 'text-[#38BDF8] font-bold' : 'text-[#94A3B8]'
           }`}
         >
           {label}

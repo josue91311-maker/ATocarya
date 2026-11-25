@@ -386,7 +386,7 @@ export const ServiceDetailModal: React.FC<Props> = ({
                   </div>
                   <div>
                     <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                      <span>🎵 Repertorio Oficial Publicado</span>
+                      <span>Repertorio Oficial Publicado</span>
                     </h4>
                     <p className="text-[11px] text-emerald-800 mt-0.5">
                       {songs.length} alabanza(s) listas para ensayar con videos de YouTube y tonos.

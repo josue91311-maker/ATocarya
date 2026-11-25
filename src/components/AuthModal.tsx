@@ -124,7 +124,7 @@ export const AuthModal: React.FC<Props> = ({ isOpen, initialMode, onClose }) => 
         <div className="relative h-24 bg-gradient-to-r from-violet-600 via-indigo-600 to-fuchsia-600 p-6 flex items-center justify-between">
           <div className="relative z-10">
             <h2 className="text-xl font-extrabold text-white flex items-center gap-2">
-              <span>🎸</span> AtocarYa
+              AtocarYa
             </h2>
             <p className="text-xs text-violet-100">
               {mode === 'login' && 'Ingreso de Músico con PIN'}
@@ -378,7 +378,7 @@ export const AuthModal: React.FC<Props> = ({ isOpen, initialMode, onClose }) => 
           {mode === 'admin' && (
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="p-3 bg-amber-950/30 border border-amber-500/30 rounded-xl text-amber-200 text-xs">
-                👑 <strong>Modo Administrador</strong>: Habilita y programa fechas de servicio dominical, asigna cupos y descarga cronogramas.
+                <strong>Modo Administrador</strong>: Habilita y programa fechas de servicio dominical, asigna cupos y descarga cronogramas.
               </div>
 
               <div>

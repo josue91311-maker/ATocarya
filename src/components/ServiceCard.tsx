@@ -212,7 +212,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
                 >
                   <div className="flex items-center gap-1.5 text-[#202C37] font-semibold">
                     <Music className="w-3.5 h-3.5 text-[#315F6D]" />
-                    <span>🎵 {songsCount} canciones con videos y tonos</span>
+                    <span>{songsCount} canciones con videos y tonos</span>
                   </div>
                   <a
                     href={`/#/repertorio/${service.id}`}

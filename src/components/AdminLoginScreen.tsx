@@ -28,43 +28,57 @@ export const AdminLoginScreen: React.FC<Props> = ({ onGoToMusicians }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F7F4EF] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
-      {/* Subtle Ambient Background */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-[0.08]"
-        style={{ backgroundImage: 'url("/app-bg.jpg")' }}
+    <div className="min-h-screen bg-[#0B1120] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
+      {/* Atmospheric Concert Stage Backdrop */}
+      <div
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-25 scale-105"
+        style={{
+          backgroundImage:
+            'url("https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1600&q=80")',
+        }}
+        aria-hidden="true"
+      />
+      <div
+        className="fixed inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            'radial-gradient(ellipse 75% 55% at 50% 15%, rgba(56, 98, 168, 0.42), rgba(11, 17, 32, 0.94) 70%, #070B16 100%)',
+        }}
         aria-hidden="true"
       />
 
       <div className="w-full max-w-md relative z-10">
-        
-        {/* Original Logo Header */}
+        {/* Branding Header */}
         <div className="text-center mb-8 flex flex-col items-center">
-          <Logo size="lg" subtitle="Panel de Coordinación Administrativa" />
+          <Logo size="lg" subtitle="ADMIN" />
+          <p className="mt-4 text-[10px] font-display font-semibold uppercase tracking-[0.28em] text-[#94A3B8]">
+            PANEL DE COORDINACIÓN GENERAL
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="bg-white border border-[#E5E8EA] rounded-[24px] p-6 sm:p-8 shadow-card">
+        {/* Dark Glass Card */}
+        <div className="bg-[#131D35]/85 backdrop-blur-xl border border-white/10 rounded-3xl p-6 sm:p-8 shadow-modal">
           <div className="mb-6">
-            <h2 className="text-xl font-bold font-display text-[#202C37] flex items-center gap-2">
-              <Shield className="w-5 h-5 text-[#315F6D]" />
+            <h2 className="text-sm font-display font-bold uppercase tracking-[0.18em] text-white flex items-center gap-2">
+              <Shield className="w-4 h-4 text-[#FACC15]" />
               <span>Acceso de Administrador</span>
             </h2>
-            <p className="text-xs text-[#64717C] mt-1">
+            <div className="w-10 h-0.5 bg-[#FACC15] mt-2 rounded-full" />
+            <p className="text-xs text-[#94A3B8] mt-2.5">
               Ingresa el PIN maestro para programar fechas, músicos y cupos.
             </p>
           </div>
 
           {error && (
-            <div className="mb-5 p-3 rounded-xl bg-[#F7EAE5] border border-[#C96B65]/30 text-[#C96B65] text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#C96B65]" />
+            <div className="mb-5 p-3.5 rounded-xl bg-[#FB7185]/12 border border-[#FB7185]/35 text-[#FDA4AF] text-xs flex items-center gap-2.5">
+              <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#FB7185]" />
               <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-[#202C37] mb-1.5">
+              <label className="block text-[11px] font-display font-bold uppercase tracking-wider text-[#CBD5E1] mb-2">
                 PIN Maestro de Administrador
               </label>
               <div className="relative">
@@ -77,18 +91,17 @@ export const AdminLoginScreen: React.FC<Props> = ({ onGoToMusicians }) => {
                   value={pin}
                   onChange={(e) => setPin(e.target.value)}
                   placeholder="••••"
-                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl text-[#315F6D] placeholder-[#89939C] focus:bg-white focus:outline-none focus:border-[#315F6D] transition-all"
+                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#0B1120]/80 border border-white/15 rounded-xl text-[#FACC15] placeholder-[#64748B] focus:bg-[#0B1120] focus:outline-none focus:border-[#FACC15] focus:ring-2 focus:ring-[#FACC15]/20 transition-all"
                 />
-                <Lock className="w-4 h-4 text-[#89939C] absolute left-4 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-[#64748B] absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
             </div>
 
-            {/* Petróleo Submit button */}
             <button
               type="submit"
-              className="w-full mt-3 py-3 px-4 bg-[#315F6D] hover:bg-[#234A57] text-white text-sm font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-xs"
+              className="w-full mt-3 py-3.5 px-6 bg-[#FACC15] hover:bg-[#FDE047] text-[#0B1120] text-xs font-display font-extrabold uppercase tracking-[0.18em] rounded-full flex items-center justify-center gap-2 transition-all shadow-glow-yellow active:scale-[0.98]"
             >
-              <span>Acceder al Panel de Control</span>
+              <span>Acceder al Panel</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
@@ -98,7 +111,7 @@ export const AdminLoginScreen: React.FC<Props> = ({ onGoToMusicians }) => {
         <div className="mt-6 text-center">
           <button
             onClick={onGoToMusicians}
-            className="inline-flex items-center gap-1.5 text-xs text-[#64717C] hover:text-[#315F6D] transition-colors font-semibold"
+            className="inline-flex items-center gap-1.5 text-xs text-[#94A3B8] hover:text-[#38BDF8] transition-colors font-semibold uppercase tracking-wider"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Volver al Portal de Músicos</span>

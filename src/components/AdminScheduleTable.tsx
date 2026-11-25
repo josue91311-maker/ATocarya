@@ -190,7 +190,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
             title="Crear fechas para cualquier día de la semana, cantidad y hora"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#315F6D]" />
-            <span>⚡ Creación Rápida</span>
+            <span>Creación Rápida</span>
           </button>
 
           <button
@@ -317,7 +317,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
             className="py-2.5 px-3 bg-[#FAF9F6] border border-[#315F6D]/30 text-[#315F6D] text-xs font-bold rounded-xl flex items-center justify-center gap-1.5 shadow-2xs"
           >
             <Sparkles className="w-3.5 h-3.5 text-[#315F6D]" />
-            <span>⚡ Creación Rápida</span>
+            <span>Creación Rápida</span>
           </button>
 
           <button
@@ -351,7 +351,7 @@ export const AdminScheduleTable: React.FC<Props> = ({
               onChange={(e) => setSelectedMonth(e.target.value)}
               className="bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl px-3 py-2 text-xs font-bold text-[#202C37] focus:outline-none focus:border-[#315F6D] cursor-pointer w-full sm:w-auto"
             >
-              <option value="all">📅 Todos los meses ({services.length})</option>
+              <option value="all">Todos los meses ({services.length})</option>
               {availableMonths.map((m) => (
                 <option key={m} value={m}>
                   {getMonthLabel(m)}

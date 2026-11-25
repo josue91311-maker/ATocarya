@@ -143,38 +143,44 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       
-      {/* 0. HERO EDITORIAL BANNER (Desktop & Portal) */}
+      {/* 0. HERO ATMOSFÉRICO DE ESCENARIO (Desktop & Portal) */}
       {musicianUser && (
-        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#C96B65] via-[#BD8C29] to-[#315F6D] text-white p-6 sm:p-8 shadow-card">
-          {/* Subtle line art of guitar on the right */}
-          <div className="absolute -right-4 -top-6 bottom-0 w-72 sm:w-96 pointer-events-none select-none opacity-20 filter invert">
-            <img 
-              src="/assets/music/guitar-line.svg" 
-              alt="" 
-              className="w-full h-full object-cover object-right"
-            />
-          </div>
+        <div className="relative rounded-3xl overflow-hidden bg-[#0B1120] border border-white/10 text-white p-7 sm:p-10 shadow-modal">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
+            style={{
+              backgroundImage:
+                'url("https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=80")',
+            }}
+          />
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'linear-gradient(120deg, rgba(11,17,32,0.92) 0%, rgba(28,48,88,0.65) 55%, rgba(11,17,32,0.88) 100%)',
+            }}
+          />
 
           <div className="relative z-10 max-w-xl">
-            <span className="text-[10px] sm:text-[11px] font-extrabold tracking-widest uppercase text-white/80 block">
-              FECHAS DE CULTO
+            <span className="text-[10px] sm:text-[11px] font-display font-bold tracking-[0.28em] uppercase text-[#38BDF8] block">
+              FECHAS DE CULTO · {musicianUser.primaryInstrument}
             </span>
-            <h1 className="font-serif text-3xl sm:text-4xl text-white font-normal mt-1 leading-tight">
-              Hola, {musicianUser.fullName.split(' ')[0]}
+            <h1 className="font-script text-4xl sm:text-5xl text-white font-bold mt-1.5 leading-tight drop-shadow-md">
+              ¡Hola, {musicianUser.fullName.split(' ')[0]}!
             </h1>
-            <p className="text-xs sm:text-sm text-white/90 mt-1">
-              Aquí tienes un resumen de tus próximos cultos.
+            <p className="text-xs sm:text-sm text-[#CBD5E1] mt-1.5">
+              Aquí tienes el resumen de tus próximos cultos y vacantes disponibles.
             </p>
           </div>
         </div>
       )}
 
-      {/* ⚡ TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
+      {/* TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
       {nextService && musicianUser && !myAssignedSlotInNext && recommendedSlotInNext && (
-        <div className="bg-[#D9E9EB]/60 border border-[#315F6D]/20 text-[#202C37] rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bg-[#131D35]/90 border border-[#38BDF8]/30 text-white rounded-2xl p-4 sm:p-5 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-[#315F6D] text-white flex flex-col items-center justify-center shrink-0 shadow-xs">
-              <span className="text-[9px] uppercase font-bold tracking-wider leading-none">
+            <div className="w-12 h-12 rounded-xl bg-[#38BDF8] text-[#0B1120] flex flex-col items-center justify-center shrink-0 shadow-glow">
+              <span className="text-[9px] uppercase font-black tracking-wider leading-none">
                 {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { month: 'short' })}
               </span>
               <span className="text-xl font-black font-display leading-tight tabular-nums">
@@ -183,14 +189,14 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 rounded-md bg-[#315F6D] text-white shadow-2xs">
-                  ⚡ Sugerido para ti
+                <span className="text-[10px] font-display uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-[#FACC15] text-[#0B1120]">
+                  Sugerido para ti
                 </span>
-                <span className="text-xs font-bold text-[#64717C]">
+                <span className="text-xs font-bold text-[#94A3B8] tabular-nums">
                   {nextService.date} ({nextService.time})
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold font-display text-[#202C37] mt-0.5">
+              <h3 className="text-sm sm:text-base font-bold font-display text-white mt-1">
                 {musicianUser.fullName}, toca tu instrumento ({musicianUser.primaryInstrument})
               </h3>
             </div>
@@ -198,7 +204,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
           <div className="flex items-center gap-2">
             <button
               onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
-              className="px-4 py-2.5 bg-[#315F6D] hover:bg-[#234A57] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-colors"
+              className="px-5 py-2.5 bg-[#38BDF8] hover:bg-[#7DD3FC] text-[#0B1120] rounded-full text-xs font-display font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow transition-all"
             >
               <Check className="w-4 h-4 stroke-[3]" />
               <span>Anotarme en {recommendedSlotInNext.label}</span>
@@ -329,7 +335,7 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
                 onChange={(e) => setSelectedMonth(e.target.value)}
                 className="bg-transparent text-xs font-bold text-[#202C37] focus:outline-none w-full cursor-pointer"
               >
-                <option value="all">📅 Todos los meses</option>
+                <option value="all">Todos los meses</option>
                 {availableMonths.map((mKey) => (
                   <option key={mKey} value={mKey}>
                     {getMonthLabel(mKey)}

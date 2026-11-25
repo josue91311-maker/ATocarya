@@ -108,7 +108,7 @@ export const MyServicesView: React.FC<Props> = ({ onSelectService }) => {
                       title="Ver repertorio de canciones y tonos"
                     >
                       <Music className="w-3.5 h-3.5" />
-                      <span>🎵 Ver Canciones ({service.songs.length})</span>
+                      <span>Ver Canciones ({service.songs.length})</span>
                     </a>
                   )}
                   <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#D9E9EB] border border-[#315F6D]/30 text-[#315F6D] text-xs font-bold shadow-2xs">
