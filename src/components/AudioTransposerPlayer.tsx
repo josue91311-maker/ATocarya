@@ -363,8 +363,8 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
       {/* 2. Banner Grande: Tonalidad que se va a tocar en el Culto */}
       <div className={`p-3.5 sm:p-4 rounded-2xl my-3 border transition-all ${
         worshipDelta !== 0
-          ? 'bg-gradient-to-r from-[#D9E9EB]/60 via-[#F7F4EF] to-[#D9E9EB]/30 border-[#315F6D]/30 shadow-xs'
-          : 'bg-[#FAF9F6] border-[#E5E8EA]'
+          ? 'bg-[#1E1E26] border-[#D8B28A]/40 shadow-xs'
+          : 'bg-[#16161B] border-white/10'
       }`}>
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">

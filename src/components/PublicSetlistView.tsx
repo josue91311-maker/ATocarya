@@ -353,7 +353,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
             className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-luminosity pointer-events-none"
             style={{ backgroundImage: 'url("/app-bg.jpg")' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#234A57] via-[#315F6D]/95 to-[#315F6D]/80 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1714] via-[#16161C]/95 to-[#121217]/85 pointer-events-none" />
 
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2">

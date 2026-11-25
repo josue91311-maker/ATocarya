@@ -37,19 +37,22 @@
     letter-spacing: -0.025em;
   }
 
-  /* Native form controls in obsidian studio theme */
+  select,
+  input,
+  textarea {
+    color-scheme: dark;
+  }
+
   select option {
     background-color: #16161B;
     color: #FFFFFF;
   }
 }
 
-/* Tabular numbers for aligned metric scanning */
 .tnum, .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Modern Obsidian Studio Card */
 .saas-surface,
 .stage-card {
   @apply bg-[#16161B]/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-card;
@@ -59,18 +62,15 @@
   @apply bg-[#16161B] hover:bg-[#1F1F26] border-b border-white/10 transition-colors duration-150;
 }
 
-/* Modern Studio CTA button (inspired by RESONATE) */
 .stage-pill-btn {
   @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-5 py-2.5 text-xs font-display font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#D8B28A] hover:text-[#0D0D10] hover:border-[#D8B28A] active:scale-[0.98];
 }
 
-/* Touch-optimized button target (min 44px) */
 .touch-target {
   min-height: 44px;
   min-width: 44px;
 }
 
-/* Clean dark scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -86,7 +86,6 @@
   background: rgba(216, 178, 138, 0.55);
 }
 
-/* Hide horizontal scrollbar on pill filter strips */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }
@@ -96,8 +95,8 @@
 }
 
 /* ==========================================================================
-   Global RESONATE Obsidian Studio Harmonization
-   Guarantees crisp white text on deep charcoal-black surfaces everywhere.
+   Global RESONATE Obsidian Studio Harmonization (including opacity variants)
+   Guarantees crisp white text on deep charcoal-black surfaces across ALL modals.
    ========================================================================== */
 .bg-\[\#F7F4EF\]:not(.visual-export-canvas),
 .bg-\[\#FAF9F6\]:not(.visual-export-canvas) {
@@ -105,19 +104,17 @@
 }
 
 .bg-white:not(.visual-export-canvas):not(.keep-light),
-.bg-white\/95:not(.visual-export-canvas):not(.keep-light),
-.bg-white\/98:not(.visual-export-canvas):not(.keep-light),
-.bg-white\/90:not(.visual-export-canvas):not(.keep-light),
-.bg-white\/80:not(.visual-export-canvas):not(.keep-light) {
+[class*="bg-white/"]:not(.visual-export-canvas):not(.keep-light) {
   background-color: #16161B !important;
   color: #FFFFFF;
 }
 
 .bg-slate-50:not(.visual-export-canvas),
-.bg-slate-50\/80:not(.visual-export-canvas),
-.bg-slate-50\/40:not(.visual-export-canvas),
+[class*="bg-slate-50/"]:not(.visual-export-canvas),
 .bg-slate-100:not(.visual-export-canvas),
+[class*="bg-slate-100/"]:not(.visual-export-canvas),
 .bg-slate-200:not(.visual-export-canvas),
+[class*="bg-slate-200/"]:not(.visual-export-canvas),
 .bg-\[\#E5E8F0\]:not(.visual-export-canvas),
 .bg-\[\#E5E8EA\]:not(.visual-export-canvas) {
   background-color: #1F1F26 !important;
@@ -129,17 +126,17 @@
 .hover\:bg-\[\#FAF9F6\]:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#F1F5F5\]:hover:not(.visual-export-canvas),
 .hover\:bg-\[\#E5E8EA\]:hover:not(.visual-export-canvas) {
-  background-color: #272730 !important;
+  background-color: #282832 !important;
 }
 
 .border-\[\#E5E8EA\]:not(.visual-export-canvas),
 .border-\[\#EEF0F1\]:not(.visual-export-canvas),
-.border-slate-200:not(.visual-export-canvas),
-.border-slate-200\/80:not(.visual-export-canvas),
-.border-slate-200\/90:not(.visual-export-canvas),
 .border-slate-100:not(.visual-export-canvas),
+[class*="border-slate-100/"]:not(.visual-export-canvas),
+.border-slate-200:not(.visual-export-canvas),
+[class*="border-slate-200/"]:not(.visual-export-canvas),
 .border-slate-300:not(.visual-export-canvas) {
-  border-color: rgba(255, 255, 255, 0.10) !important;
+  border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
 .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
@@ -167,44 +164,96 @@
 }
 
 /* Primary Buttons -> Warm Studio Champagne Gold with crisp Obsidian text */
-.bg-\[\#315F6D\]:not(.visual-export-canvas) {
+.bg-\[\#315F6D\]:not(.visual-export-canvas),
+.bg-emerald-600:not(.visual-export-canvas) {
   background-color: #D8B28A !important;
   color: #0D0D10 !important;
 }
 
 .hover\:bg-\[\#234A57\]:hover:not(.visual-export-canvas),
-.hover\:bg-\[\#264F5D\]:hover:not(.visual-export-canvas) {
+.hover\:bg-\[\#264F5D\]:hover:not(.visual-export-canvas),
+.hover\:bg-emerald-700:hover:not(.visual-export-canvas) {
   background-color: #E5C6A4 !important;
   color: #0D0D10 !important;
 }
 
-.text-\[\#315F6D\]:not(.visual-export-canvas) {
+.text-\[\#315F6D\]:not(.visual-export-canvas),
+.text-emerald-600:not(.visual-export-canvas) {
   color: #D8B28A !important;
 }
 
+/* Soft Gold / Teal Tinted Pills */
 .bg-\[\#D9E9EB\]:not(.visual-export-canvas),
+[class*="bg-[#D9E9EB]/"]:not(.visual-export-canvas),
 .bg-\[\#E4F0F0\]:not(.visual-export-canvas),
-.bg-\[\#E4F0F0\]\/50:not(.visual-export-canvas),
-.bg-\[\#D9E9EB\]\/60:not(.visual-export-canvas) {
+[class*="bg-[#E4F0F0]/"]:not(.visual-export-canvas),
+.bg-teal-50:not(.visual-export-canvas),
+[class*="bg-teal-50/"]:not(.visual-export-canvas) {
   background-color: rgba(216, 178, 138, 0.16) !important;
+  border-color: rgba(216, 178, 138, 0.35) !important;
 }
 
-.bg-\[\#FFF1CB\]:not(.visual-export-canvas) {
+.text-teal-700:not(.visual-export-canvas),
+.text-teal-800:not(.visual-export-canvas),
+.text-teal-950:not(.visual-export-canvas) {
+  color: #E5C6A4 !important;
+}
+
+/* Emerald Tinted Pills */
+.bg-emerald-50:not(.visual-export-canvas),
+[class*="bg-emerald-50/"]:not(.visual-export-canvas),
+.bg-emerald-100:not(.visual-export-canvas) {
+  background-color: rgba(52, 211, 153, 0.16) !important;
+}
+
+.border-emerald-200:not(.visual-export-canvas),
+[class*="border-emerald-200/"]:not(.visual-export-canvas),
+.border-emerald-300:not(.visual-export-canvas) {
+  border-color: rgba(52, 211, 153, 0.35) !important;
+}
+
+.text-emerald-950:not(.visual-export-canvas),
+.text-emerald-900:not(.visual-export-canvas),
+.text-emerald-800:not(.visual-export-canvas),
+.text-emerald-700:not(.visual-export-canvas) {
+  color: #6EE7B7 !important;
+}
+
+/* Warm Amber / Warning Tinted Pills */
+.bg-\[\#FFF1CB\]:not(.visual-export-canvas),
+.bg-amber-50:not(.visual-export-canvas),
+[class*="bg-amber-50/"]:not(.visual-export-canvas),
+.bg-amber-100:not(.visual-export-canvas),
+[class*="bg-amber-100/"]:not(.visual-export-canvas) {
   background-color: rgba(224, 142, 69, 0.18) !important;
+  border-color: rgba(224, 142, 69, 0.38) !important;
 }
 
 .text-\[\#BD8C29\]:not(.visual-export-canvas),
-.text-\[\#87621D\]:not(.visual-export-canvas) {
+.text-\[\#87621D\]:not(.visual-export-canvas),
+.text-amber-700:not(.visual-export-canvas),
+.text-amber-800:not(.visual-export-canvas),
+.text-amber-900:not(.visual-export-canvas),
+.text-amber-950:not(.visual-export-canvas) {
   color: #F3B36C !important;
 }
 
+/* Rose / Red / Danger Tinted Pills */
 .bg-\[\#F7E3DF\]:not(.visual-export-canvas),
+[class*="bg-[#F7E3DF]/"]:not(.visual-export-canvas),
 .bg-\[\#F7EAE5\]:not(.visual-export-canvas),
-.bg-\[\#F7E3DF\]\/50:not(.visual-export-canvas) {
+.bg-rose-50:not(.visual-export-canvas),
+.bg-rose-100:not(.visual-export-canvas),
+.bg-red-50:not(.visual-export-canvas) {
   background-color: rgba(251, 113, 133, 0.16) !important;
+  border-color: rgba(251, 113, 133, 0.35) !important;
 }
 
-.text-\[\#C96B65\]:not(.visual-export-canvas) {
+.text-\[\#C96B65\]:not(.visual-export-canvas),
+.text-rose-700:not(.visual-export-canvas),
+.text-rose-800:not(.visual-export-canvas),
+.text-rose-950:not(.visual-export-canvas),
+.text-red-700:not(.visual-export-canvas) {
   color: #FDA4AF !important;
 }
 
@@ -213,21 +262,18 @@
   color: #FFFFFF !important;
 }
 
-.bg-emerald-50:not(.visual-export-canvas),
-.bg-emerald-50\/70:not(.visual-export-canvas),
-.bg-emerald-50\/90:not(.visual-export-canvas),
-.bg-emerald-100:not(.visual-export-canvas) {
-  background-color: rgba(52, 211, 153, 0.16) !important;
+/* Blue / Indigo Tinted Pills */
+.bg-blue-50:not(.visual-export-canvas),
+[class*="bg-blue-50/"]:not(.visual-export-canvas),
+.bg-indigo-50:not(.visual-export-canvas) {
+  background-color: rgba(56, 189, 248, 0.15) !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
 }
 
-.border-emerald-200:not(.visual-export-canvas),
-.border-emerald-200\/90:not(.visual-export-canvas),
-.border-emerald-300:not(.visual-export-canvas) {
-  border-color: rgba(52, 211, 153, 0.35) !important;
-}
-
-.text-emerald-950:not(.visual-export-canvas),
-.text-emerald-800:not(.visual-export-canvas),
-.text-emerald-700:not(.visual-export-canvas) {
-  color: #6EE7B7 !important;
+.text-blue-600:not(.visual-export-canvas),
+.text-blue-700:not(.visual-export-canvas),
+.text-blue-900:not(.visual-export-canvas),
+.text-indigo-700:not(.visual-export-canvas),
+.text-indigo-900:not(.visual-export-canvas) {
+  color: #7DD3FC !important;
 }

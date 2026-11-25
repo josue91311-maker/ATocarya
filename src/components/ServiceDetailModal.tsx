@@ -153,51 +153,51 @@ export const ServiceDetailModal: React.FC<Props> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/40 backdrop-blur-sm overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-white border border-slate-200 rounded-3xl shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-[#16161B] border border-white/15 rounded-3xl shadow-modal overflow-hidden my-auto max-h-[92vh] flex flex-col text-white">
         
-        {/* Header - Planning Center Plan Sheet Style */}
-        <div className="px-6 py-5 border-b border-slate-200/90 bg-slate-50/60">
+        {/* Header Superior Oscuro de Alto Contraste */}
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-white/10 bg-[#1D1D24] shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-[#D8B28A]/20 text-[#E5C6A4] border border-[#D8B28A]/40">
                   {service.title}
                 </span>
                 {isExpired ? (
-                  <span className="text-[11px] font-bold text-rose-700 bg-rose-50 border border-rose-200 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold text-[#FDA4AF] bg-[#FB7185]/15 border border-[#FB7185]/35 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
                     <Lock className="w-3 h-3" /> Inscripciones Expiradas
                   </span>
                 ) : service.isOpen ? (
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Fechas Abiertas
+                  <span className="text-[11px] font-bold text-[#6EE7B7] bg-[#34D399]/15 border border-[#34D399]/35 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse"></span> Fechas Abiertas
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-slate-500 bg-slate-100 border border-slate-200 px-2.5 py-0.5 rounded-md flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-slate-400" /> Inscripciones cerradas
+                  <span className="text-[11px] font-bold text-[#B4B4BE] bg-white/5 border border-white/15 px-2.5 py-0.5 rounded-md flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-[#8E8E9A]" /> Inscripciones cerradas
                   </span>
                 )}
               </div>
 
-              <h2 className="text-lg sm:text-2xl font-bold font-display text-slate-900 capitalize">
+              <h2 className="text-lg sm:text-2xl font-bold font-display text-white capitalize">
                 {dateFormatted}
               </h2>
 
-              <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-slate-600">
+              <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-[#B4B4BE]">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
-                  Culto: <strong className="text-slate-800 tabular-nums">{service.time}</strong>
+                  <Clock className="w-3.5 h-3.5 text-[#D8B28A]" />
+                  Culto: <strong className="text-white tabular-nums">{service.time}</strong>
                 </span>
                 {service.rehearsalTime && (
                   <span>
-                    · Ensayo: <strong className="text-slate-800 tabular-nums">{service.rehearsalTime}</strong>
+                    · Ensayo: <strong className="text-white tabular-nums">{service.rehearsalTime}</strong>
                   </span>
                 )}
                 <span>
-                  · Cobertura: <strong className="text-slate-800 tabular-nums">{occupiedCount} de {totalSlots}</strong> posiciones
+                  · Cobertura: <strong className="text-white tabular-nums">{occupiedCount} de {totalSlots}</strong> posiciones
                 </span>
                 {service.registrationDeadline && (
-                  <span className="text-amber-800 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded font-medium">
+                  <span className="text-[#F3B36C] bg-[#E08E45]/15 border border-[#E08E45]/35 px-2 py-0.5 rounded font-medium">
                     Fecha límite: <strong>{service.registrationDeadline}</strong>
                   </span>
                 )}
@@ -206,317 +206,319 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              className="p-2 rounded-xl text-[#B4B4BE] hover:text-white hover:bg-white/10 transition-colors shrink-0"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {service.notes && (
-            <div className="mt-3 p-3 rounded-xl bg-white border border-slate-200 text-xs text-slate-700 flex items-start gap-2 shadow-2xs">
-              <FileText className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
-              <span><strong>Notas / Repertorio:</strong> {service.notes}</span>
+            <div className="mt-3 p-3 rounded-xl bg-[#141419] border border-white/10 text-xs text-[#E4E4E7] flex items-start gap-2">
+              <FileText className="w-4 h-4 text-[#D8B28A] flex-shrink-0 mt-0.5" />
+              <span><strong className="text-white">Notas / Repertorio:</strong> {service.notes}</span>
             </div>
           )}
         </div>
 
-        {/* ACCESO RÁPIDO RECOMENDADO PARA EL USUARIO MÚSICO (Planning Center Style) */}
-        {musicianUser && isMusicianView && (
-          <div className="mx-6 mt-4">
-            {isExpired && !myAssignedSlot ? (
-              <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3 shadow-2xs">
-                <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold flex-shrink-0">
-                  <Lock className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-rose-950">
-                    Inscripciones expiradas para este servicio
-                  </h4>
-                  <p className="text-xs text-rose-800 mt-0.5">
-                    El plazo de postulación para esta fecha ha finalizado{service.registrationDeadline ? ` (límite: ${service.registrationDeadline})` : ''}. Ya no se admiten registros de puestos.
-                  </p>
-                </div>
-              </div>
-            ) : myAssignedSlot ? (
-              <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm">
-                    <Check className="w-5 h-5 stroke-[2.5]" />
+        {/* Cuerpo Principal Desplazable (incluye Setlist, Bloqueo de Músicos y Puestos sin recortarse) */}
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+
+          {/* ACCESO RÁPIDO RECOMENDADO PARA EL USUARIO MÚSICO */}
+          {musicianUser && isMusicianView && (
+            <div>
+              {isExpired && !myAssignedSlot ? (
+                <div className="p-4 bg-[#FB7185]/12 border border-[#FB7185]/35 rounded-2xl flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#FB7185]/20 text-[#FDA4AF] flex items-center justify-center font-bold flex-shrink-0">
+                    <Lock className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-emerald-950">
-                      ¡Estás confirmado en este servicio!
+                    <h4 className="text-xs font-bold text-white">
+                      Inscripciones expiradas para este servicio
                     </h4>
-                    <p className="text-xs text-emerald-800 mt-0.5">
-                      Puesto asignado: <strong>{myAssignedSlot.label}</strong>
+                    <p className="text-xs text-[#FDA4AF] mt-0.5">
+                      El plazo de postulación para esta fecha ha finalizado{service.registrationDeadline ? ` (límite: ${service.registrationDeadline})` : ''}. Ya no se admiten registros de puestos.
                     </p>
                   </div>
                 </div>
-
-                {!isExpired && (
-                  <button
-                    onClick={() => handleRelease(myAssignedSlot.key)}
-                    className="px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold transition-colors shadow-2xs"
-                  >
-                    Liberar mi puesto
-                  </button>
-                )}
-              </div>
-            ) : recommendedSlot && service.isOpen && !isExpired ? (
-              <div className="p-4 bg-emerald-50/80 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/20">
-                    <Sparkles className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 bg-emerald-600 text-white rounded-md">
-                        Acceso Rápido
-                      </span>
-                      <h4 className="text-xs font-bold text-emerald-950">
-                        {musicianUser.fullName}, tu instrumento es {musicianUser.primaryInstrument}
+              ) : myAssignedSlot ? (
+                <div className="p-4 bg-[#34D399]/12 border border-[#34D399]/35 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#34D399] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0">
+                      <Check className="w-5 h-5 stroke-[2.5]" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs font-bold text-white">
+                        Estás confirmado en este servicio
                       </h4>
+                      <p className="text-xs text-[#6EE7B7] mt-0.5">
+                        Puesto asignado: <strong>{myAssignedSlot.label}</strong>
+                      </p>
                     </div>
-                    <p className="text-xs text-emerald-800 mt-0.5">
-                      El puesto <strong>{recommendedSlot.label}</strong> está libre para este {dayName}.
-                    </p>
                   </div>
-                </div>
 
-                <button
-                  onClick={() => handleClaim(recommendedSlot.key)}
-                  className="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 shadow-sm shadow-emerald-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <Check className="w-4 h-4 stroke-[3]" />
-                  <span>Aceptar puesto ({recommendedSlot.label})</span>
-                </button>
-              </div>
-            ) : null}
-          </div>
-        )}
-
-        {/* Alerts */}
-        {errorMsg && (
-          <div className="mx-6 mt-3 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        {successMsg && (
-          <div className="mx-6 mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800 text-xs flex items-center gap-2">
-            <Check className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-            <span>{successMsg}</span>
-          </div>
-        )}
-
-        {/* Sección de Repertorio de Canciones (Setlist) */}
-        {(() => {
-          const isDirector = Boolean(
-            musicianUser && (
-              musicianUser.primaryInstrument === 'Voz Director' ||
-              musicianUser.primaryInstrument?.toLowerCase().includes('director') ||
-              service.slots?.voz_director?.musicianId === musicianUser.id
-            )
-          );
-          // El Administrador SIEMPRE puede gestionar canciones, o el Director Musical
-          const canManageSetlist = isAdminAuthenticated || isDirector;
-          const songs = service.songs || [];
-          const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
-          const publicUrl = `/#/repertorio/${service.id}`;
-
-          if (canManageSetlist) {
-            return (
-              <div className="mx-5 sm:mx-6 mt-3 p-4 bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 border border-emerald-200 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
-                    <Music className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-slate-900">
-                        Repertorio de Canciones (Setlist)
-                      </span>
-                      <span className={`text-[10px] font-black uppercase px-2 py-0.2 rounded-md ${
-                        service.isSongsPublished
-                          ? 'bg-emerald-100 text-emerald-900 border border-emerald-300'
-                          : 'bg-amber-100 text-amber-900 border border-amber-300'
-                      }`}>
-                        {service.isSongsPublished ? '✓ Publicado' : 'Borrador'}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-slate-600 mt-0.5">
-                      {songs.length > 0
-                        ? `${songs.length} alabanza(s) configurada(s) con videos y tonos.`
-                        : 'Aún no has agregado canciones a este culto.'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2 self-end sm:self-auto">
-                  {onOpenSetlist && (
+                  {!isExpired && (
                     <button
-                      type="button"
-                      onClick={() => onOpenSetlist(service)}
-                      className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center gap-1.5"
+                      onClick={() => handleRelease(myAssignedSlot.key)}
+                      className="px-3 py-1.5 bg-[#1F1F26] hover:bg-[#FB7185]/20 text-[#FDA4AF] border border-[#FB7185]/35 rounded-xl text-xs font-bold transition-colors"
                     >
-                      <Music className="w-3.5 h-3.5" />
-                      <span>Gestionar Canciones</span>
+                      Liberar mi puesto
                     </button>
                   )}
+                </div>
+              ) : recommendedSlot && service.isOpen && !isExpired ? (
+                <div className="p-4 bg-[#D8B28A]/12 border border-[#D8B28A]/35 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0">
+                      <Sparkles className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 bg-[#D8B28A] text-[#0D0D10] rounded-md">
+                          Acceso Rápido
+                        </span>
+                        <h4 className="text-xs font-bold text-white">
+                          {musicianUser.fullName}, tu instrumento es {musicianUser.primaryInstrument}
+                        </h4>
+                      </div>
+                      <p className="text-xs text-[#E5C6A4] mt-0.5">
+                        El puesto <strong>{recommendedSlot.label}</strong> está libre para este {dayName}.
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={() => handleClaim(recommendedSlot.key)}
+                    className="w-full sm:w-auto px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-glow transition-all active:scale-[0.98]"
+                  >
+                    <Check className="w-4 h-4 stroke-[3]" />
+                    <span>Aceptar puesto ({recommendedSlot.label})</span>
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          )}
+
+          {/* Alerts */}
+          {errorMsg && (
+            <div className="p-3 bg-[#FB7185]/15 border border-[#FB7185]/40 rounded-xl text-[#FDA4AF] text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-[#FB7185] flex-shrink-0" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="p-3 bg-[#34D399]/15 border border-[#34D399]/40 rounded-xl text-[#6EE7B7] text-xs flex items-center gap-2">
+              <Check className="w-4 h-4 text-[#34D399] flex-shrink-0" />
+              <span>{successMsg}</span>
+            </div>
+          )}
+
+          {/* Sección de Repertorio de Canciones (Setlist) */}
+          {(() => {
+            const isDirector = Boolean(
+              musicianUser && (
+                musicianUser.primaryInstrument === 'Voz Director' ||
+                musicianUser.primaryInstrument?.toLowerCase().includes('director') ||
+                service.slots?.voz_director?.musicianId === musicianUser.id
+              )
+            );
+            const canManageSetlist = isAdminAuthenticated || isDirector;
+            const songs = service.songs || [];
+            const isPublished = Boolean(service.isSongsPublished && songs.length > 0);
+            const publicUrl = `/#/repertorio/${service.id}`;
+
+            if (canManageSetlist) {
+              return (
+                <div className="p-4 bg-[#1E1E26] border border-[#D8B28A]/35 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-card">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0 shadow-glow">
+                      <Music className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="text-xs sm:text-sm font-bold text-white">
+                          Repertorio de Canciones (Setlist)
+                        </span>
+                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
+                          service.isSongsPublished
+                            ? 'bg-[#34D399]/20 text-[#6EE7B7] border border-[#34D399]/40'
+                            : 'bg-[#E08E45]/20 text-[#F3B36C] border border-[#E08E45]/40'
+                        }`}>
+                          {service.isSongsPublished ? '✓ Publicado' : 'Borrador'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#B4B4BE] mt-0.5">
+                        {songs.length > 0
+                          ? `${songs.length} alabanza(s) configurada(s) con videos y tonos.`
+                          : 'Aún no has agregado canciones a este culto.'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    {onOpenSetlist && (
+                      <button
+                        type="button"
+                        onClick={() => onOpenSetlist(service)}
+                        className="px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black transition-all shadow-glow flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Music className="w-3.5 h-3.5" />
+                        <span>Gestionar Canciones</span>
+                      </button>
+                    )}
+                    <a
+                      href={publicUrl}
+                      onClick={onClose}
+                      className="p-2 bg-[#141419] hover:bg-[#272730] text-white border border-white/15 rounded-xl transition-colors"
+                      title="Ver link público oficial"
+                    >
+                      <ExternalLink className="w-4 h-4 text-[#D8B28A]" />
+                    </a>
+                  </div>
+                </div>
+              );
+            }
+
+            if (isPublished) {
+              return (
+                <div className="p-4 bg-[#1E1E26] border border-[#D8B28A]/35 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-card">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0 shadow-glow">
+                      <Music className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                        <span>Repertorio Oficial Publicado</span>
+                      </h4>
+                      <p className="text-xs text-[#B4B4BE] mt-0.5">
+                        {songs.length} alabanza(s) listas para ensayar con videos de YouTube y tonos.
+                      </p>
+                    </div>
+                  </div>
+
                   <a
                     href={publicUrl}
                     onClick={onClose}
-                    className="p-2 bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 rounded-xl transition-colors"
-                    title="Ver link público oficial"
+                    className="px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black transition-all shadow-glow flex items-center justify-center gap-1.5 self-end sm:self-auto"
                   >
-                    <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
+                    <span>Ver Canciones & Tonos</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              </div>
-            );
-          }
+              );
+            }
 
-          if (isPublished) {
-            return (
-              <div className="mx-5 sm:mx-6 mt-3 p-4 bg-emerald-50/70 border border-emerald-200/90 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-2xs">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold flex-shrink-0 shadow-sm shadow-emerald-600/30">
-                    <Music className="w-5 h-5" />
+            return null;
+          })()}
+
+          {/* Panel de Gestión de Bloqueo de Músicos por Culto (Exclusivo Administrador - Sin Recortes) */}
+          {showAdminControls && (
+            <div className="bg-[#1C1C23] border border-white/12 rounded-2xl overflow-hidden shadow-card">
+              <div 
+                onClick={() => setShowBlockedUsersPanel(!showBlockedUsersPanel)}
+                className="p-4 bg-[#1F1F27] flex items-center justify-between gap-3 cursor-pointer hover:bg-[#262630] transition-colors"
+              >
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                    (service.blockedMusicianIds || []).length > 0 
+                      ? 'bg-[#FB7185]/20 text-[#FDA4AF] border border-[#FB7185]/35' 
+                      : 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/30'
+                  }`}>
+                    <UserX className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
-                      <span>Repertorio Oficial Publicado</span>
+                  <div className="min-w-0">
+                    <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 flex-wrap">
+                      <span>Bloqueo de Músicos para este Culto</span>
+                      {(service.blockedMusicianIds || []).length > 0 && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FB7185]/20 text-[#FDA4AF] border border-[#FB7185]/40">
+                          {(service.blockedMusicianIds || []).length} bloqueado(s)
+                        </span>
+                      )}
                     </h4>
-                    <p className="text-[11px] text-emerald-800 mt-0.5">
-                      {songs.length} alabanza(s) listas para ensayar con videos de YouTube y tonos.
+                    <p className="text-xs text-[#B4B4BE] mt-0.5 leading-snug">
+                      Los músicos bloqueados no verán este culto disponible ni tendrán acceso a sus canciones publicadas.
                     </p>
                   </div>
                 </div>
-
-                <a
-                  href={publicUrl}
-                  onClick={onClose}
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black transition-all shadow-sm flex items-center justify-center gap-1.5 self-end sm:self-auto"
+                <button
+                  type="button"
+                  className="px-3.5 py-2 rounded-xl bg-[#141419] hover:bg-[#D8B28A] text-[#D8B28A] hover:text-[#0D0D10] border border-[#D8B28A]/40 text-xs font-bold transition-all shrink-0 cursor-pointer"
                 >
-                  <span>Ver Canciones & Tonos</span>
-                  <ExternalLink className="w-3.5 h-3.5" />
-                </a>
+                  {showBlockedUsersPanel ? 'Ocultar' : 'Gestionar'}
+                </button>
               </div>
-            );
-          }
 
-          return null;
-        })()}
+              {showBlockedUsersPanel && (
+                <div className="p-4 border-t border-white/10 bg-[#16161B] space-y-3">
+                  <div className="relative">
+                    <Search className="w-4 h-4 text-[#8E8E9A] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      placeholder="Buscar músico por nombre o instrumento..."
+                      value={blockedSearch}
+                      onChange={(e) => setBlockedSearch(e.target.value)}
+                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#0D0D10] border border-white/15 rounded-xl focus:outline-none focus:border-[#D8B28A] text-white placeholder-[#8E8E9A]"
+                    />
+                  </div>
 
-        {/* Panel de Gestión de Bloqueo de Músicos por Culto (Exclusivo Administrador) */}
-        {showAdminControls && (
-          <div className="mx-5 sm:mx-6 mt-3 bg-white border border-[#E5E8EA] rounded-2xl overflow-hidden shadow-xs">
-            <div 
-              onClick={() => setShowBlockedUsersPanel(!showBlockedUsersPanel)}
-              className="p-3 sm:p-3.5 bg-[#FAF9F6] flex items-center justify-between cursor-pointer hover:bg-[#F1F5F5] transition-colors"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${
-                  (service.blockedMusicianIds || []).length > 0 
-                    ? 'bg-[#F7E3DF] text-[#C96B65]' 
-                    : 'bg-[#D9E9EB] text-[#315F6D]'
-                }`}>
-                  <UserX className="w-4 h-4" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-[#202C37] flex items-center gap-2 flex-wrap">
-                    <span>Bloqueo de Músicos para este Culto</span>
-                    {(service.blockedMusicianIds || []).length > 0 && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#F7E3DF] text-[#C96B65] border border-[#C96B65]/30">
-                        {(service.blockedMusicianIds || []).length} bloqueado(s)
-                      </span>
-                    )}
-                  </h4>
-                  <p className="text-[11px] text-[#64717C]">
-                    Los músicos bloqueados no verán este culto disponible ni tendrán acceso a sus canciones publicadas.
-                  </p>
-                </div>
-              </div>
-              <button
-                type="button"
-                className="px-3 py-1.5 rounded-xl bg-white border border-[#E5E8EA] text-xs font-bold text-[#315F6D] hover:bg-slate-50 transition-colors shadow-2xs shrink-0"
-              >
-                {showBlockedUsersPanel ? 'Ocultar' : 'Gestionar'}
-              </button>
-            </div>
-
-            {showBlockedUsersPanel && (
-              <div className="p-3.5 sm:p-4 border-t border-[#E5E8EA] bg-white space-y-3">
-                <div className="relative">
-                  <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="text"
-                    placeholder="Buscar músico por nombre o instrumento..."
-                    value={blockedSearch}
-                    onChange={(e) => setBlockedSearch(e.target.value)}
-                    className="w-full pl-8 pr-3 py-2 text-xs bg-[#FAF9F6] border border-[#E5E8EA] rounded-xl focus:outline-none focus:border-[#315F6D] text-[#202C37]"
-                  />
-                </div>
-
-                <div className="max-h-56 overflow-y-auto space-y-1.5 custom-scrollbar pr-0.5">
-                  {musicians
-                    .filter(m => !blockedSearch || m.fullName.toLowerCase().includes(blockedSearch.toLowerCase()) || m.primaryInstrument.toLowerCase().includes(blockedSearch.toLowerCase()))
-                    .map(m => {
-                      const isBlocked = (service.blockedMusicianIds || []).includes(m.id);
-                      return (
-                        <div 
-                          key={m.id}
-                          className={`p-2.5 rounded-xl border flex items-center justify-between gap-2 transition-all ${
-                            isBlocked 
-                              ? 'bg-[#F7E3DF]/50 border-[#C96B65]/50' 
-                              : 'bg-white border-[#E5E8EA] hover:bg-[#FAF9F6]'
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5 min-w-0">
-                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                              isBlocked ? 'bg-[#C96B65] text-white' : 'bg-[#D9E9EB] text-[#315F6D]'
-                            }`}>
-                              {m.fullName.charAt(0).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <p className="text-xs font-bold text-[#202C37] truncate">{m.fullName}</p>
-                              <p className="text-[10px] text-[#64717C] truncate">{m.primaryInstrument}</p>
-                            </div>
-                          </div>
-
-                          <button
-                            type="button"
-                            onClick={() => toggleBlockMusicianInService(service.id, m.id)}
-                            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                              isBlocked
-                                ? 'bg-[#C96B65] text-white hover:bg-[#B95752] shadow-2xs'
-                                : 'bg-[#FAF9F6] text-[#64717C] hover:text-[#C96B65] hover:bg-[#F7E3DF] border border-[#E5E8EA]'
+                  <div className="max-h-60 overflow-y-auto space-y-2 custom-scrollbar pr-1">
+                    {musicians
+                      .filter(m => !blockedSearch || m.fullName.toLowerCase().includes(blockedSearch.toLowerCase()) || m.primaryInstrument.toLowerCase().includes(blockedSearch.toLowerCase()))
+                      .map(m => {
+                        const isBlocked = (service.blockedMusicianIds || []).includes(m.id);
+                        return (
+                          <div 
+                            key={m.id}
+                            className={`p-2.5 sm:p-3 rounded-xl border flex items-center justify-between gap-2 transition-all ${
+                              isBlocked 
+                                ? 'bg-[#FB7185]/12 border-[#FB7185]/40' 
+                                : 'bg-[#1F1F26] border-white/10 hover:border-white/20'
                             }`}
                           >
-                            {isBlocked ? (
-                              <>
-                                <UserX className="w-3.5 h-3.5" />
-                                <span>Bloqueado</span>
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="w-3.5 h-3.5" />
-                                <span>Permitido</span>
-                              </>
-                            )}
-                          </button>
-                        </div>
-                      );
-                    })}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
+                                isBlocked ? 'bg-[#E11D48] text-white' : 'bg-[#D8B28A]/20 text-[#D8B28A]'
+                              }`}>
+                                {m.fullName.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-xs font-bold text-white truncate">{m.fullName}</p>
+                                <p className="text-[11px] text-[#B4B4BE] truncate">{m.primaryInstrument}</p>
+                              </div>
+                            </div>
 
-        {/* Slots Content Area */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-6 flex-1">
+                            <button
+                              type="button"
+                              onClick={() => toggleBlockMusicianInService(service.id, m.id)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                                isBlocked
+                                  ? 'bg-[#E11D48] text-white hover:bg-[#BE123C]'
+                                  : 'bg-[#141419] text-[#B4B4BE] hover:text-[#FDA4AF] hover:border-[#FB7185]/40 border border-white/15'
+                              }`}
+                            >
+                              {isBlocked ? (
+                                <>
+                                  <UserX className="w-3.5 h-3.5" />
+                                  <span>Bloqueado</span>
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="w-3.5 h-3.5" />
+                                  <span>Permitido</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        );
+                      })}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Slots Categories */}
+          <div className="space-y-6 pt-1">
           {categories.map((cat) => {
             const catSlots = slotsList.filter(s => s.category === cat);
             if (catSlots.length === 0) return null;
@@ -664,17 +666,18 @@ export const ServiceDetailModal: React.FC<Props> = ({
               </div>
             );
           })}
+          </div>
         </div>
 
         {/* Footer info */}
-        <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-500 flex-shrink-0">
-          <div className="flex items-center gap-1.5 text-slate-600">
-            <Info className="w-3.5 h-3.5 text-blue-600" />
-            <span>Regla de Alabanza: Solo puedes poner tu check en <strong>1 puesto</strong> por fecha de servicio.</span>
+        <div className="p-4 bg-[#1D1D24] border-t border-white/10 flex items-center justify-between gap-3 text-xs text-[#B4B4BE] shrink-0">
+          <div className="flex items-center gap-1.5 text-[#B4B4BE]">
+            <Info className="w-3.5 h-3.5 text-[#D8B28A] shrink-0" />
+            <span>Regla de Alabanza: Solo puedes poner tu check en <strong className="text-white">1 puesto</strong> por fecha de servicio.</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold transition-colors"
+            className="px-4 py-1.5 rounded-xl bg-[#272730] hover:bg-[#D8B28A] text-white hover:text-[#0D0D10] border border-white/15 text-xs font-bold transition-colors shrink-0 cursor-pointer"
           >
             Listo / Cerrar
           </button>
