@@ -4,48 +4,37 @@
 
 @layer base {
   :root {
-    --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    --font-studio: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+    --font-display: 'Montserrat', 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-body: 'Inter', system-ui, -apple-system, sans-serif;
-    --studio-bg: #0D0D10;
-    --studio-surface: #16161B;
-    --studio-elevated: #1F1F26;
-    --studio-border: rgba(255, 255, 255, 0.10);
-    --studio-gold: #D8B28A;
-    --studio-amber: #E08E45;
+    --azul-iglesia: #2E4056;
+    --arena-calida: #DCBD9E;
+    --cafe-oscuro: #302C24;
+    --salvia-apagado: #8E9B84;
+    --crema-fondo: #F8F4EA;
   }
 
   body {
     font-family: var(--font-body);
-    background-color: #0D0D10;
+    background-color: #F8F4EA;
     background-image:
-      radial-gradient(ellipse 80% 45% at 50% -10%, rgba(216, 178, 138, 0.14), transparent 65%),
-      radial-gradient(ellipse 50% 35% at 85% 15%, rgba(224, 142, 69, 0.08), transparent 60%);
+      radial-gradient(ellipse 75% 50% at 12% 0%, rgba(220, 189, 158, 0.28), transparent 60%),
+      radial-gradient(ellipse 65% 45% at 90% 12%, rgba(142, 155, 132, 0.20), transparent 58%),
+      radial-gradient(ellipse 55% 40% at 50% 100%, rgba(46, 64, 86, 0.06), transparent 65%);
     background-attachment: fixed;
-    @apply text-white antialiased selection:bg-[#D8B28A] selection:text-[#0D0D10] min-h-screen;
+    @apply text-[#302C24] antialiased selection:bg-[#2E4056] selection:text-[#F8F4EA] min-h-screen;
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 
   .font-serif,
-  .font-script {
-    font-family: var(--font-studio);
-    letter-spacing: -0.025em;
-  }
-
+  .font-script,
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.025em;
-  }
-
-  select,
-  input,
-  textarea {
-    color-scheme: dark;
+    letter-spacing: -0.02em;
   }
 
   select option {
-    background-color: #16161B;
-    color: #FFFFFF;
+    background-color: #FCFBF8;
+    color: #302C24;
   }
 }
 
@@ -53,17 +42,150 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ==========================================================================
+   ANIMACIONES ORGÁNICAS Y MICRO-INTERACCIONES MODERNAS
+   ========================================================================== */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(1.5deg); }
+}
+
+@keyframes pulseSoft {
+  0%, 100% { transform: scale(1); opacity: 0.85; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes cardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.animate-card-reveal {
+  animation: cardReveal 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ==========================================================================
+   BOTONES CINÉTICOS CON RESORTE Y BARRIDO DE LUZ (NO COMUNES)
+   ========================================================================== */
+.btn-kinetic {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.btn-kinetic::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -60%;
+  width: 45%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.28),
+    transparent
+  );
+  transform: rotate(24deg);
+  transition: left 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.btn-kinetic:hover {
+  transform: translateY(-2px);
+}
+
+.btn-kinetic:hover::after {
+  left: 130%;
+}
+
+.btn-kinetic:active {
+  transform: translateY(1px) scale(0.97);
+}
+
+/* Micro-movimiento universal en botones interactivos de la aplicación */
+button:not(:disabled),
+a[class*="rounded-"] {
+  transition:
+    transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.24s ease,
+    background-color 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+button:not(:disabled):active,
+a[class*="rounded-"]:active {
+  transform: scale(0.96) translateY(1px);
+}
+
+/* Botón píldora moderno de escenario / cabecera */
+.stage-pill-btn {
+  @apply btn-kinetic inline-flex items-center justify-center gap-2 rounded-full border border-[#DCBD9E]/60 bg-[#DCBD9E]/20 backdrop-blur-md px-6 py-2.5 text-xs font-display font-bold uppercase tracking-[0.14em] text-[#F8F4EA] hover:bg-[#DCBD9E] hover:text-[#302C24] hover:border-[#DCBD9E] shadow-xs;
+}
+
+/* ==========================================================================
+   CUADROS / TARJETAS BENTO ARQUITECTÓNICAS CON RELIEVE Y MOVIMIENTO
+   ========================================================================== */
+.bento-card,
 .saas-surface,
 .stage-card {
-  @apply bg-[#16161B]/95 backdrop-blur-md border border-white/10 rounded-2xl shadow-card;
+  position: relative;
+  background: linear-gradient(180deg, #FFFFFF 0%, #FCF9F2 100%);
+  border: 1px solid rgba(46, 64, 86, 0.11);
+  border-radius: 22px;
+  box-shadow:
+    0 10px 28px -10px rgba(48, 44, 36, 0.09),
+    0 2px 6px -1px rgba(48, 44, 36, 0.04),
+    inset 0 1px 0 #FFFFFF;
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.25s ease;
+}
+
+.bento-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(46, 64, 86, 0.26);
+  box-shadow:
+    0 20px 40px -12px rgba(46, 64, 86, 0.15),
+    0 4px 12px -2px rgba(48, 44, 36, 0.05),
+    inset 0 1px 0 #FFFFFF;
+}
+
+/* Elevación suave automática en tarjetas de la interfaz en escritorio */
+@media (hover: hover) {
+  div[class*="shadow-card"] {
+    transition:
+      transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+      border-color 0.24s ease;
+  }
+  div[class*="shadow-card"]:hover {
+    transform: translateY(-2.5px);
+    box-shadow:
+      0 18px 36px -10px rgba(46, 64, 86, 0.14),
+      0 4px 10px -2px rgba(48, 44, 36, 0.05),
+      inset 0 1px 0 #FFFFFF;
+  }
 }
 
 .saas-row {
-  @apply bg-[#16161B] hover:bg-[#1F1F26] border-b border-white/10 transition-colors duration-150;
-}
-
-.stage-pill-btn {
-  @apply inline-flex items-center justify-center gap-2 rounded-xl border border-white/25 bg-white/5 px-5 py-2.5 text-xs font-display font-bold tracking-wide text-white transition-all duration-200 hover:bg-[#D8B28A] hover:text-[#0D0D10] hover:border-[#D8B28A] active:scale-[0.98];
+  @apply bg-[#FCFBF8] hover:bg-[#F4EFE4] border-b border-[#E8E1D3] transition-colors duration-150;
 }
 
 .touch-target {
@@ -71,19 +193,20 @@
   min-width: 44px;
 }
 
+/* Minimalist warm scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0D0D10;
+  background: rgba(220, 189, 158, 0.15);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.18);
+  background: rgba(46, 64, 86, 0.25);
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(216, 178, 138, 0.55);
+  background: rgba(46, 64, 86, 0.5);
 }
 
 .scrollbar-none::-webkit-scrollbar {
@@ -95,185 +218,114 @@
 }
 
 /* ==========================================================================
-   Global RESONATE Obsidian Studio Harmonization (including opacity variants)
-   Guarantees crisp white text on deep charcoal-black surfaces across ALL modals.
+   ARMONIZACIÓN GLOBAL CON LA PALETA OFICIAL ATOCAR YA
+   (Azul Iglesia #2E4056 · Arena Cálida #DCBD9E · Café Oscuro #302C24 ·
+    Salvia Apagado #8E9B84 · Crema Fondo #F8F4EA)
    ========================================================================== */
-.bg-\[\#F7F4EF\]:not(.visual-export-canvas),
-.bg-\[\#FAF9F6\]:not(.visual-export-canvas) {
-  background-color: #111115 !important;
+.bg-\[\#F7F4EF\],
+.bg-\[\#FAF9F6\] {
+  background-color: #F8F4EA !important;
 }
 
-.bg-white:not(.visual-export-canvas):not(.keep-light),
-[class*="bg-white/"]:not(.visual-export-canvas):not(.keep-light) {
-  background-color: #16161B !important;
-  color: #FFFFFF;
+.border-\[\#E5E8EA\],
+.border-\[\#EEF0F1\],
+.border-slate-200,
+[class*="border-slate-200/"],
+.border-slate-100 {
+  border-color: #E6DFD1 !important;
 }
 
-.bg-slate-50:not(.visual-export-canvas),
-[class*="bg-slate-50/"]:not(.visual-export-canvas),
-.bg-slate-100:not(.visual-export-canvas),
-[class*="bg-slate-100/"]:not(.visual-export-canvas),
-.bg-slate-200:not(.visual-export-canvas),
-[class*="bg-slate-200/"]:not(.visual-export-canvas),
-.bg-\[\#E5E8F0\]:not(.visual-export-canvas),
-.bg-\[\#E5E8EA\]:not(.visual-export-canvas) {
-  background-color: #1F1F26 !important;
+.text-\[\#202C37\],
+.text-slate-900,
+.text-slate-800 {
+  color: #302C24 !important;
 }
 
-.hover\:bg-slate-50:hover:not(.visual-export-canvas),
-.hover\:bg-slate-100:hover:not(.visual-export-canvas),
-.hover\:bg-slate-200:hover:not(.visual-export-canvas),
-.hover\:bg-\[\#FAF9F6\]:hover:not(.visual-export-canvas),
-.hover\:bg-\[\#F1F5F5\]:hover:not(.visual-export-canvas),
-.hover\:bg-\[\#E5E8EA\]:hover:not(.visual-export-canvas) {
-  background-color: #282832 !important;
+.text-\[\#64717C\],
+.text-\[\#46516F\],
+.text-slate-600,
+.text-slate-500 {
+  color: #635C51 !important;
 }
 
-.border-\[\#E5E8EA\]:not(.visual-export-canvas),
-.border-\[\#EEF0F1\]:not(.visual-export-canvas),
-.border-slate-100:not(.visual-export-canvas),
-[class*="border-slate-100/"]:not(.visual-export-canvas),
-.border-slate-200:not(.visual-export-canvas),
-[class*="border-slate-200/"]:not(.visual-export-canvas),
-.border-slate-300:not(.visual-export-canvas) {
-  border-color: rgba(255, 255, 255, 0.12) !important;
+.text-\[\#89939C\],
+.text-slate-400 {
+  color: #8D8579 !important;
 }
 
-.divide-slate-100 > :not([hidden]) ~ :not([hidden]),
-.divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
-  border-color: rgba(255, 255, 255, 0.08) !important;
+/* Azul Iglesia Primario + Efecto táctil moderno */
+.bg-\[\#315F6D\],
+.bg-emerald-600 {
+  background-color: #2E4056 !important;
+  color: #F8F4EA !important;
+  box-shadow: 0 6px 16px -4px rgba(46, 64, 86, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.16);
 }
 
-.text-\[\#202C37\]:not(.visual-export-canvas),
-.text-slate-900:not(.visual-export-canvas),
-.text-slate-800:not(.visual-export-canvas),
-.text-slate-700:not(.visual-export-canvas) {
+.hover\:bg-\[\#234A57\]:hover,
+.hover\:bg-\[\#264F5D\]:hover,
+.hover\:bg-emerald-700:hover {
+  background-color: #213042 !important;
   color: #FFFFFF !important;
+  transform: translateY(-1.5px);
+  box-shadow: 0 10px 22px -5px rgba(46, 64, 86, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-.text-\[\#64717C\]:not(.visual-export-canvas),
-.text-\[\#46516F\]:not(.visual-export-canvas),
-.text-slate-600:not(.visual-export-canvas),
-.text-slate-500:not(.visual-export-canvas) {
-  color: #B4B4BE !important;
+.text-\[\#315F6D\],
+.text-emerald-600,
+.text-emerald-700,
+.text-emerald-800 {
+  color: #2E4056 !important;
 }
 
-.text-\[\#89939C\]:not(.visual-export-canvas),
-.text-slate-400:not(.visual-export-canvas) {
-  color: #8E8E9A !important;
+/* Salvia Apagado & Azul Iglesia suave en badges */
+.bg-\[\#D9E9EB\],
+[class*="bg-[#D9E9EB]/"],
+.bg-\[\#E4F0F0\],
+[class*="bg-[#E4F0F0]/"] {
+  background-color: #E7EDF3 !important;
+  border-color: rgba(46, 64, 86, 0.20) !important;
 }
 
-/* Primary Buttons -> Warm Studio Champagne Gold with crisp Obsidian text */
-.bg-\[\#315F6D\]:not(.visual-export-canvas),
-.bg-emerald-600:not(.visual-export-canvas) {
-  background-color: #D8B28A !important;
-  color: #0D0D10 !important;
+.bg-emerald-50,
+[class*="bg-emerald-50/"],
+.bg-emerald-100 {
+  background-color: #EBF0E7 !important;
+  border-color: rgba(142, 155, 132, 0.42) !important;
 }
 
-.hover\:bg-\[\#234A57\]:hover:not(.visual-export-canvas),
-.hover\:bg-\[\#264F5D\]:hover:not(.visual-export-canvas),
-.hover\:bg-emerald-700:hover:not(.visual-export-canvas) {
-  background-color: #E5C6A4 !important;
-  color: #0D0D10 !important;
+.text-emerald-950,
+.text-emerald-900 {
+  color: #302C24 !important;
 }
 
-.text-\[\#315F6D\]:not(.visual-export-canvas),
-.text-emerald-600:not(.visual-export-canvas) {
-  color: #D8B28A !important;
+/* Arena Cálida en etiquetas destacadas */
+.bg-\[\#FFF1CB\],
+.bg-amber-50,
+[class*="bg-amber-50/"],
+.bg-amber-100 {
+  background-color: #F5EBE0 !important;
+  border-color: rgba(220, 189, 158, 0.65) !important;
 }
 
-/* Soft Gold / Teal Tinted Pills */
-.bg-\[\#D9E9EB\]:not(.visual-export-canvas),
-[class*="bg-[#D9E9EB]/"]:not(.visual-export-canvas),
-.bg-\[\#E4F0F0\]:not(.visual-export-canvas),
-[class*="bg-[#E4F0F0]/"]:not(.visual-export-canvas),
-.bg-teal-50:not(.visual-export-canvas),
-[class*="bg-teal-50/"]:not(.visual-export-canvas) {
-  background-color: rgba(216, 178, 138, 0.16) !important;
-  border-color: rgba(216, 178, 138, 0.35) !important;
+.text-\[\#BD8C29\],
+.text-\[\#87621D\],
+.text-amber-800,
+.text-amber-900 {
+  color: #7D5A38 !important;
 }
 
-.text-teal-700:not(.visual-export-canvas),
-.text-teal-800:not(.visual-export-canvas),
-.text-teal-950:not(.visual-export-canvas) {
-  color: #E5C6A4 !important;
+/* Terracota cálido armónico para alertas / liberar */
+.bg-\[\#F7E3DF\],
+[class*="bg-[#F7E3DF]/"],
+.bg-\[\#F7EAE5\] {
+  background-color: #F7E8E4 !important;
 }
 
-/* Emerald Tinted Pills */
-.bg-emerald-50:not(.visual-export-canvas),
-[class*="bg-emerald-50/"]:not(.visual-export-canvas),
-.bg-emerald-100:not(.visual-export-canvas) {
-  background-color: rgba(52, 211, 153, 0.16) !important;
+.text-\[\#C96B65\] {
+  color: #A84C3A !important;
 }
 
-.border-emerald-200:not(.visual-export-canvas),
-[class*="border-emerald-200/"]:not(.visual-export-canvas),
-.border-emerald-300:not(.visual-export-canvas) {
-  border-color: rgba(52, 211, 153, 0.35) !important;
-}
-
-.text-emerald-950:not(.visual-export-canvas),
-.text-emerald-900:not(.visual-export-canvas),
-.text-emerald-800:not(.visual-export-canvas),
-.text-emerald-700:not(.visual-export-canvas) {
-  color: #6EE7B7 !important;
-}
-
-/* Warm Amber / Warning Tinted Pills */
-.bg-\[\#FFF1CB\]:not(.visual-export-canvas),
-.bg-amber-50:not(.visual-export-canvas),
-[class*="bg-amber-50/"]:not(.visual-export-canvas),
-.bg-amber-100:not(.visual-export-canvas),
-[class*="bg-amber-100/"]:not(.visual-export-canvas) {
-  background-color: rgba(224, 142, 69, 0.18) !important;
-  border-color: rgba(224, 142, 69, 0.38) !important;
-}
-
-.text-\[\#BD8C29\]:not(.visual-export-canvas),
-.text-\[\#87621D\]:not(.visual-export-canvas),
-.text-amber-700:not(.visual-export-canvas),
-.text-amber-800:not(.visual-export-canvas),
-.text-amber-900:not(.visual-export-canvas),
-.text-amber-950:not(.visual-export-canvas) {
-  color: #F3B36C !important;
-}
-
-/* Rose / Red / Danger Tinted Pills */
-.bg-\[\#F7E3DF\]:not(.visual-export-canvas),
-[class*="bg-[#F7E3DF]/"]:not(.visual-export-canvas),
-.bg-\[\#F7EAE5\]:not(.visual-export-canvas),
-.bg-rose-50:not(.visual-export-canvas),
-.bg-rose-100:not(.visual-export-canvas),
-.bg-red-50:not(.visual-export-canvas) {
-  background-color: rgba(251, 113, 133, 0.16) !important;
-  border-color: rgba(251, 113, 133, 0.35) !important;
-}
-
-.text-\[\#C96B65\]:not(.visual-export-canvas),
-.text-rose-700:not(.visual-export-canvas),
-.text-rose-800:not(.visual-export-canvas),
-.text-rose-950:not(.visual-export-canvas),
-.text-red-700:not(.visual-export-canvas) {
-  color: #FDA4AF !important;
-}
-
-.bg-\[\#C96B65\]:not(.visual-export-canvas) {
-  background-color: #E11D48 !important;
+.bg-\[\#C96B65\] {
+  background-color: #A84C3A !important;
   color: #FFFFFF !important;
-}
-
-/* Blue / Indigo Tinted Pills */
-.bg-blue-50:not(.visual-export-canvas),
-[class*="bg-blue-50/"]:not(.visual-export-canvas),
-.bg-indigo-50:not(.visual-export-canvas) {
-  background-color: rgba(56, 189, 248, 0.15) !important;
-  border-color: rgba(56, 189, 248, 0.35) !important;
-}
-
-.text-blue-600:not(.visual-export-canvas),
-.text-blue-700:not(.visual-export-canvas),
-.text-blue-900:not(.visual-export-canvas),
-.text-indigo-700:not(.visual-export-canvas),
-.text-indigo-900:not(.visual-export-canvas) {
-  color: #7DD3FC !important;
 }

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Lock, User, ArrowRight, AlertCircle, Radio } from 'lucide-react';
+import { Lock, User, ArrowRight, AlertCircle, Music2 } from 'lucide-react';
 import { Logo } from './Logo';
 
 interface Props {
@@ -37,133 +37,117 @@ export const MusicianLoginScreen: React.FC<Props> = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0D0D10] flex flex-col justify-center items-center px-4 py-12 relative overflow-hidden">
-      {/* Atmospheric Concert Stage Backdrop (inspired by live spotlight crowd) */}
-      <div
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-center bg-no-repeat opacity-30 scale-105"
-        style={{
-          backgroundImage:
-            'url("https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1600&q=80")',
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="fixed inset-0 pointer-events-none z-0"
-        style={{
-          background:
-            'radial-gradient(ellipse 75% 55% at 50% 15%, rgba(216, 178, 138, 0.16), rgba(13, 13, 16, 0.92) 70%, #09090B 100%)',
-        }}
-        aria-hidden="true"
-      />
+    <div className="min-h-screen bg-[#F8F4EA] flex flex-col justify-center items-center px-4 py-10 relative overflow-hidden">
+      {/* Formas Orgánicas Flotantes en Arena Cálida y Salvia Apagado */}
+      <div className="fixed -top-24 -left-24 w-80 h-80 rounded-full bg-[#DCBD9E]/35 blur-3xl pointer-events-none animate-float-slow" />
+      <div className="fixed top-1/3 -right-24 w-96 h-96 rounded-full bg-[#8E9B84]/25 blur-3xl pointer-events-none animate-float-slow" />
+      <div className="fixed -bottom-24 left-1/4 w-72 h-72 rounded-full bg-[#2E4056]/10 blur-3xl pointer-events-none" />
 
-      <div className="w-full max-w-md relative z-10">
-        {/* Branding & Atmospheric Hero Header */}
-        <div className="text-center mb-8 flex flex-col items-center">
-          <Logo size="lg" subtitle="MÚSICOS" />
-          <p className="mt-5 text-[10px] font-display font-semibold uppercase tracking-[0.32em] text-[#94A3B8] flex items-center gap-2">
-            <Radio className="w-3.5 h-3.5 text-[#D8B28A]" />
-            <span>MÚSICA PARA SENTIR Y ADORAR</span>
-          </p>
-          <h1 className="font-script text-4xl sm:text-5xl text-white mt-1 drop-shadow-md">
-            Bienvenido al Escenario
-          </h1>
+      <div className="w-full max-w-md relative z-10 animate-card-reveal">
+        {/* Logo Oficial AtocarYa */}
+        <div className="text-center mb-7 flex flex-col items-center">
+          <Logo size="lg" />
+          <div className="mt-3 inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/80 border border-[#E5DEC9] shadow-2xs text-[10px] font-display font-bold uppercase tracking-[0.2em] text-[#2E4056]">
+            <Music2 className="w-3.5 h-3.5 text-[#8E9B84]" />
+            <span>Portal Oficial de Integrantes</span>
+          </div>
         </div>
 
-        {/* Sleek Midnight Glass Card */}
-        <div className="bg-[#16161B]/90 backdrop-blur-xl border border-white/15 rounded-3xl p-6 sm:p-8 shadow-modal">
-          <div className="mb-6">
-            <h2 className="text-sm font-display font-bold uppercase tracking-[0.2em] text-white">
-              Iniciar Sesión
-            </h2>
-            <div className="w-10 h-0.5 bg-[#D8B28A] mt-2 rounded-full" />
-            <p className="text-xs text-[#94A3B8] mt-2.5 leading-relaxed">
-              Ingresa tu nombre y PIN de 4 dígitos para acceder a tus fechas y repertorio.
-            </p>
-          </div>
+        {/* Cuadro Bento Arquitectónico con Barra Tricolor Oficial */}
+        <div className="bento-card rounded-[28px] overflow-hidden">
+          <div className="h-1.5 w-full bg-gradient-to-r from-[#2E4056] via-[#8E9B84] to-[#DCBD9E]" />
 
-          {error && (
-            <div className="mb-5 p-3.5 rounded-xl bg-[#FB7185]/12 border border-[#FB7185]/35 text-[#FDA4AF] text-xs flex items-center gap-2.5">
-              <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#FB7185]" />
-              <span>{error}</span>
+          <div className="p-6 sm:p-8">
+            <div className="mb-6">
+              <h2 className="text-lg sm:text-xl font-display font-extrabold text-[#302C24] tracking-tight">
+                Bienvenido al Ministerio
+              </h2>
+              <p className="text-xs text-[#635C51] mt-1 leading-relaxed">
+                Selecciona tu nombre e ingresa tu PIN de 4 dígitos para ver tus cultos y canciones.
+              </p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {/* Musician Select / Name */}
-            <div>
-              <label className="block text-[11px] font-display font-bold uppercase tracking-wider text-[#CBD5E1] mb-2">
-                Músico / Integrante
-              </label>
-              {musicians.length > 0 ? (
-                <div className="relative">
-                  <select
-                    value={selectedId}
-                    onChange={(e) => {
-                      setSelectedId(e.target.value);
-                      const m = musicians.find(item => item.id === e.target.value);
-                      if (m) setTypedName(m.fullName);
-                    }}
-                    className="w-full px-4 py-3 bg-[#0D0D10]/80 border border-white/15 rounded-xl text-sm text-white focus:bg-[#0D0D10] focus:outline-none focus:border-[#D8B28A] focus:ring-2 focus:ring-[#D8B28A]/20 transition-all font-medium"
-                  >
-                    <option value="">-- Elige tu nombre de la lista --</option>
-                    {musicians.map((m) => (
-                      <option key={m.id} value={m.id}>
-                        {m.fullName} ({m.primaryInstrument})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              ) : (
+            {error && (
+              <div className="mb-5 p-3.5 rounded-2xl bg-[#F7E8E4] border border-[#A84C3A]/25 text-[#A84C3A] text-xs font-medium flex items-center gap-2.5 animate-card-reveal">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 text-[#A84C3A]" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-[11px] font-display font-bold uppercase tracking-wider text-[#302C24] mb-1.5">
+                  Músico / Integrante
+                </label>
+                {musicians.length > 0 ? (
+                  <div className="relative">
+                    <select
+                      value={selectedId}
+                      onChange={(e) => {
+                        setSelectedId(e.target.value);
+                        const m = musicians.find(item => item.id === e.target.value);
+                        if (m) setTypedName(m.fullName);
+                      }}
+                      className="w-full px-4 py-3.5 bg-[#F8F4EA] border border-[#E5DEC9] rounded-2xl text-sm text-[#302C24] focus:bg-white focus:outline-none focus:border-[#2E4056] focus:ring-4 focus:ring-[#2E4056]/10 transition-all font-semibold cursor-pointer"
+                    >
+                      <option value="">-- Elige tu nombre de la lista --</option>
+                      {musicians.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.fullName} ({m.primaryInstrument})
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={typedName}
+                      onChange={(e) => setTypedName(e.target.value)}
+                      placeholder="Tu nombre completo"
+                      className="w-full px-4 py-3.5 bg-[#F8F4EA] border border-[#E5DEC9] rounded-2xl text-sm text-[#302C24] placeholder-[#8D8579] focus:bg-white focus:outline-none focus:border-[#2E4056] focus:ring-4 focus:ring-[#2E4056]/10 transition-all"
+                    />
+                    <User className="w-4 h-4 text-[#8D8579] absolute right-4 top-1/2 -translate-y-1/2" />
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-display font-bold uppercase tracking-wider text-[#302C24] mb-1.5">
+                  PIN de Acceso (4 dígitos)
+                </label>
                 <div className="relative">
                   <input
-                    type="text"
+                    type="password"
+                    maxLength={4}
+                    inputMode="numeric"
+                    pattern="[0-9]*"
                     required
-                    value={typedName}
-                    onChange={(e) => setTypedName(e.target.value)}
-                    placeholder="Tu nombre completo"
-                    className="w-full px-4 py-3 bg-[#0D0D10]/80 border border-white/15 rounded-xl text-sm text-white placeholder-[#64748B] focus:bg-[#0D0D10] focus:outline-none focus:border-[#D8B28A] focus:ring-2 focus:ring-[#D8B28A]/20 transition-all"
+                    value={pin}
+                    onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="••••"
+                    className="w-full px-4 py-3.5 text-center tracking-[0.7em] font-mono text-xl bg-[#F8F4EA] border border-[#E5DEC9] rounded-2xl text-[#2E4056] placeholder-[#8D8579] focus:bg-white focus:outline-none focus:border-[#2E4056] focus:ring-4 focus:ring-[#2E4056]/10 transition-all"
                   />
-                  <User className="w-4 h-4 text-[#64748B] absolute right-3.5 top-1/2 -translate-y-1/2" />
+                  <Lock className="w-4 h-4 text-[#8D8579] absolute left-4 top-1/2 -translate-y-1/2" />
                 </div>
-              )}
-            </div>
-
-            {/* PIN Input */}
-            <div>
-              <label className="block text-[11px] font-display font-bold uppercase tracking-wider text-[#CBD5E1] mb-2">
-                PIN de 4 dígitos
-              </label>
-              <div className="relative">
-                <input
-                  type="password"
-                  maxLength={4}
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  required
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                  placeholder="••••"
-                  className="w-full px-4 py-3 text-center tracking-[0.7em] font-mono text-xl bg-[#0D0D10]/80 border border-white/15 rounded-xl text-[#D8B28A] placeholder-[#64748B] focus:bg-[#0D0D10] focus:outline-none focus:border-[#D8B28A] focus:ring-2 focus:ring-[#D8B28A]/20 transition-all"
-                />
-                <Lock className="w-4 h-4 text-[#64748B] absolute left-4 top-1/2 -translate-y-1/2" />
               </div>
+
+              {/* Botón Cinético Moderno en Azul Iglesia */}
+              <button
+                type="submit"
+                className="btn-kinetic group w-full mt-2 py-3.5 px-6 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] text-xs font-display font-extrabold uppercase tracking-[0.16em] rounded-2xl flex items-center justify-center gap-2.5 shadow-glow cursor-pointer"
+              >
+                <span>Ingresar a Programación</span>
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </button>
+            </form>
+
+            <div className="mt-6 pt-5 border-t border-[#ECE6D8] text-center">
+              <p className="text-[11px] text-[#635C51] leading-relaxed">
+                El registro de integrantes es gestionado por el líder administrador. Si necesitas tu PIN, consulta con dirección de alabanza.
+              </p>
             </div>
-
-            {/* Pill CTA Button */}
-            <button
-              type="submit"
-              className="w-full mt-3 py-3.5 px-6 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] text-xs font-display font-extrabold uppercase tracking-[0.18em] rounded-full flex items-center justify-center gap-2 transition-all shadow-glow active:scale-[0.98]"
-            >
-              <span>Acceder al Calendario</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          {/* Institutional Note */}
-          <div className="mt-6 pt-5 border-t border-white/10 text-center">
-            <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-              El registro de nuevos integrantes es realizado exclusivamente por el líder administrador. Si aún no tienes acceso, consulta con el director de alabanza.
-            </p>
           </div>
         </div>
       </div>

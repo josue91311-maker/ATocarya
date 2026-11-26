@@ -215,7 +215,7 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
 
   if (stanzas.length === 0) {
     return (
-      <div className="p-6 text-center text-xs text-[#8E8E9A]">
+      <div className="p-6 text-center text-xs text-[#8D8579]">
         No hay letra registrada para esta canción.
       </div>
     );
@@ -225,19 +225,19 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
     <div
       className={
         isFullscreen
-          ? 'fixed inset-0 z-50 bg-[#0D0D10] text-white flex flex-col p-4 sm:p-6 animate-in fade-in duration-150'
+          ? 'fixed inset-0 z-50 bg-[#F8F4EA] text-[#302C24] flex flex-col p-4 sm:p-6 animate-in fade-in duration-150'
           : 'space-y-3'
       }
     >
       {/* 1. Barra Superior de Herramientas de Canto (Zoom, Auto-Avance, Pantalla Completa) */}
-      <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-white/10 shrink-0">
+      <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-[#E5DEC9] shrink-0">
         <div className="flex items-center gap-2 min-w-0">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#D8B28A]/15 border border-[#D8B28A]/35 text-[#D8B28A] text-[11px] font-display font-bold uppercase tracking-wider">
-            <Sparkles className="w-3 h-3" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#E7EDF3] border border-[#2E4056]/20 text-[#2E4056] text-[11px] font-display font-bold uppercase tracking-wider">
+            <Sparkles className="w-3 h-3 text-[#637358]" />
             <span>Parte {activeIndex + 1} de {totalParts}</span>
           </span>
           {isFullscreen && songTitle && (
-            <h3 className="text-sm sm:text-base font-display font-bold text-white truncate">
+            <h3 className="text-sm sm:text-base font-display font-bold text-[#302C24] truncate">
               {songTitle}
             </h3>
           )}
@@ -245,22 +245,22 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
 
         <div className="flex items-center gap-1.5 flex-wrap">
           {/* Control tamaño de letra */}
-          <div className="inline-flex items-center bg-[#1F1F26] border border-white/10 rounded-xl p-0.5">
+          <div className="inline-flex items-center bg-[#F5EBE0] border border-[#DCBD9E]/60 rounded-xl p-0.5">
             <button
               type="button"
               onClick={() => setFontScale((prev) => (prev > 0 ? ((prev - 1) as 0 | 1 | 2 | 3) : 0))}
               disabled={fontScale === 0}
-              className="px-2 py-1 text-[11px] font-bold text-[#B4B4BE] hover:text-white disabled:opacity-35 cursor-pointer"
+              className="px-2.5 py-1 text-[11px] font-display font-bold text-[#635C51] hover:text-[#302C24] disabled:opacity-35 cursor-pointer"
               title="Reducir tamaño de letra"
             >
               A-
             </button>
-            <Type className="w-3 h-3 text-[#D8B28A] mx-0.5" />
+            <Type className="w-3 h-3 text-[#2E4056] mx-0.5" />
             <button
               type="button"
               onClick={() => setFontScale((prev) => (prev < 3 ? ((prev + 1) as 0 | 1 | 2 | 3) : 3))}
               disabled={fontScale === 3}
-              className="px-2 py-1 text-[11px] font-bold text-[#B4B4BE] hover:text-white disabled:opacity-35 cursor-pointer"
+              className="px-2.5 py-1 text-[11px] font-display font-bold text-[#635C51] hover:text-[#302C24] disabled:opacity-35 cursor-pointer"
               title="Aumentar tamaño de letra"
             >
               A+
@@ -269,14 +269,14 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
 
           {/* Botón Auto-Scroll manos libres */}
           {totalParts > 1 && (
-            <div className="inline-flex items-center bg-[#1F1F26] border border-white/10 rounded-xl p-0.5">
+            <div className="inline-flex items-center bg-[#F5EBE0] border border-[#DCBD9E]/60 rounded-xl p-0.5">
               <button
                 type="button"
                 onClick={() => setAutoAdvance((v) => !v)}
-                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold flex items-center gap-1 transition-colors cursor-pointer ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] font-display font-bold flex items-center gap-1 transition-all cursor-pointer ${
                   autoAdvance
-                    ? 'bg-[#D8B28A] text-[#0D0D10]'
-                    : 'text-[#B4B4BE] hover:text-white'
+                    ? 'bg-[#2E4056] text-[#F8F4EA] shadow-2xs'
+                    : 'text-[#635C51] hover:text-[#302C24]'
                 }`}
                 title="Avance automático manos libres"
               >
@@ -287,7 +287,7 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
                 <select
                   value={autoSeconds}
                   onChange={(e) => setAutoSeconds(Number(e.target.value))}
-                  className="bg-transparent text-[10px] font-bold text-[#D8B28A] px-1.5 py-0.5 focus:outline-none cursor-pointer"
+                  className="bg-transparent text-[10px] font-display font-bold text-[#2E4056] px-1.5 py-0.5 focus:outline-none cursor-pointer"
                   title="Segundos por estrofa"
                 >
                   <option value={7}>7s</option>
@@ -302,10 +302,10 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
           <button
             type="button"
             onClick={() => setIsFullscreen(!isFullscreen)}
-            className={`px-2.5 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1.5 border transition-colors cursor-pointer ${
+            className={`btn-kinetic px-2.5 py-1.5 rounded-xl text-[11px] font-display font-bold flex items-center gap-1.5 border cursor-pointer ${
               isFullscreen
-                ? 'bg-[#E11D48] text-white border-[#E11D48]'
-                : 'bg-[#1F1F26] text-white border-white/10 hover:border-[#D8B28A]/50'
+                ? 'bg-[#302C24] text-[#F8F4EA] border-[#302C24]'
+                : 'bg-[#FCFBF8] text-[#2E4056] border-[#E5DEC9] hover:border-[#2E4056]/40 hover:bg-[#E7EDF3]'
             }`}
             title={isFullscreen ? 'Salir de pantalla completa' : 'Modo Escenario (Pantalla Completa)'}
           >
@@ -325,10 +325,10 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
                 key={stanza.id}
                 type="button"
                 onClick={() => goToPart(idx)}
-                className={`px-3 py-1.5 rounded-xl text-[11px] font-display font-bold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
+                className={`btn-kinetic px-3 py-1.5 rounded-xl text-[11px] font-display font-bold whitespace-nowrap shrink-0 cursor-pointer ${
                   isActive
-                    ? 'bg-[#D8B28A] text-[#0D0D10] shadow-xs'
-                    : 'bg-[#1F1F26] text-[#B4B4BE] hover:text-white border border-white/10'
+                    ? 'bg-[#2E4056] text-[#F8F4EA] shadow-xs'
+                    : 'bg-[#F5EBE0]/80 text-[#635C51] hover:text-[#302C24] border border-[#E5DEC9]'
                 }`}
               >
                 {idx + 1}. {stanza.label}
@@ -356,23 +356,23 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
               onClick={() => goToPart(idx)}
               className={`p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer ${
                 isActive
-                  ? 'bg-[#1F1F27] border-[#D8B28A] border-l-4 shadow-card opacity-100'
-                  : 'bg-[#131318]/70 border-white/5 opacity-45 hover:opacity-80'
+                  ? 'bg-[#FFFFFF] border-[#2E4056] border-l-4 shadow-card opacity-100 scale-[1.005]'
+                  : 'bg-[#F8F4EA]/75 border-[#E5DEC9] opacity-55 hover:opacity-90'
               }`}
             >
               {/* Etiqueta de la parte */}
               <div className="flex items-center justify-between mb-2">
                 <span
-                  className={`text-[10px] font-display font-extrabold uppercase tracking-widest px-2 py-0.5 rounded-md ${
+                  className={`text-[10px] font-display font-extrabold uppercase tracking-widest px-2.5 py-0.5 rounded-lg ${
                     isActive
-                      ? 'bg-[#D8B28A]/20 text-[#D8B28A]'
-                      : 'bg-white/5 text-[#8E8E9A]'
+                      ? 'bg-[#E7EDF3] text-[#2E4056]'
+                      : 'bg-[#F5EBE0] text-[#8D8579]'
                   }`}
                 >
                   {stanza.label}
                 </span>
                 {isActive && (
-                  <span className="text-[10px] font-bold text-[#D8B28A] uppercase tracking-wider">
+                  <span className="text-[10px] font-display font-bold text-[#637358] bg-[#EBF0E7] px-2 py-0.5 rounded-full uppercase tracking-wider">
                     Cantando ahora
                   </span>
                 )}
@@ -386,13 +386,13 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
                       {line.segments?.map((seg, sIdx) => (
                         <span key={sIdx} className="inline-flex flex-col">
                           {seg.chord ? (
-                            <span className="text-xs font-black font-mono text-[#D8B28A] select-none pb-1 tracking-tight">
+                            <span className="text-xs font-black font-mono text-[#2E4056] bg-[#E7EDF3] px-1 rounded select-none mb-1 tracking-tight w-fit">
                               {seg.chord}
                             </span>
                           ) : (
-                            <span className="text-xs invisible select-none pb-1">_</span>
+                            <span className="text-xs invisible select-none mb-1">_</span>
                           )}
-                          <span className={`${textSizeClasses} font-sans font-semibold text-white whitespace-pre`}>
+                          <span className={`${textSizeClasses} font-sans font-semibold text-[#302C24] whitespace-pre`}>
                             {seg.text || ' '}
                           </span>
                         </span>
@@ -401,7 +401,7 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
                   ))}
                 </div>
               ) : (
-                <div className={`${textSizeClasses} font-sans font-semibold text-white space-y-1`}>
+                <div className={`${textSizeClasses} font-sans font-semibold text-[#302C24] space-y-1`}>
                   {stanza.lines.map((line, lineIdx) => (
                     <p key={lineIdx}>{line}</p>
                   ))}
@@ -412,10 +412,10 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
         })}
       </div>
 
-      {/* 4. Botonera Ergonómica Inferior: SUBIR PARTE / BAJAR PARTE */}
+      {/* 4. Botonera Ergonómica Inferior: SUBIR LETRA / BAJAR PARTE */}
       {totalParts > 1 && (
         <div
-          className={`pt-2.5 border-t border-white/10 flex items-center gap-2 shrink-0 ${
+          className={`pt-2.5 border-t border-[#E5DEC9] flex items-center gap-2 shrink-0 ${
             isFullscreen ? 'max-w-3xl w-full mx-auto pb-2' : ''
           }`}
         >
@@ -423,7 +423,7 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
             type="button"
             onClick={() => goToPart(0)}
             disabled={activeIndex === 0}
-            className="p-3 rounded-xl bg-[#1F1F26] hover:bg-[#272730] text-[#B4B4BE] hover:text-white border border-white/10 disabled:opacity-35 transition-colors cursor-pointer"
+            className="btn-kinetic p-3 rounded-xl bg-[#F5EBE0] hover:bg-[#DCBD9E]/45 text-[#635C51] hover:text-[#302C24] border border-[#DCBD9E]/60 disabled:opacity-35 cursor-pointer"
             title="Volver al inicio de la letra"
           >
             <RotateCcw className="w-4 h-4" />
@@ -433,9 +433,9 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
             type="button"
             onClick={() => goToPart(activeIndex - 1)}
             disabled={activeIndex === 0}
-            className="flex-1 py-3 px-4 rounded-xl bg-[#1F1F26] hover:bg-[#272730] active:scale-[0.98] text-white border border-white/15 font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 disabled:opacity-35 transition-all cursor-pointer"
+            className="btn-kinetic flex-1 py-3 px-4 rounded-xl bg-[#F5EBE0] hover:bg-[#DCBD9E]/55 text-[#302C24] border border-[#DCBD9E] font-display font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 disabled:opacity-35 cursor-pointer"
           >
-            <ChevronUp className="w-4 h-4 text-[#D8B28A]" />
+            <ChevronUp className="w-4 h-4 text-[#2E4056] stroke-[2.5]" />
             <span>Subir Letra</span>
           </button>
 
@@ -443,10 +443,10 @@ export const StageLyricsPrompter: React.FC<StageLyricsPrompterProps> = ({
             type="button"
             onClick={() => goToPart(activeIndex + 1)}
             disabled={activeIndex >= totalParts - 1}
-            className="flex-[1.35] py-3 px-4 rounded-xl bg-[#D8B28A] hover:bg-[#E5C6A4] active:scale-[0.98] text-[#0D0D10] font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-glow disabled:opacity-35 transition-all cursor-pointer"
+            className="btn-kinetic flex-[1.35] py-3 px-4 rounded-xl bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] font-display font-extrabold text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-glow disabled:opacity-35 cursor-pointer"
           >
             <span>Bajar Parte</span>
-            <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+            <ChevronDown className="w-4 h-4 text-[#DCBD9E] stroke-[2.5]" />
           </button>
         </div>
       )}

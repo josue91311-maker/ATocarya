@@ -143,44 +143,49 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
   return (
     <div className="space-y-6 animate-in fade-in duration-150">
       
-      {/* 0. HERO ATMOSFÉRICO DE ESCENARIO (Desktop & Portal) */}
+      {/* 0. HERO ARQUITECTÓNICO ATOCAR YA (Desktop & Portal) */}
       {musicianUser && (
-        <div className="relative rounded-3xl overflow-hidden bg-[#16161B] border border-white/15 text-white p-7 sm:p-10 shadow-modal">
-          <div
-            className="absolute inset-0 bg-cover bg-center opacity-35 pointer-events-none"
-            style={{
-              backgroundImage:
-                'url("https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1400&q=80")',
-            }}
-          />
-          <div
-            className="absolute inset-0 pointer-events-none"
-            style={{
-              background:
-                'linear-gradient(120deg, rgba(13,13,16,0.92) 0%, rgba(42,34,26,0.70) 55%, rgba(13,13,16,0.90) 100%)',
-            }}
-          />
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#2E4056] via-[#26374B] to-[#3B4F66] border border-[#213042] text-[#F8F4EA] p-7 sm:p-9 shadow-modal">
+          <div className="absolute -top-20 -right-16 w-72 h-72 rounded-full bg-[#DCBD9E]/20 blur-3xl pointer-events-none animate-float-slow" />
+          <div className="absolute -bottom-24 left-1/3 w-64 h-64 rounded-full bg-[#8E9B84]/25 blur-3xl pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#DCBD9E] via-[#8E9B84] to-[#DCBD9E] opacity-80" />
 
-          <div className="relative z-10 max-w-xl">
-            <span className="text-[10px] sm:text-[11px] font-display font-bold tracking-[0.28em] uppercase text-[#D8B28A] block">
-              FECHAS DE CULTO · {musicianUser.primaryInstrument}
-            </span>
-            <h1 className="font-script text-4xl sm:text-5xl text-white font-bold mt-1.5 leading-tight drop-shadow-md">
-              ¡Hola, {musicianUser.fullName.split(' ')[0]}!
-            </h1>
-            <p className="text-xs sm:text-sm text-[#CBD5E1] mt-1.5">
-              Aquí tienes el resumen de tus próximos cultos y vacantes disponibles.
-            </p>
+          <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="max-w-xl">
+              <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#F8F4EA]/12 border border-[#DCBD9E]/35 text-[10px] sm:text-[11px] font-display font-bold tracking-[0.22em] uppercase text-[#DCBD9E]">
+                FECHAS DE CULTO · {musicianUser.primaryInstrument}
+              </span>
+              <h1 className="font-display text-2xl sm:text-4xl text-[#F8F4EA] font-extrabold mt-2.5 tracking-tight leading-tight">
+                Hola, {musicianUser.fullName.split(' ')[0]}
+              </h1>
+              <p className="text-xs sm:text-sm text-[#E7EDF3]/90 mt-1.5 font-medium">
+                Revisa el cronograma oficial, ensaya con el repertorio y confirma tus puestos en un toque.
+              </p>
+            </div>
+
+            <div className="hidden md:flex items-center gap-3 bg-[#F8F4EA]/10 backdrop-blur-md border border-[#F8F4EA]/20 rounded-2xl px-4 py-3 shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-[#DCBD9E] text-[#302C24] flex items-center justify-center font-display font-black text-lg">
+                {myServicesCount}
+              </div>
+              <div>
+                <span className="text-[10px] font-display font-bold uppercase tracking-widest text-[#DCBD9E] block">
+                  Confirmados
+                </span>
+                <span className="text-xs font-semibold text-[#F8F4EA]">
+                  Servicios asignados
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       )}
 
       {/* TARJETÓN DE PRÓXIMO CULTO & RECOMENDACIÓN RÁPIDA 1-CLIC */}
       {nextService && musicianUser && !myAssignedSlotInNext && recommendedSlotInNext && (
-        <div className="bg-[#16161B]/90 border border-[#D8B28A]/30 text-white rounded-2xl p-4 sm:p-5 shadow-card flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="bento-card bg-[#FCFBF8] border-[#DCBD9E] text-[#302C24] rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex flex-col items-center justify-center shrink-0 shadow-glow">
-              <span className="text-[9px] uppercase font-black tracking-wider leading-none">
+            <div className="w-12 h-12 rounded-2xl bg-[#2E4056] text-[#F8F4EA] flex flex-col items-center justify-center shrink-0 shadow-xs">
+              <span className="text-[9px] uppercase font-black tracking-wider leading-none text-[#DCBD9E]">
                 {new Date(nextService.date + 'T00:00:00').toLocaleDateString('es-ES', { month: 'short' })}
               </span>
               <span className="text-xl font-black font-display leading-tight tabular-nums">
@@ -188,87 +193,87 @@ export const CalendarView: React.FC<Props> = ({ onSelectService, onOpenSetlist }
               </span>
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-display uppercase font-black tracking-wider px-2.5 py-0.5 rounded-full bg-[#E08E45] text-[#0D0D10]">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-[10px] font-display uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-full bg-[#F5EBE0] text-[#7D5A38] border border-[#DCBD9E]">
                   Sugerido para ti
                 </span>
-                <span className="text-xs font-bold text-[#94A3B8] tabular-nums">
+                <span className="text-xs font-bold text-[#635C51] tabular-nums">
                   {nextService.date} ({nextService.time})
                 </span>
               </div>
-              <h3 className="text-sm sm:text-base font-bold font-display text-white mt-1">
-                {musicianUser.fullName}, toca tu instrumento ({musicianUser.primaryInstrument})
+              <h3 className="text-sm sm:text-base font-bold font-display text-[#302C24] mt-1">
+                {musicianUser.fullName}, confirma tu puesto en {musicianUser.primaryInstrument}
               </h3>
             </div>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => claimSlot(nextService.id, recommendedSlotInNext.key)}
-              className="px-5 py-2.5 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-full text-xs font-display font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow transition-all"
+              className="btn-kinetic w-full md:w-auto px-5 py-2.5 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-extrabold uppercase tracking-wider flex items-center justify-center gap-2 shadow-glow cursor-pointer"
             >
-              <Check className="w-4 h-4 stroke-[3]" />
+              <Check className="w-4 h-4 stroke-[3] text-[#DCBD9E]" />
               <span>Anotarme en {recommendedSlotInNext.label}</span>
             </button>
           </div>
         </div>
       )}
 
-      {/* 1. TOP METRICS STRIP EDITORIAL (3 Tarjetas) */}
+      {/* 1. TOP METRICS STRIP BENTO (3 Tarjetas) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-        <div className="bg-[#F7EAE5] border border-[#EEF0F1] rounded-[18px] p-4 sm:p-5 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#C96B65]/15 text-[#C96B65] flex items-center justify-center shrink-0">
+        <div className="bento-card bg-[#FCFBF8] border-[#E5DEC9] rounded-2xl p-4 sm:p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#E7EDF3] text-[#2E4056] flex items-center justify-center shrink-0">
             <CalendarIcon className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-[#64717C] uppercase tracking-wider">
+            <p className="text-[10px] font-display font-bold text-[#635C51] uppercase tracking-wider">
               PRÓXIMOS CULTOS
             </p>
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-2xl sm:text-3xl font-black font-display text-[#202C37] tabular-nums">
+              <span className="text-2xl sm:text-3xl font-black font-display text-[#2E4056] tabular-nums">
                 {totalServices}
               </span>
-              <span className="text-xs text-[#64717C]">fechas vigentes</span>
+              <span className="text-xs text-[#635C51]">fechas vigentes</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-[#D9E9EB] border border-[#EEF0F1] rounded-[18px] p-4 sm:p-5 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#315F6D]/15 text-[#315F6D] flex items-center justify-center shrink-0">
+        <div className="bento-card bg-[#EBF0E7]/75 border-[#8E9B84]/40 rounded-2xl p-4 sm:p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#8E9B84]/25 text-[#4A5940] flex items-center justify-center shrink-0">
             <CheckCircle2 className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-[#64717C] uppercase tracking-wider">
+            <p className="text-[10px] font-display font-bold text-[#4A5940] uppercase tracking-wider">
               MIS PUESTOS
             </p>
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-2xl sm:text-3xl font-black font-display text-[#315F6D] tabular-nums">
+              <span className="text-2xl sm:text-3xl font-black font-display text-[#302C24] tabular-nums">
                 {myServicesCount}
               </span>
-              <span className="text-xs text-[#64717C]">confirmados</span>
+              <span className="text-xs text-[#4A5940]">confirmados</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-[#FFF1CB] border border-[#EEF0F1] rounded-[18px] p-4 sm:p-5 shadow-card flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-[#BD8C29]/15 text-[#BD8C29] flex items-center justify-center shrink-0">
+        <div className="bento-card bg-[#F5EBE0]/80 border-[#DCBD9E]/55 rounded-2xl p-4 sm:p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-2xl bg-[#DCBD9E]/35 text-[#7D5A38] flex items-center justify-center shrink-0">
             <Users className="w-6 h-6" />
           </div>
           <div>
-            <p className="text-[10px] font-bold text-[#64717C] uppercase tracking-wider">
+            <p className="text-[10px] font-display font-bold text-[#7D5A38] uppercase tracking-wider">
               VACANTES ABIERTAS
             </p>
             <div className="flex items-baseline gap-2 mt-0.5">
-              <span className="text-2xl sm:text-3xl font-black font-display text-[#87621D] tabular-nums">
+              <span className="text-2xl sm:text-3xl font-black font-display text-[#7D5A38] tabular-nums">
                 {totalVacancies}
               </span>
-              <span className="text-xs text-[#64717C]">cupos disponibles</span>
+              <span className="text-xs text-[#635C51]">cupos disponibles</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* 2. HEADER & CONTROLS TOOLBAR */}
-      <div className="bg-white border border-[#E5E8EA] rounded-[18px] p-4 sm:p-5 shadow-card space-y-4">
+      <div className="bento-card bg-[#FCFBF8] border-[#E5DEC9] rounded-2xl p-4 sm:p-5 space-y-4">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>

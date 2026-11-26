@@ -246,14 +246,14 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
   );
 
   return (
-    <div className="min-h-screen bg-[#0D0D10] text-white flex flex-col selection:bg-[#D8B28A]/30">
+    <div className="min-h-screen bg-[#F8F4EA] text-[#302C24] flex flex-col selection:bg-[#DCBD9E]/45">
       
-      {/* 1. Header Superior Moderno (Azul Atmosférico con alto contraste) */}
-      <header className="sticky top-0 z-30 bg-[#141418]/95 backdrop-blur-xl border-b border-white/15 shadow-card">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between">
+      {/* 1. Header Superior Editorial AtocarYa (Crema cálida + Azul Iglesia con máximo contraste) */}
+      <header className="sticky top-0 z-30 bg-[#FCFBF8]/92 backdrop-blur-xl border-b border-[#E5DEC9] shadow-2xs">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-15 sm:h-16 flex items-center justify-between gap-2">
           
           {/* Logo y Botón Volver */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
             <button
               type="button"
               onClick={() => {
@@ -265,46 +265,46 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   window.location.hash = '#/';
                 }
               }}
-              className="p-1.5 sm:px-3.5 sm:py-1.5 text-white hover:text-[#D8B28A] bg-[#16161B] hover:bg-[#22222A] border border-white/15 rounded-full text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="btn-kinetic p-2 sm:px-3.5 sm:py-1.5 text-[#302C24] hover:text-[#2E4056] bg-[#F5EBE0] hover:bg-[#DCBD9E]/45 border border-[#DCBD9E]/60 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 cursor-pointer shrink-0"
               title="Volver"
             >
               <ArrowLeft className="w-4 h-4" />
               <span className="hidden sm:inline">Volver</span>
             </button>
-            <Logo size="sm" showText={true} lightText={true} />
+            <Logo size="sm" showText={true} lightText={false} />
           </div>
 
           {/* Badge Central Desktop */}
-          <div className="hidden md:flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-widest bg-[#16161B] text-[#E5C6A4] border border-[#D8B28A]/30">
-            <span className="w-2 h-2 rounded-full bg-[#E08E45] animate-pulse"></span>
+          <div className="hidden md:flex items-center gap-2 px-3.5 py-1 rounded-full text-[11px] font-display font-bold uppercase tracking-widest bg-[#EBF0E7] text-[#4A5940] border border-[#8E9B84]/40">
+            <span className="w-2 h-2 rounded-full bg-[#637358] animate-pulse"></span>
             <span>REPERTORIO OFICIAL</span>
           </div>
 
           {/* Acciones Derecha */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={handleCopyLink}
-              className="hidden sm:flex px-3.5 py-1.5 bg-[#16161B] hover:bg-[#22222A] text-white border border-white/15 rounded-full text-xs font-bold items-center gap-1.5 transition-colors"
+              className="btn-kinetic hidden sm:flex px-3.5 py-1.5 bg-[#FCFBF8] hover:bg-[#F5EBE0] text-[#302C24] border border-[#E5DEC9] rounded-xl text-xs font-display font-bold items-center gap-1.5 cursor-pointer"
               title="Copiar enlace del repertorio"
             >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-[#34D399]" /> : <Copy className="w-3.5 h-3.5 text-[#CBD5E1]" />}
+              {copiedLink ? <Check className="w-3.5 h-3.5 text-[#4A5940]" /> : <Copy className="w-3.5 h-3.5 text-[#635C51]" />}
               <span>{copiedLink ? '¡Copiado!' : 'Copiar Link'}</span>
             </button>
 
             <button
               onClick={handleShareWhatsApp}
-              className="px-4 py-1.5 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-full text-xs font-display font-extrabold uppercase tracking-wider flex items-center gap-1.5 transition-all shadow-glow"
+              className="btn-kinetic px-4 py-1.5 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-extrabold uppercase tracking-wider flex items-center gap-1.5 shadow-glow cursor-pointer"
               title="Compartir por WhatsApp"
             >
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3.5 h-3.5 text-[#DCBD9E]" />
               <span>WhatsApp</span>
             </button>
 
             <button
               type="button"
-              onClick={handleCopyLink}
-              className="sm:hidden p-1.5 text-[#CBD5E1] hover:text-white rounded-lg hover:bg-white/10"
-              title="Copiar enlace"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="sm:hidden p-2 text-[#302C24] hover:bg-[#F5EBE0] rounded-xl transition-colors"
+              title="Más opciones"
             >
               <MoreVertical className="w-5 h-5" />
             </button>
@@ -313,19 +313,19 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
 
         {/* Menú desplegable móvil */}
         {mobileMenuOpen && (
-          <div className="sm:hidden border-t border-slate-200 bg-white px-4 py-3 space-y-2 shadow-lg animate-in slide-in-from-top-2">
-            <div className="flex items-center justify-between text-xs font-semibold text-slate-500 pb-2 border-b border-slate-100">
+          <div className="sm:hidden border-t border-[#E5DEC9] bg-[#FCFBF8] px-4 py-3 space-y-2 shadow-lg animate-in slide-in-from-top-2">
+            <div className="flex items-center justify-between text-xs font-semibold text-[#635C51] pb-2 border-b border-[#E5DEC9]">
               <span>{service.title}</span>
-              <span className="text-[#315F6D] font-bold">Oficial</span>
+              <span className="text-[#2E4056] font-bold">Oficial</span>
             </div>
             <button
               onClick={() => {
                 handleCopyLink();
                 setMobileMenuOpen(false);
               }}
-              className="w-full text-left py-2 px-3 text-xs font-bold text-slate-700 hover:bg-slate-50 rounded-xl flex items-center gap-2"
+              className="w-full text-left py-2 px-3 text-xs font-bold text-[#302C24] hover:bg-[#F5EBE0] rounded-xl flex items-center gap-2"
             >
-              <Copy className="w-4 h-4 text-slate-500" />
+              <Copy className="w-4 h-4 text-[#635C51]" />
               <span>{copiedLink ? '¡Enlace Copiado!' : 'Copiar enlace directo'}</span>
             </button>
             {onGoToPortal && (
@@ -334,7 +334,7 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                   setMobileMenuOpen(false);
                   onGoToPortal();
                 }}
-                className="w-full text-left py-2 px-3 text-xs font-bold text-[#315F6D] hover:bg-[#FAF9F6] rounded-xl flex items-center gap-2"
+                className="w-full text-left py-2 px-3 text-xs font-bold text-[#2E4056] hover:bg-[#E7EDF3] rounded-xl flex items-center gap-2"
               >
                 <span>Acceder al Portal de Músicos</span>
               </button>
@@ -346,56 +346,53 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
       {/* Main Container */}
       <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-5 sm:py-6 pb-20 space-y-5 sm:space-y-6">
 
-        {/* 2. Hero Banner del Culto (Diseño Petróleo Editorial) */}
-        <div className="relative rounded-3xl overflow-hidden bg-[#315F6D] text-white p-5 sm:p-7 shadow-card border border-[#234A57]">
-          {/* Fondo sutil de concierto */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center opacity-25 mix-blend-luminosity pointer-events-none"
-            style={{ backgroundImage: 'url("/app-bg.jpg")' }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-[#1A1714] via-[#16161C]/95 to-[#121217]/85 pointer-events-none" />
+        {/* 2. Hero Banner del Culto (Azul Iglesia + Arena Cálida + Salvia) */}
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-br from-[#2E4056] via-[#26374B] to-[#3B4F66] text-[#F8F4EA] p-5 sm:p-7 shadow-modal border border-[#213042]">
+          <div className="absolute -top-16 -right-12 w-60 h-60 rounded-full bg-[#DCBD9E]/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-20 left-1/4 w-56 h-56 rounded-full bg-[#8E9B84]/25 blur-3xl pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#DCBD9E] via-[#8E9B84] to-[#DCBD9E] opacity-85" />
 
           <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-white/20 text-[#FFF1CB] border border-white/30 font-display">
+                <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#F8F4EA]/15 text-[#DCBD9E] border border-[#DCBD9E]/40 font-display">
                   REPERTORIO OFICIAL
                 </span>
-                <span className="text-xs font-semibold text-slate-200 capitalize">
+                <span className="text-xs font-semibold text-[#E7EDF3] capitalize">
                   {fullDateStr}
                 </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight font-display">
+              <h1 className="text-2xl sm:text-3xl font-black text-[#F8F4EA] tracking-tight font-display">
                 {service.title}
               </h1>
-              <div className="flex items-center gap-4 text-xs text-slate-200 pt-1 flex-wrap">
+              <div className="flex items-center gap-4 text-xs text-[#E7EDF3] pt-1 flex-wrap">
                 <span className="flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-[#E8B844]" />
-                  Culto: <strong className="text-white">{service.time}</strong>
+                  <Clock className="w-3.5 h-3.5 text-[#DCBD9E]" />
+                  Culto: <strong className="text-[#F8F4EA]">{service.time}</strong>
                 </span>
                 {service.rehearsalTime && (
                   <span className="flex items-center gap-1.5">
-                    <Headphones className="w-3.5 h-3.5 text-[#E8B844]" />
-                    Ensayo: <strong className="text-white">{service.rehearsalTime}</strong>
+                    <Headphones className="w-3.5 h-3.5 text-[#DCBD9E]" />
+                    Ensayo: <strong className="text-[#F8F4EA]">{service.rehearsalTime}</strong>
                   </span>
                 )}
                 {directorName && (
                   <span className="flex items-center gap-1.5">
-                    <Users className="w-3.5 h-3.5 text-[#E8B844]" />
-                    Director: <strong className="text-white">{directorName}</strong>
+                    <Users className="w-3.5 h-3.5 text-[#DCBD9E]" />
+                    Director: <strong className="text-[#F8F4EA]">{directorName}</strong>
                   </span>
                 )}
               </div>
             </div>
 
-            {/* Tarjeta flotante glassmorphism con contador */}
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-3 sm:p-4 flex items-center gap-3 shrink-0 self-start sm:self-auto">
-              <Music className="w-7 h-7 sm:w-8 sm:h-8 text-[#E8B844]" />
+            {/* Tarjeta flotante con contador */}
+            <div className="bg-[#F8F4EA]/12 backdrop-blur-md border border-[#F8F4EA]/20 rounded-2xl p-3 sm:p-4 flex items-center gap-3 shrink-0 self-start sm:self-auto">
+              <Music className="w-7 h-7 sm:w-8 sm:h-8 text-[#DCBD9E]" />
               <div>
-                <span className="text-2xl sm:text-3xl font-black text-white leading-none block">
+                <span className="text-2xl sm:text-3xl font-black font-display text-[#F8F4EA] leading-none block">
                   {songs.length}
                 </span>
-                <span className="text-[10px] sm:text-xs text-slate-200 font-medium block">
+                <span className="text-[10px] sm:text-xs text-[#E7EDF3] font-medium block">
                   alabanzas programadas
                 </span>
               </div>
@@ -736,10 +733,10 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         <button
                           type="button"
                           onClick={() => setChordProMode('with-chords')}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-display font-bold transition-all ${
                             chordProMode === 'with-chords'
-                              ? 'bg-[#D8B28A] text-[#0D0D10]'
-                              : 'bg-[#1F1F26] text-[#B4B4BE]'
+                              ? 'bg-[#2E4056] text-[#F8F4EA]'
+                              : 'bg-[#F5EBE0] text-[#635C51]'
                           }`}
                         >
                           Con Acordes
@@ -747,10 +744,10 @@ export const PublicSetlistView: React.FC<Props> = ({ serviceId, onGoToPortal }) 
                         <button
                           type="button"
                           onClick={() => setChordProMode('lyrics-only')}
-                          className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                          className={`px-2.5 py-1 rounded-lg text-[11px] font-display font-bold transition-all ${
                             chordProMode === 'lyrics-only'
-                              ? 'bg-[#D8B28A] text-[#0D0D10]'
-                              : 'bg-[#1F1F26] text-[#B4B4BE]'
+                              ? 'bg-[#2E4056] text-[#F8F4EA]'
+                              : 'bg-[#F5EBE0] text-[#635C51]'
                           }`}
                         >
                           Solo Letra

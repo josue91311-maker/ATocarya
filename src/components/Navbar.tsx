@@ -117,33 +117,31 @@ export const Navbar: React.FC<Props> = ({
   const canAccessTracks = isAdminAuthenticated || isDirector;
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-[#0D0D10] text-white">
+    <div className="min-h-screen flex flex-col md:flex-row bg-[#F8F4EA] text-[#302C24]">
       {/* ========================================================================= */}
-      {/* 1. DESKTOP SIDEBAR (MIDNIGHT CONCERT STAGE #111115)                       */}
+      {/* 1. DESKTOP SIDEBAR (AZUL IGLESIA #2E4056 CON PÍLDORAS CINÉTICAS)          */}
       {/* ========================================================================= */}
       <aside 
-        className={`hidden md:flex flex-col justify-between min-h-screen bg-[#141418] border-r border-white/15 text-white sticky top-0 shrink-0 shadow-modal z-30 select-none transition-all duration-300 ease-in-out ${
+        className={`hidden md:flex flex-col justify-between min-h-screen bg-gradient-to-b from-[#2E4056] to-[#223143] text-[#F8F4EA] sticky top-0 shrink-0 shadow-modal z-30 select-none transition-all duration-300 ease-in-out ${
           isSidebarCollapsed ? 'w-20 p-3' : 'w-64 p-5'
         }`}
       >
         <div className="space-y-6">
-          {/* Header del Sidebar: Logo + Botón Plegar/Desplegar + Badge Administrador */}
-          <div className="pt-1 flex flex-col gap-2">
+          {/* Header del Sidebar */}
+          <div className="pt-1 flex flex-col gap-2.5">
             <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'justify-between'} w-full`}>
               <div className="flex items-center overflow-hidden">
                 <Logo 
                   lightText 
                   size="sm" 
                   showText={!isSidebarCollapsed}
-                  subtitle={portal === 'admin' ? 'ADMIN' : 'LIVE'}
                 />
               </div>
 
-              {/* Botón Plegar / Desplegar en la cabecera */}
               <button
                 type="button"
                 onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-                className="p-1.5 rounded-xl text-[#94A3B8] hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                className="p-1.5 rounded-xl text-[#DCBD9E] hover:text-white hover:bg-white/10 transition-all cursor-pointer shrink-0"
                 title={isSidebarCollapsed ? "Desplegar barra de módulos" : "Plegar barra de módulos"}
               >
                 {isSidebarCollapsed ? (
@@ -154,31 +152,30 @@ export const Navbar: React.FC<Props> = ({
               </button>
             </div>
 
-            {/* Badge Administrador */}
             {!isSidebarCollapsed && portal === 'admin' && (
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#E08E45]/10 border border-[#E08E45]/25 text-[10px] font-display font-bold uppercase tracking-widest text-[#E08E45]">
-                <span className="w-2 h-2 rounded-full bg-[#E08E45] animate-pulse shrink-0" />
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#DCBD9E]/18 border border-[#DCBD9E]/35 text-[10px] font-display font-bold uppercase tracking-widest text-[#F5EBE0]">
+                <span className="w-2 h-2 rounded-full bg-[#8E9B84] animate-pulse shrink-0" />
                 <span>Panel Administrador</span>
               </div>
             )}
             {isSidebarCollapsed && portal === 'admin' && (
               <div className="flex justify-center mt-1" title="Panel Administrador">
-                <span className="w-2 h-2 rounded-full bg-[#E08E45] animate-pulse" />
+                <span className="w-2 h-2 rounded-full bg-[#DCBD9E] animate-pulse" />
               </div>
             )}
           </div>
 
           {/* Navigation Links for Musicians */}
           {portal === 'musician' && musicianUser && (
-            <nav className="space-y-1.5">
+            <nav className="space-y-2">
               <button
                 type="button"
                 onClick={() => setMusicianTab('calendar')}
                 title="Fechas de Culto"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   musicianTab === 'calendar'
-                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                    : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                    : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                 }`}
               >
                 <CalendarDays className="w-4 h-4 shrink-0" />
@@ -189,10 +186,10 @@ export const Navbar: React.FC<Props> = ({
                 type="button"
                 onClick={() => setMusicianTab('my-services')}
                 title="Mis Asignaciones"
-                className={`relative w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-3.5'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`relative w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-3.5'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   musicianTab === 'my-services'
-                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                    : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                    : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                 }`}
               >
                 <div className={`flex items-center ${isSidebarCollapsed ? 'justify-center' : 'gap-3'}`}>
@@ -200,22 +197,21 @@ export const Navbar: React.FC<Props> = ({
                   {!isSidebarCollapsed && <span>Mis Asignaciones</span>}
                 </div>
                 {assignedCount > 0 && (
-                  <span className={`${isSidebarCollapsed ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'} rounded-full bg-[#E08E45] text-[#0D0D10] font-black flex items-center justify-center tabular-nums`}>
+                  <span className={`${isSidebarCollapsed ? 'absolute -top-1 -right-1 w-4 h-4 text-[9px]' : 'w-5 h-5 text-[10px]'} rounded-full bg-[#DCBD9E] text-[#302C24] font-black flex items-center justify-center tabular-nums shadow-xs`}>
                     {assignedCount}
                   </span>
                 )}
               </button>
 
-              {/* Repertorio: Exclusivo para rol de Voz Director / Director */}
               {isDirector && (
                 <button
                   type="button"
                   onClick={() => setMusicianTab('tracks')}
                   title="Repertorio Musical"
-                  className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                  className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                     musicianTab === 'tracks'
-                      ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                      : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                      ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                      : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                   }`}
                 >
                   <Music className="w-4 h-4 shrink-0" />
@@ -223,12 +219,11 @@ export const Navbar: React.FC<Props> = ({
                 </button>
               )}
 
-              {/* Mi Perfil */}
               <button
                 type="button"
                 onClick={() => setProfileModalOpen(true)}
                 title="Mi Perfil"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent transition-all cursor-pointer`}
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5 transition-all cursor-pointer`}
               >
                 <UserRound className="w-4 h-4 shrink-0" />
                 {!isSidebarCollapsed && <span>Mi Perfil</span>}
@@ -238,15 +233,15 @@ export const Navbar: React.FC<Props> = ({
 
           {/* Navigation Links for Administrator */}
           {portal === 'admin' && isAdminAuthenticated && (
-            <nav className="space-y-1.5">
+            <nav className="space-y-2">
               <button
                 type="button"
                 onClick={() => setAdminTab('schedule')}
                 title="Matriz de Planes"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'schedule'
-                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                    : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                    : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                 }`}
               >
                 <Table className="w-4 h-4 shrink-0" />
@@ -257,10 +252,10 @@ export const Navbar: React.FC<Props> = ({
                 type="button"
                 onClick={() => setAdminTab('visual-board')}
                 title="Fotos / WhatsApp"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'visual-board'
-                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                    : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                    : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                 }`}
               >
                 <Camera className="w-4 h-4 shrink-0" />
@@ -271,10 +266,10 @@ export const Navbar: React.FC<Props> = ({
                 type="button"
                 onClick={() => setAdminTab('musicians')}
                 title="Equipo de Músicos"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'musicians'
-                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                    : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                    : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                 }`}
               >
                 <UsersRound className="w-4 h-4 shrink-0" />
@@ -285,10 +280,10 @@ export const Navbar: React.FC<Props> = ({
                 type="button"
                 onClick={() => setAdminTab('songs-bank')}
                 title="Banco Canciones"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider transition-all cursor-pointer ${
                   adminTab === 'songs-bank'
-                    ? 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/35 shadow-glow'
-                    : 'text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent'
+                    ? 'bg-[#F8F4EA] text-[#2E4056] shadow-md translate-x-1'
+                    : 'text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5'
                 }`}
               >
                 <Music2 className="w-4 h-4 shrink-0" />
@@ -299,7 +294,7 @@ export const Navbar: React.FC<Props> = ({
                 type="button"
                 onClick={() => onNavigatePortal('musician')}
                 title="Vista Músicos"
-                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-xl text-[11px] font-display font-bold uppercase tracking-wider text-[#94A3B8] hover:bg-white/5 hover:text-white border border-transparent transition-all cursor-pointer`}
+                className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-start px-3.5 gap-3'} py-3 rounded-2xl text-[11px] font-display font-bold uppercase tracking-wider text-[#F8F4EA]/80 hover:bg-white/10 hover:text-white hover:translate-x-0.5 transition-all cursor-pointer`}
               >
                 <UserRound className="w-4 h-4 shrink-0" />
                 {!isSidebarCollapsed && <span>Vista Músicos</span>}
@@ -309,11 +304,11 @@ export const Navbar: React.FC<Props> = ({
         </div>
 
         {/* Bottom Actions */}
-        <div className="pt-4 border-t border-white/10 space-y-2">
+        <div className="pt-4 border-t border-white/15 space-y-2">
           <button
             type="button"
             onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-3'} py-2 rounded-xl text-xs font-semibold text-[#94A3B8] hover:text-white hover:bg-white/5 transition-colors cursor-pointer`}
+            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'justify-between px-3'} py-2 rounded-xl text-xs font-semibold text-[#F8F4EA]/75 hover:text-white hover:bg-white/10 transition-colors cursor-pointer`}
             title={isSidebarCollapsed ? "Desplegar barra de módulos" : "Plegar barra de módulos"}
           >
             <div className="flex items-center gap-2">
@@ -321,17 +316,17 @@ export const Navbar: React.FC<Props> = ({
               {!isSidebarCollapsed && <span>Plegar menú</span>}
             </div>
             {!isSidebarCollapsed && (
-              <span className="text-[10px] text-[#64748B] bg-white/5 px-1.5 py-0.5 rounded">Ctrl+B</span>
+              <span className="text-[10px] text-[#F8F4EA]/60 bg-white/10 px-1.5 py-0.5 rounded">Ctrl+B</span>
             )}
           </button>
 
           <button
             type="button"
             onClick={portal === 'admin' ? logoutAdmin : logoutMusician}
-            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'gap-2.5 px-3'} py-2.5 rounded-xl text-xs font-bold text-[#94A3B8] hover:text-white hover:bg-[#F43F5E]/20 transition-colors cursor-pointer`}
+            className={`w-full flex items-center ${isSidebarCollapsed ? 'justify-center px-0' : 'gap-2.5 px-3'} py-2.5 rounded-xl text-xs font-bold text-[#F8F4EA]/85 hover:text-white hover:bg-[#A84C3A] transition-colors cursor-pointer`}
             title="Cerrar Sesión"
           >
-            <LogOut className="w-4 h-4 shrink-0 text-[#FB7185]" />
+            <LogOut className="w-4 h-4 shrink-0" />
             {!isSidebarCollapsed && <span>Cerrar Sesión</span>}
           </button>
         </div>
@@ -342,7 +337,7 @@ export const Navbar: React.FC<Props> = ({
       {/* ========================================================================= */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen">
         {/* Desktop Top Header Bar */}
-        <header className="hidden md:flex items-center justify-between h-16 px-6 sm:px-8 bg-[#141418]/90 border-b border-white/15 sticky top-0 z-20 backdrop-blur-xl">
+        <header className="hidden md:flex items-center justify-between h-16 px-6 sm:px-8 bg-[#FCFBF8]/88 border-b border-[#E5DEC9] sticky top-0 z-20 backdrop-blur-xl">
           {/* Input Buscador General */}
           <div className="relative w-80 max-w-sm">
             <input
@@ -350,19 +345,19 @@ export const Navbar: React.FC<Props> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar fecha, instrumento o canción..."
-              className="w-full pl-9 pr-4 py-2 bg-[#16161B]/90 border border-white/10 rounded-full text-xs text-white placeholder-[#64748B] focus:bg-[#16161B] focus:outline-none focus:border-[#D8B28A] transition-all"
+              className="w-full pl-9 pr-4 py-2 bg-[#F8F4EA] border border-[#E5DEC9] rounded-full text-xs text-[#302C24] placeholder-[#8D8579] focus:bg-white focus:outline-none focus:border-[#2E4056] transition-all font-medium"
             />
-            <Search className="w-4 h-4 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-4 h-4 text-[#8D8579] absolute left-3 top-1/2 -translate-y-1/2" />
           </div>
 
-          {/* Lado Derecho: WhatsApp (Admin), Campana, Perfil */}
+          {/* Lado Derecho */}
           <div className="flex items-center gap-4">
             {portal === 'admin' && isAdminAuthenticated && (
               <button
                 onClick={openShareModal}
-                className="flex items-center gap-1.5 px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-full text-[11px] font-display font-extrabold uppercase tracking-wider transition-all shadow-glow"
+                className="btn-kinetic flex items-center gap-1.5 px-4 py-2 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-full text-[11px] font-display font-extrabold uppercase tracking-wider shadow-glow cursor-pointer"
               >
-                <Share2 className="w-3.5 h-3.5" />
+                <Share2 className="w-3.5 h-3.5 text-[#DCBD9E]" />
                 <span>Compartir WhatsApp</span>
               </button>
             )}
@@ -374,20 +369,19 @@ export const Navbar: React.FC<Props> = ({
                 onClick={() => setNotificationsOpen(!notificationsOpen)}
                 className={`p-2 rounded-full transition-all relative cursor-pointer ${
                   hasNotificationsToday 
-                    ? 'text-[#E08E45] bg-[#E08E45]/15 hover:bg-[#E08E45]/25 border border-[#E08E45]/30' 
-                    : 'text-[#94A3B8] hover:text-white hover:bg-white/10'
+                    ? 'text-[#2E4056] bg-[#F5EBE0] hover:bg-[#DCBD9E]/50 border border-[#DCBD9E]' 
+                    : 'text-[#635C51] hover:text-[#302C24] hover:bg-[#EFECE4]'
                 }`}
                 title="Notificaciones de Culto (Hora Perú)"
               >
                 <Bell className={`w-5 h-5 ${hasNotificationsToday ? 'animate-pulse' : ''}`} />
                 {notificationCount > 0 && (
-                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#F43F5E] text-white text-[10px] font-black flex items-center justify-center tabular-nums shadow-xs">
+                  <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[#A84C3A] text-white text-[10px] font-black flex items-center justify-center tabular-nums shadow-xs">
                     {notificationCount}
                   </span>
                 )}
               </button>
 
-              {/* Popover / Menú Desplegable de Notificaciones */}
               {notificationsOpen && (
                 <>
                   <div 
@@ -395,34 +389,34 @@ export const Navbar: React.FC<Props> = ({
                     onClick={() => setNotificationsOpen(false)} 
                   />
 
-                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#16161B] rounded-2xl shadow-modal border border-white/15 z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                    <div className="p-4 bg-[#111115] border-b border-white/10 text-white flex items-center justify-between">
+                  <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-[#FCFBF8] rounded-3xl shadow-modal border border-[#E5DEC9] z-50 overflow-hidden animate-card-reveal">
+                    <div className="p-4 bg-[#2E4056] text-[#F8F4EA] flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Bell className="w-4 h-4 text-[#E08E45]" />
+                        <Bell className="w-4 h-4 text-[#DCBD9E]" />
                         <h3 className="text-xs font-display font-bold uppercase tracking-wider">Notificaciones de Culto</h3>
                       </div>
                       <button
                         type="button"
                         onClick={() => setNotificationsOpen(false)}
-                        className="text-[#94A3B8] hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
+                        className="text-[#F8F4EA]/75 hover:text-white p-1 rounded-lg transition-colors cursor-pointer"
                         title="Cerrar"
                       >
                         <X className="w-4 h-4" />
                       </button>
                     </div>
 
-                    <div className="px-4 py-2 bg-[#111115] border-b border-white/10 flex items-center justify-between text-[11px] text-[#94A3B8]">
+                    <div className="px-4 py-2 bg-[#F8F4EA] border-b border-[#E5DEC9] flex items-center justify-between text-[11px] text-[#635C51]">
                       <span className="font-semibold flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-[#D8B28A]" />
+                        <Clock className="w-3 h-3 text-[#2E4056]" />
                         Hora Oficial Perú (UTC-5)
                       </span>
-                      <span className="font-bold text-[#D8B28A] tabular-nums">{peruToday}</span>
+                      <span className="font-bold text-[#2E4056] tabular-nums">{peruToday}</span>
                     </div>
 
                     <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
                       <div>
-                        <p className="text-[10px] font-display font-bold uppercase tracking-widest text-[#94A3B8] mb-2 flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-[#D8B28A]" />
+                        <p className="text-[10px] font-display font-bold uppercase tracking-widest text-[#635C51] mb-2 flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-[#8E9B84]" />
                           <span>Cultos Programados Hoy</span>
                         </p>
 
@@ -436,26 +430,26 @@ export const Navbar: React.FC<Props> = ({
                               return (
                                 <div 
                                   key={service.id}
-                                  className="p-3 rounded-xl bg-[#1F1F26] border border-white/10 hover:border-[#D8B28A]/40 transition-colors space-y-2"
+                                  className="p-3 rounded-2xl bg-[#F8F4EA] border border-[#E5DEC9] hover:border-[#2E4056]/35 transition-colors space-y-2"
                                 >
                                   <div className="flex items-start justify-between gap-2">
                                     <div>
-                                      <p className="text-xs font-bold text-white">
+                                      <p className="text-xs font-bold text-[#302C24]">
                                         {service.title || 'Culto de Adoración'}
                                       </p>
-                                      <p className="text-[11px] text-[#94A3B8] flex items-center gap-1 mt-0.5">
-                                        <Clock className="w-3 h-3 text-[#E08E45]" />
+                                      <p className="text-[11px] text-[#635C51] flex items-center gap-1 mt-0.5">
+                                        <Clock className="w-3 h-3 text-[#8E9B84]" />
                                         <span>Hora: {service.time || '19:30'}</span>
                                       </p>
                                     </div>
-                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/30">
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#EBF0E7] text-[#2E4056] border border-[#8E9B84]/40">
                                       Hoy
                                     </span>
                                   </div>
 
                                   {mySlot && (
-                                    <div className="p-2 rounded-lg bg-[#E08E45]/12 border border-[#E08E45]/30 flex items-center justify-between">
-                                      <span className="text-[11px] font-bold text-[#E08E45]">
+                                    <div className="p-2 rounded-xl bg-[#F5EBE0] border border-[#DCBD9E] flex items-center justify-between">
+                                      <span className="text-[11px] font-bold text-[#302C24]">
                                         Asignado: {mySlot[1].label || mySlot[0]}
                                       </span>
                                       {service.isSongsPublished && service.songs && service.songs.length > 0 && onOpenSetlist && (
@@ -465,7 +459,7 @@ export const Navbar: React.FC<Props> = ({
                                             setNotificationsOpen(false);
                                             onOpenSetlist(service);
                                           }}
-                                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0D0D10] bg-[#D8B28A] hover:bg-[#E5C6A4] px-2.5 py-1 rounded-full transition-colors cursor-pointer"
+                                          className="inline-flex items-center gap-1 text-[10px] font-bold text-[#F8F4EA] bg-[#2E4056] hover:bg-[#213042] px-2.5 py-1 rounded-full transition-colors cursor-pointer"
                                         >
                                           <Music className="w-3 h-3" />
                                           <span>Canciones</span>
@@ -481,7 +475,7 @@ export const Navbar: React.FC<Props> = ({
                                         setNotificationsOpen(false);
                                         onOpenService(service);
                                       }}
-                                      className="w-full text-center text-[11px] font-bold text-[#D8B28A] hover:text-[#E5C6A4] hover:underline pt-1 cursor-pointer"
+                                      className="w-full text-center text-[11px] font-bold text-[#2E4056] hover:underline pt-1 cursor-pointer"
                                     >
                                       Ver detalles del equipo →
                                     </button>
@@ -491,11 +485,11 @@ export const Navbar: React.FC<Props> = ({
                             })}
                           </div>
                         ) : (
-                          <div className="p-3.5 rounded-xl bg-[#111115] border border-dashed border-white/15 text-center">
-                            <p className="text-xs text-[#CBD5E1] font-semibold">
+                          <div className="p-3.5 rounded-2xl bg-[#F8F4EA] border border-dashed border-[#E5DEC9] text-center">
+                            <p className="text-xs text-[#302C24] font-semibold">
                               No hay cultos programados para hoy (Hora Perú).
                             </p>
-                            <p className="text-[10px] text-[#64748B] mt-0.5">
+                            <p className="text-[10px] text-[#8D8579] mt-0.5">
                               Revisa las próximas fechas de servicio en tu agenda.
                             </p>
                           </div>
@@ -503,25 +497,25 @@ export const Navbar: React.FC<Props> = ({
                       </div>
 
                       {portal === 'musician' && musicianUser && assignedCount > 0 && (
-                        <div className="pt-2 border-t border-white/10">
-                          <p className="text-[10px] font-display font-bold uppercase tracking-widest text-[#94A3B8] mb-1">
+                        <div className="pt-2 border-t border-[#ECE6D8]">
+                          <p className="text-[10px] font-display font-bold uppercase tracking-widest text-[#635C51] mb-1">
                             Tus Asignaciones Confirmadas
                           </p>
-                          <p className="text-xs text-[#CBD5E1]">
-                            Tienes <span className="font-bold text-[#D8B28A]">{assignedCount}</span> culto(s) programado(s) en tu agenda.
+                          <p className="text-xs text-[#302C24]">
+                            Tienes <span className="font-bold text-[#2E4056]">{assignedCount}</span> culto(s) programado(s) en tu agenda.
                           </p>
                         </div>
                       )}
                     </div>
 
-                    <div className="p-3 bg-[#111115] border-t border-white/10 flex items-center justify-between">
-                      <span className="text-[10px] text-[#64748B]">
-                        ATocarYa · Notificaciones activas
+                    <div className="p-3 bg-[#F8F4EA] border-t border-[#E5DEC9] flex items-center justify-between">
+                      <span className="text-[10px] text-[#8D8579]">
+                        AtocarYa · Notificaciones activas
                       </span>
                       <button
                         type="button"
                         onClick={() => setNotificationsOpen(false)}
-                        className="text-xs font-bold text-[#D8B28A] hover:underline cursor-pointer"
+                        className="text-xs font-bold text-[#2E4056] hover:underline cursor-pointer"
                       >
                         Entendido
                       </button>
@@ -537,27 +531,27 @@ export const Navbar: React.FC<Props> = ({
                 <button
                   type="button"
                   onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
-                  className="flex items-center gap-3 pl-1 pr-2.5 py-1 rounded-full hover:bg-white/5 transition-colors cursor-pointer border border-white/10 hover:border-[#D8B28A]/40"
+                  className="flex items-center gap-3 pl-1 pr-2.5 py-1 rounded-full bg-[#F8F4EA] hover:bg-[#EFECE4] transition-all cursor-pointer border border-[#E5DEC9]"
                 >
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D8B28A] to-[#0284C7] text-[#0D0D10] flex items-center justify-center text-xs font-black shadow-xs">
+                  <div className="w-8 h-8 rounded-full bg-[#2E4056] text-[#F8F4EA] flex items-center justify-center text-xs font-black shadow-xs">
                     {musicianUser.fullName.charAt(0).toUpperCase()}
                   </div>
                   <div className="text-left hidden lg:block">
-                    <p className="text-xs font-bold text-white leading-tight">
+                    <p className="text-xs font-bold text-[#302C24] leading-tight">
                       {musicianUser.fullName.split(' ')[0]}
                     </p>
-                    <p className="text-[10px] text-[#D8B28A] font-semibold leading-none mt-0.5">
+                    <p className="text-[10px] text-[#637358] font-bold leading-none mt-0.5">
                       {musicianUser.primaryInstrument}
                     </p>
                   </div>
-                  <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8]" />
+                  <ChevronDown className="w-3.5 h-3.5 text-[#635C51]" />
                 </button>
 
                 {profileDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-[#16161B] border border-white/15 rounded-2xl shadow-modal py-2 z-50">
-                    <div className="px-3.5 py-2 border-b border-white/10">
-                      <p className="text-xs font-bold text-white">{musicianUser.fullName}</p>
-                      <p className="text-[10px] text-[#D8B28A]">{musicianUser.primaryInstrument}</p>
+                  <div className="absolute right-0 mt-2 w-52 bg-[#FCFBF8] border border-[#E5DEC9] rounded-2xl shadow-modal py-2 z-50 animate-card-reveal">
+                    <div className="px-3.5 py-2 border-b border-[#ECE6D8]">
+                      <p className="text-xs font-bold text-[#302C24]">{musicianUser.fullName}</p>
+                      <p className="text-[10px] text-[#637358] font-semibold">{musicianUser.primaryInstrument}</p>
                     </div>
                     <button
                       type="button"
@@ -565,9 +559,9 @@ export const Navbar: React.FC<Props> = ({
                         setProfileDropdownOpen(false);
                         setProfileModalOpen(true);
                       }}
-                      className="w-full text-left px-3.5 py-2 text-xs text-white hover:bg-white/5 font-semibold flex items-center gap-2 cursor-pointer"
+                      className="w-full text-left px-3.5 py-2 text-xs text-[#302C24] hover:bg-[#F8F4EA] font-semibold flex items-center gap-2 cursor-pointer"
                     >
-                      <UserRound className="w-3.5 h-3.5 text-[#D8B28A]" />
+                      <UserRound className="w-3.5 h-3.5 text-[#2E4056]" />
                       <span>Ver Mi Perfil</span>
                     </button>
                     <button
@@ -576,9 +570,9 @@ export const Navbar: React.FC<Props> = ({
                         setProfileDropdownOpen(false);
                         onNavigatePortal('admin');
                       }}
-                      className="w-full text-left px-3.5 py-2 text-xs text-[#94A3B8] hover:bg-white/5 hover:text-white font-semibold flex items-center gap-2 cursor-pointer"
+                      className="w-full text-left px-3.5 py-2 text-xs text-[#635C51] hover:bg-[#F8F4EA] font-semibold flex items-center gap-2 cursor-pointer"
                     >
-                      <Shield className="w-3.5 h-3.5 text-[#E08E45]" />
+                      <Shield className="w-3.5 h-3.5 text-[#8E9B84]" />
                       <span>Acceso Administrador</span>
                     </button>
                     <button
@@ -587,7 +581,7 @@ export const Navbar: React.FC<Props> = ({
                         setProfileDropdownOpen(false);
                         logoutMusician();
                       }}
-                      className="w-full text-left px-3.5 py-2 text-xs text-[#FB7185] hover:bg-[#F43F5E]/15 font-semibold flex items-center gap-2"
+                      className="w-full text-left px-3.5 py-2 text-xs text-[#A84C3A] hover:bg-[#F7E8E4] font-semibold flex items-center gap-2"
                     >
                       <LogOut className="w-3.5 h-3.5" />
                       <span>Cerrar Sesión</span>
@@ -600,17 +594,17 @@ export const Navbar: React.FC<Props> = ({
             {/* Chip Administrador */}
             {portal === 'admin' && isAdminAuthenticated && (
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-[#E08E45] text-[#0D0D10] flex items-center justify-center text-xs font-black shadow-glow-yellow">
+                <div className="w-8 h-8 rounded-full bg-[#DCBD9E] text-[#302C24] flex items-center justify-center text-xs font-black shadow-xs">
                   A
                 </div>
                 <div className="text-left hidden lg:block">
-                  <p className="text-xs font-bold text-white">Administrador</p>
-                  <p className="text-[10px] text-[#E08E45] font-bold uppercase tracking-wider">Líder General</p>
+                  <p className="text-xs font-bold text-[#302C24]">Administrador</p>
+                  <p className="text-[10px] text-[#637358] font-bold uppercase tracking-wider">Líder General</p>
                 </div>
                 <button
                   type="button"
                   onClick={logoutAdmin}
-                  className="p-1.5 text-[#94A3B8] hover:text-[#FB7185] rounded-lg transition-colors ml-1"
+                  className="p-1.5 text-[#635C51] hover:text-[#A84C3A] rounded-lg transition-colors ml-1"
                   title="Cerrar sesión admin"
                 >
                   <LogOut className="w-4 h-4" />
@@ -627,83 +621,69 @@ export const Navbar: React.FC<Props> = ({
       </div>
 
       {/* ========================================================================= */}
-      {/* 3. MOBILE BOTTOM NAVIGATION BAR (FIXED EN CELULAR < 768px)                */}
+      {/* 3. MOBILE FLOATING DOCK BAR (MODERNO, ERGONÓMICO Y PRÁCTICO EN CELULAR)    */}
       {/* ========================================================================= */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#141418]/95 backdrop-blur-xl border-t border-white/15 py-2 px-3 flex items-center justify-around shadow-modal">
+      <nav className="md:hidden fixed bottom-2.5 inset-x-3 z-40 bg-[#2E4056]/95 backdrop-blur-xl border border-white/15 rounded-2xl py-2 px-2 flex items-center justify-around shadow-modal">
         {portal === 'musician' && (
           <>
-            {/* 1. Inicio */}
             <button
               onClick={() => setMusicianTab('calendar')}
-              className={`relative flex flex-col items-center justify-center min-w-[66px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+              className={`relative flex flex-col items-center justify-center min-w-[62px] py-1.5 px-2.5 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'calendar'
-                  ? 'text-[#D8B28A] font-bold'
-                  : 'text-[#64748B] hover:text-white font-medium'
+                  ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                  : 'text-[#F8F4EA]/75 hover:text-white font-medium'
               }`}
             >
-              {musicianTab === 'calendar' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-              )}
-              <Home className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Inicio</span>
+              <Home className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Inicio</span>
             </button>
 
-            {/* 2. Mis Cultos */}
             <button
               onClick={() => setMusicianTab('my-services')}
-              className={`relative flex flex-col items-center justify-center min-w-[66px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+              className={`relative flex flex-col items-center justify-center min-w-[62px] py-1.5 px-2.5 rounded-xl transition-all cursor-pointer ${
                 musicianTab === 'my-services'
-                  ? 'text-[#D8B28A] font-bold'
-                  : 'text-[#64748B] hover:text-white font-medium'
+                  ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                  : 'text-[#F8F4EA]/75 hover:text-white font-medium'
               }`}
             >
-              {musicianTab === 'my-services' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-              )}
-              <CalendarDays className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Cultos</span>
+              <CalendarDays className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Cultos</span>
               {assignedCount > 0 && (
-                <span className="absolute top-0 right-1.5 w-4 h-4 rounded-full bg-[#E08E45] text-[#0D0D10] text-[9px] font-black flex items-center justify-center tabular-nums">
+                <span className="absolute -top-1 right-0.5 w-4 h-4 rounded-full bg-[#8E9B84] text-white text-[9px] font-black flex items-center justify-center tabular-nums border border-[#2E4056]">
                   {assignedCount}
                 </span>
               )}
             </button>
 
-            {/* 3. Repertorio / Pistas: Solo si es Voz Director / Director */}
             {isDirector && (
               <button
                 onClick={() => setMusicianTab('tracks')}
-                className={`relative flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-all cursor-pointer ${
+                className={`relative flex flex-col items-center justify-center min-w-[60px] py-1.5 px-2.5 rounded-xl transition-all cursor-pointer ${
                   musicianTab === 'tracks'
-                    ? 'text-[#D8B28A] font-bold'
-                    : 'text-[#64748B] hover:text-white font-medium'
+                    ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                    : 'text-[#F8F4EA]/75 hover:text-white font-medium'
                 }`}
               >
-                {musicianTab === 'tracks' && (
-                  <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-                )}
-                <Music className="w-5 h-5 mb-0.5" />
-                <span className="text-[10px] font-display uppercase tracking-wider">Pistas</span>
+                <Music className="w-4 h-4 mb-0.5" />
+                <span className="text-[9px] font-display uppercase tracking-wider">Pistas</span>
               </button>
             )}
 
-            {/* 4. Mi Perfil */}
             <button
               onClick={() => setProfileModalOpen(true)}
-              className="flex flex-col items-center justify-center min-w-[62px] py-1 px-2 rounded-xl text-[#64748B] hover:text-[#D8B28A] font-medium transition-all cursor-pointer"
+              className="flex flex-col items-center justify-center min-w-[58px] py-1.5 px-2 rounded-xl text-[#F8F4EA]/75 hover:text-[#DCBD9E] font-medium transition-all cursor-pointer"
             >
-              <UserRound className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Perfil</span>
+              <UserRound className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Perfil</span>
             </button>
 
-            {/* 5. Salir */}
             <button
               onClick={logoutMusician}
-              className="flex flex-col items-center justify-center min-w-[54px] py-1 px-2 rounded-xl text-[#64748B] hover:text-[#FB7185] transition-colors cursor-pointer"
+              className="flex flex-col items-center justify-center min-w-[50px] py-1.5 px-2 rounded-xl text-[#F8F4EA]/70 hover:text-[#FDA4AF] transition-colors cursor-pointer"
               title="Cerrar Sesión"
             >
-              <LogOut className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Salir</span>
+              <LogOut className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Salir</span>
             </button>
           </>
         )}
@@ -712,62 +692,50 @@ export const Navbar: React.FC<Props> = ({
           <>
             <button
               onClick={() => setAdminTab('schedule')}
-              className={`relative flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-colors ${
+              className={`relative flex flex-col items-center justify-center min-w-[64px] py-1.5 px-2.5 rounded-xl transition-all ${
                 adminTab === 'schedule'
-                  ? 'text-[#D8B28A] font-bold'
-                  : 'text-[#64748B] hover:text-white font-medium'
+                  ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                  : 'text-[#F8F4EA]/75 hover:text-white font-medium'
               }`}
             >
-              {adminTab === 'schedule' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-              )}
-              <Table className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Matriz</span>
+              <Table className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Matriz</span>
             </button>
 
             <button
               onClick={() => setAdminTab('visual-board')}
-              className={`relative flex flex-col items-center justify-center min-w-[64px] py-1 px-2 rounded-xl transition-colors ${
+              className={`relative flex flex-col items-center justify-center min-w-[64px] py-1.5 px-2.5 rounded-xl transition-all ${
                 adminTab === 'visual-board'
-                  ? 'text-[#D8B28A] font-bold'
-                  : 'text-[#64748B] hover:text-white font-medium'
+                  ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                  : 'text-[#F8F4EA]/75 hover:text-white font-medium'
               }`}
             >
-              {adminTab === 'visual-board' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-              )}
-              <Camera className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Fotos</span>
+              <Camera className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Fotos</span>
             </button>
 
             <button
               onClick={() => setAdminTab('musicians')}
-              className={`relative flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-colors ${
+              className={`relative flex flex-col items-center justify-center min-w-[58px] py-1.5 px-2 rounded-xl transition-all ${
                 adminTab === 'musicians'
-                  ? 'text-[#D8B28A] font-bold'
-                  : 'text-[#64748B] hover:text-white font-medium'
+                  ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                  : 'text-[#F8F4EA]/75 hover:text-white font-medium'
               }`}
             >
-              {adminTab === 'musicians' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-              )}
-              <UsersRound className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Músicos</span>
+              <UsersRound className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Músicos</span>
             </button>
 
             <button
               onClick={() => setAdminTab('songs-bank')}
-              className={`relative flex flex-col items-center justify-center min-w-[56px] py-1 px-1.5 rounded-xl transition-colors ${
+              className={`relative flex flex-col items-center justify-center min-w-[58px] py-1.5 px-2 rounded-xl transition-all ${
                 adminTab === 'songs-bank'
-                  ? 'text-[#D8B28A] font-bold'
-                  : 'text-[#64748B] hover:text-white font-medium'
+                  ? 'bg-[#DCBD9E] text-[#302C24] font-extrabold shadow-xs -translate-y-0.5'
+                  : 'text-[#F8F4EA]/75 hover:text-white font-medium'
               }`}
             >
-              {adminTab === 'songs-bank' && (
-                <span className="absolute -top-2 w-6 h-0.5 bg-[#D8B28A] rounded-full" />
-              )}
-              <Music2 className="w-5 h-5 mb-0.5" />
-              <span className="text-[10px] font-display uppercase tracking-wider">Banco</span>
+              <Music2 className="w-4 h-4 mb-0.5" />
+              <span className="text-[9px] font-display uppercase tracking-wider">Banco</span>
             </button>
           </>
         )}

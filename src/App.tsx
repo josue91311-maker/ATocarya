@@ -145,7 +145,7 @@ const MainRouter: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setMobileMusicianView('home')}
-                      className="w-full py-2.5 px-4 bg-[#D9E9EB] hover:bg-[#315F6D]/20 text-[#315F6D] border border-[#315F6D]/30 rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors"
+                      className="btn-kinetic w-full py-2.5 px-4 bg-[#E7EDF3] hover:bg-[#DCBD9E]/35 text-[#2E4056] border border-[#2E4056]/20 rounded-2xl text-xs font-display font-bold flex items-center justify-center gap-1.5 shadow-2xs"
                     >
                       <span>← Volver a Vista Rápida del Músico</span>
                     </button>
@@ -176,9 +176,9 @@ const MainRouter: React.FC = () => {
           )}
         </main>
 
-        <footer className="relative z-10 mt-auto border-t border-white/10 py-5 px-4 text-center bg-[#141418]/90 backdrop-blur-sm hidden md:block">
-          <p className="text-[11px] font-display uppercase tracking-widest text-[#64748B]">
-            ATocarYa · Coordinador de Músicos & Alabanza
+        <footer className="relative z-10 mt-auto border-t border-[#E5DEC9] py-5 px-4 text-center bg-[#FCFBF8]/90 backdrop-blur-sm hidden md:block">
+          <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] text-[#635C51]">
+            AtocarYa · Programación de Canciones
           </p>
         </footer>
 
@@ -257,9 +257,9 @@ const MainRouter: React.FC = () => {
         )}
       </main>
 
-      <footer className="mt-auto border-t border-white/10 py-6 px-4 text-center bg-[#141418]/90">
-        <p className="text-[11px] font-display uppercase tracking-widest text-[#64748B]">
-          ATocarYa · Panel de Administración de Alabanza
+      <footer className="mt-auto border-t border-[#E5DEC9] py-6 px-4 text-center bg-[#FCFBF8]/90">
+        <p className="text-[11px] font-display font-bold uppercase tracking-[0.2em] text-[#635C51]">
+          AtocarYa · Panel de Administración de Alabanza
         </p>
       </footer>
 

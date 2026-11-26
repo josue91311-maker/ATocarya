@@ -13,44 +13,51 @@ export const Logo: React.FC<LogoProps> = ({
   showText = true, 
   className = '',
   subtitle = '',
+  lightText = false,
 }) => {
-  const iconDimensions = {
+  const fullHeights = {
+    sm: 'h-9 sm:h-10',
+    md: 'h-11 sm:h-12',
+    lg: 'h-16 sm:h-20',
+    xl: 'h-20 sm:h-24',
+  };
+
+  const iconSizes = {
     sm: 'w-9 h-9',
     md: 'w-10 h-10',
     lg: 'w-14 h-14',
     xl: 'w-20 h-20',
   };
 
-  const textSizes = {
-    sm: 'text-base',
-    md: 'text-lg',
-    lg: 'text-2xl',
-    xl: 'text-3xl',
-  };
-
   return (
-    <div className={`inline-flex items-center gap-2.5 select-none ${className}`}>
-      {/* Emblema Oficial: A Grande + Arpa de David + Oveja Abstracta en Oro Champán & Obsidiana */}
-      <div
-        className={`${iconDimensions[size]} relative rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-glow`}
-      >
-        <img
-          src="/logo-emblem.png?v=4"
-          alt="ATocarYa"
-          className="w-full h-full object-contain"
-        />
-      </div>
-
-      {showText && (
-        <div className="flex items-center gap-2">
-          <span
-            className={`${textSizes[size]} font-display font-extrabold tracking-tight text-white leading-none`}
-          >
-            ATocar<span className="text-[#D8B28A]">Ya</span>
-          </span>
-          <span className="px-2 py-0.5 rounded-md bg-gradient-to-r from-[#D8B28A] to-[#E08E45] text-[#0D0D10] text-[9px] font-black uppercase tracking-widest leading-none">
-            {subtitle || 'STUDIO'}
-          </span>
+    <div className={`inline-flex items-center gap-2.5 select-none group ${className}`}>
+      {showText ? (
+        <div className="flex items-center gap-2.5">
+          <img
+            src={lightText ? '/logo-transparent.png?v=5' : '/logo-dark.png?v=5'}
+            alt="AtocarYa · Programación de Canciones"
+            className={`${fullHeights[size]} w-auto object-contain transition-transform duration-300 group-hover:scale-[1.02]`}
+          />
+          {subtitle && (
+            <span
+              className={`hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[9px] font-display font-extrabold uppercase tracking-widest ${
+                lightText
+                  ? 'bg-[#DCBD9E]/25 text-[#F8F4EA] border border-[#DCBD9E]/45'
+                  : 'bg-[#E7EDF3] text-[#2E4056] border border-[#2E4056]/20'
+              }`}
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#8E9B84] animate-pulse" />
+              {subtitle}
+            </span>
+          )}
+        </div>
+      ) : (
+        <div className={`${iconSizes[size]} relative rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-xs transition-transform duration-300 group-hover:scale-105`}>
+          <img
+            src="/logo-emblem.png?v=5"
+            alt="AtocarYa"
+            className="w-full h-full object-contain"
+          />
         </div>
       )}
     </div>

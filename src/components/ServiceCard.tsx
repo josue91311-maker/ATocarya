@@ -45,10 +45,10 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
   return (
     <div
       onClick={() => onSelect(service)}
-      className={`bg-white hover:bg-[#FAF9F6] border rounded-[18px] cursor-pointer transition-all duration-200 flex flex-col justify-between shadow-card hover:shadow-hover overflow-hidden group ${
+      className={`bento-card bg-[#FCFBF8] hover:bg-white rounded-2xl cursor-pointer flex flex-col justify-between overflow-hidden group ${
         isExpired 
-          ? 'border-[#E5E8EA] opacity-90' 
-          : 'border-[#E5E8EA] hover:border-[#315F6D]/50'
+          ? 'border-[#E5DEC9] opacity-90' 
+          : 'border-[#E5DEC9] hover:border-[#2E4056]/40'
       }`}
     >
       <div>
@@ -195,7 +195,7 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
                     <button
                       type="button"
                       onClick={() => onOpenSetlist(service)}
-                      className="px-2.5 py-1 bg-[#D9E9EB] hover:bg-[#315F6D] text-[#315F6D] hover:text-white border border-[#315F6D]/30 rounded-lg text-[11px] font-bold transition-colors flex items-center gap-1"
+                      className="btn-kinetic px-2.5 py-1 bg-[#E7EDF3] hover:bg-[#2E4056] text-[#2E4056] hover:text-[#F8F4EA] border border-[#2E4056]/25 rounded-lg text-[11px] font-display font-bold flex items-center gap-1 cursor-pointer"
                     >
                       <span>Editar Canciones</span>
                     </button>
@@ -207,16 +207,16 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
             if (isPublished) {
               return (
                 <div 
-                  className="pt-2.5 border-t border-[#EEF0F1] flex items-center justify-between text-xs"
+                  className="pt-2.5 border-t border-[#E5DEC9] flex items-center justify-between text-xs"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <div className="flex items-center gap-1.5 text-[#202C37] font-semibold">
-                    <Music className="w-3.5 h-3.5 text-[#315F6D]" />
+                  <div className="flex items-center gap-1.5 text-[#302C24] font-semibold">
+                    <Music className="w-3.5 h-3.5 text-[#2E4056]" />
                     <span>{songsCount} canciones con videos y tonos</span>
                   </div>
                   <a
                     href={`/#/repertorio/${service.id}`}
-                    className="px-3 py-1.5 bg-[#C96B65] hover:bg-[#B95752] text-white rounded-lg text-xs font-bold transition-colors flex items-center gap-1 shadow-xs"
+                    className="btn-kinetic px-3 py-1.5 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-bold flex items-center gap-1 shadow-xs"
                   >
                     <span>Ver Repertorio</span>
                   </a>
@@ -254,21 +254,21 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
             })}
           </div>
 
-          {/* Sugerencia de 1-Toque para el músico (Caja Coral/Petróleo) */}
+          {/* Sugerencia de 1-Toque para el músico */}
           {matchPrimarySlot && !myAssignedSlot && !isExpired && (
             <div 
-              className="mt-2 p-3 bg-[#D9E9EB]/50 border border-[#315F6D]/20 rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shadow-2xs"
+              className="mt-2 p-3 bg-[#F5EBE0]/85 border border-[#DCBD9E] rounded-xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shadow-2xs"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-2">
-                <span className="w-6 h-6 rounded-lg bg-[#315F6D] text-white flex items-center justify-center shrink-0 font-bold">
+                <span className="w-6 h-6 rounded-lg bg-[#2E4056] text-[#DCBD9E] flex items-center justify-center shrink-0 font-bold">
                   <Sparkles className="w-3.5 h-3.5" />
                 </span>
                 <div className="min-w-0">
-                  <span className="text-xs text-[#202C37] font-bold block">
+                  <span className="text-xs text-[#302C24] font-bold block">
                     Sugerido para ti: <strong>{matchPrimarySlot.label}</strong>
                   </span>
-                  <span className="text-[10px] text-[#64717C]">
+                  <span className="text-[10px] text-[#635C51]">
                     Puesto libre para tu instrumento ({musicianUser?.primaryInstrument})
                   </span>
                 </div>
@@ -276,9 +276,9 @@ export const ServiceCard: React.FC<Props> = ({ service, onSelect, onOpenSetlist 
               <button
                 type="button"
                 onClick={() => claimSlot(service.id, matchPrimarySlot.key)}
-                className="w-full sm:w-auto px-4 py-2 bg-[#315F6D] hover:bg-[#234A57] text-white rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs"
+                className="btn-kinetic w-full sm:w-auto px-4 py-2 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-bold flex items-center justify-center gap-1.5 shadow-xs cursor-pointer"
               >
-                <Check className="w-4 h-4 stroke-[3]" />
+                <Check className="w-4 h-4 stroke-[3] text-[#DCBD9E]" />
                 <span>Confirmar {matchPrimarySlot.label}</span>
               </button>
             </div>

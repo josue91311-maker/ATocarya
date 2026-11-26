@@ -312,19 +312,19 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         key={st}
         type="button"
         onClick={() => handleSemitoneChange(st)}
-        className={`relative py-1.5 sm:py-2 px-0.5 text-center rounded-xl transition-all flex flex-col items-center justify-center min-h-[46px] sm:min-h-[50px] cursor-pointer ${
+        className={`btn-kinetic relative py-1.5 sm:py-2 px-0.5 text-center rounded-xl flex flex-col items-center justify-center min-h-[46px] sm:min-h-[50px] cursor-pointer ${
           isSelected
-            ? 'bg-[#D8B28A] text-[#0D0D10] shadow-glow font-bold ring-2 ring-[#D8B28A]/40 scale-[1.02] z-10'
+            ? 'bg-[#2E4056] text-[#F8F4EA] shadow-glow font-bold ring-2 ring-[#2E4056]/30 scale-[1.03] z-10'
             : isWorshipTarget
-            ? 'bg-[#D8B28A]/15 hover:bg-[#D8B28A]/25 text-[#D8B28A] border-2 border-[#D8B28A]/60 font-bold'
-            : 'bg-[#0D0D10] hover:bg-[#22222A] text-white border border-white/15 font-semibold'
+            ? 'bg-[#EBF0E7] hover:bg-[#8E9B84]/25 text-[#302C24] border-2 border-[#8E9B84] font-bold'
+            : 'bg-[#F8F4EA] hover:bg-[#F5EBE0] text-[#302C24] border border-[#E5DEC9] font-semibold'
         }`}
         title={`Transportar ${st === 0 ? 'tono original' : `${st > 0 ? `+${st}` : st} semitonos`} (${noteAtSt})${isWorshipTarget ? ' - Tono oficial del culto' : ''}`}
       >
         {isWorshipTarget && (
           <span
             className={`absolute -top-1.5 -right-1 px-1 py-0.2 rounded text-[7px] sm:text-[8px] font-black uppercase tracking-tighter shadow-2xs ${
-              isSelected ? 'bg-[#E08E45] text-[#0D0D10] font-black' : 'bg-[#E08E45] text-[#0D0D10]'
+              isSelected ? 'bg-[#DCBD9E] text-[#302C24]' : 'bg-[#637358] text-[#F8F4EA]'
             }`}
           >
             Culto
@@ -335,7 +335,7 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
         </span>
         <span
           className={`text-[9px] sm:text-[10px] leading-tight mt-0.5 font-medium ${
-            isSelected ? 'text-[#0D0D10]/80' : isWorshipTarget ? 'text-[#D8B28A] font-bold' : 'text-[#94A3B8]'
+            isSelected ? 'text-[#DCBD9E]' : isWorshipTarget ? 'text-[#4A5940] font-bold' : 'text-[#635C51]'
           }`}
         >
           {label}
@@ -346,16 +346,16 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
 
   // Componente: Tarjeta del Transpositor
   const transpositorCard = (
-    <div className="bg-white border border-[#E5E8EA] rounded-2xl p-4 sm:p-5 shadow-card flex flex-col justify-between h-full">
+    <div className="bento-card bg-[#FCFBF8] border-[#E5DEC9] rounded-2xl p-4 sm:p-5 flex flex-col justify-between h-full">
       {/* 1. Header del Transpositor */}
-      <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#E5E8EA]">
+      <div className="flex items-center justify-between gap-2 pb-3 border-b border-[#E5DEC9]">
         <div className="flex items-center gap-2">
-          <Activity className="w-4 h-4 text-[#315F6D]" />
-          <h3 className="text-xs sm:text-xs md:text-sm font-bold tracking-tight text-[#202C37] uppercase font-display">
+          <Activity className="w-4 h-4 text-[#2E4056]" />
+          <h3 className="text-xs sm:text-xs md:text-sm font-bold tracking-tight text-[#302C24] uppercase font-display">
             Transpositor de Afinación (WSOLA Alta Fidelidad)
           </h3>
         </div>
-        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F7E3DF] text-[#C96B65] border border-[#C96B65]/30">
+        <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-[#F5EBE0] text-[#7D5A38] border border-[#DCBD9E]">
           Pista: {audioOriginalKey} (Original)
         </span>
       </div>
@@ -363,27 +363,27 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
       {/* 2. Banner Grande: Tonalidad que se va a tocar en el Culto */}
       <div className={`p-3.5 sm:p-4 rounded-2xl my-3 border transition-all ${
         worshipDelta !== 0
-          ? 'bg-[#1E1E26] border-[#D8B28A]/40 shadow-xs'
-          : 'bg-[#16161B] border-white/10'
+          ? 'bg-[#F5EBE0]/75 border-[#DCBD9E] shadow-2xs'
+          : 'bg-[#F8F4EA] border-[#E5DEC9]'
       }`}>
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className={`w-2.5 h-2.5 rounded-full ${worshipDelta !== 0 ? 'bg-[#315F6D] animate-pulse' : 'bg-[#315F6D]'}`} />
-              <span className={`text-[10px] sm:text-xs font-black uppercase tracking-wider ${worshipDelta !== 0 ? 'text-[#315F6D]' : 'text-[#64717C]'}`}>
+              <span className={`w-2.5 h-2.5 rounded-full ${worshipDelta !== 0 ? 'bg-[#2E4056] animate-pulse' : 'bg-[#637358]'}`} />
+              <span className={`text-[10px] sm:text-xs font-display font-black uppercase tracking-wider ${worshipDelta !== 0 ? 'text-[#2E4056]' : 'text-[#635C51]'}`}>
                 {worshipDelta !== 0 ? 'Tono Requerido para el Culto' : 'Tono Oficial del Culto'}
               </span>
             </div>
             
             {worshipDelta !== 0 ? (
-              <p className="text-xs text-[#202C37] mt-1 font-medium leading-snug">
-                Pista grabada en <strong className="text-[#202C37] font-bold">{audioOriginalKey}</strong> ➔ Transportada{' '}
-                <span className="font-bold text-[#315F6D]">
+              <p className="text-xs text-[#302C24] mt-1 font-medium leading-snug">
+                Pista grabada en <strong className="text-[#302C24] font-bold">{audioOriginalKey}</strong> ➔ Transportada{' '}
+                <span className="font-bold text-[#2E4056]">
                   {formatSemitoneShiftDescription(worshipDelta)}
                 </span>
               </p>
             ) : (
-              <p className="text-xs text-[#64717C] mt-1">
+              <p className="text-xs text-[#635C51] mt-1">
                 Se cantará en la misma tonalidad original de la pista ({audioOriginalKey})
               </p>
             )}
@@ -391,13 +391,13 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
             {/* Aviso si el usuario alteró el transportador a otro tono */}
             {semitones !== worshipDelta && (
               <div className="mt-2 flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] text-[#87621D] bg-[#FFF1CB] px-2 py-0.5 rounded-md font-bold">
+                <span className="text-[11px] text-[#7D5A38] bg-[#F5EBE0] border border-[#DCBD9E] px-2 py-0.5 rounded-md font-bold">
                   Escuchando en {currentKeyDisplay}
                 </span>
                 <button
                   type="button"
                   onClick={() => handleSemitoneChange(worshipDelta)}
-                  className="text-[11px] font-bold text-[#315F6D] hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-[#2E4056] hover:underline cursor-pointer"
                 >
                   ↩ Restablecer a tono del culto ({worshipTargetKey})
                 </button>
@@ -406,11 +406,11 @@ export const AudioTransposerPlayer: React.FC<Props> = ({
           </div>
 
           {/* GRAN VISUALIZACIÓN DE LA TONALIDAD A TOCAR */}
-          <div className="text-center shrink-0 bg-white px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border-2 border-[#315F6D]/30 shadow-card">
-            <span className="text-2xl sm:text-4xl font-black text-[#315F6D] tracking-tight block leading-none font-display">
+          <div className="text-center shrink-0 bg-[#2E4056] px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-2xl border border-[#213042] shadow-card">
+            <span className="text-2xl sm:text-4xl font-black text-[#F8F4EA] tracking-tight block leading-none font-display">
               {worshipTargetKey}
             </span>
-            <span className="text-[9px] sm:text-[10px] font-black uppercase text-[#64717C] tracking-wider block mt-1">
+            <span className="text-[9px] sm:text-[10px] font-black uppercase text-[#DCBD9E] tracking-wider block mt-1">
               Tono a Tocar
             </span>
           </div>

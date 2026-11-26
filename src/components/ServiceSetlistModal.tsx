@@ -416,29 +416,29 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs overflow-y-auto animate-in fade-in duration-150">
-      <div className="bg-[#16161B] rounded-2xl sm:rounded-3xl border border-white/15 shadow-modal max-w-3xl w-full max-h-[96vh] sm:max-h-[92vh] flex flex-col overflow-hidden my-auto text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#213042]/60 backdrop-blur-md overflow-y-auto animate-in fade-in duration-150">
+      <div className="bg-[#FCFBF8] rounded-2xl sm:rounded-3xl border border-[#E5DEC9] shadow-modal max-w-3xl w-full max-h-[96vh] sm:max-h-[92vh] flex flex-col overflow-hidden my-auto text-[#302C24]">
         
-        {/* Header Oscuro de Alto Contraste */}
-        <div className="p-4 sm:p-5 border-b border-white/10 flex items-center justify-between gap-2.5 bg-[#1D1D24] shrink-0">
+        {/* Header Azul Iglesia de Alto Contraste */}
+        <div className="p-4 sm:p-5 border-b border-[#213042] flex items-center justify-between gap-2.5 bg-gradient-to-r from-[#2E4056] to-[#26374B] text-[#F8F4EA] shrink-0">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold shadow-glow flex-shrink-0">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#DCBD9E] text-[#302C24] flex items-center justify-center font-bold shadow-xs flex-shrink-0">
               <Music className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[10px] sm:text-xs font-extrabold uppercase tracking-widest text-[#D8B28A]">
+                <span className="text-[10px] sm:text-xs font-display font-extrabold uppercase tracking-widest text-[#DCBD9E]">
                   Repertorio
                 </span>
-                <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-full ${
+                <span className={`text-[9px] font-display font-black uppercase px-2 py-0.5 rounded-full ${
                   isPublished
-                    ? 'bg-[#34D399]/20 text-[#6EE7B7] border border-[#34D399]/40'
-                    : 'bg-[#E08E45]/20 text-[#F3B36C] border border-[#E08E45]/40'
+                    ? 'bg-[#8E9B84]/35 text-[#EBF0E7] border border-[#8E9B84]/55'
+                    : 'bg-[#F8F4EA]/15 text-[#DCBD9E] border border-[#DCBD9E]/40'
                 }`}>
                   {isPublished ? '✓ Publicado' : 'Borrador'}
                 </span>
               </div>
-              <h2 className="text-sm sm:text-base font-bold font-display text-white truncate mt-0.5">
+              <h2 className="text-sm sm:text-base font-extrabold font-display text-[#F8F4EA] truncate mt-0.5">
                 {service.title} · {service.date}
               </h2>
             </div>
@@ -446,25 +446,25 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
           <button
             onClick={onClose}
-            className="p-2 text-[#B4B4BE] hover:text-white hover:bg-white/10 rounded-xl transition-colors flex-shrink-0 cursor-pointer"
+            className="btn-kinetic p-2 text-[#E7EDF3] hover:text-[#F8F4EA] hover:bg-[#F8F4EA]/15 rounded-xl flex-shrink-0 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content Body */}
-        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 sm:space-y-5 flex-1 custom-scrollbar">
+        <div className="p-4 sm:p-5 overflow-y-auto space-y-4 sm:space-y-5 flex-1 custom-scrollbar bg-[#F8F4EA]/55">
 
           {/* Switch de Publicación & Compartir */}
-          <div className="p-4 bg-[#1D1D24] border border-white/12 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="bento-card p-4 bg-[#FCFBF8] border-[#E5DEC9] rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <Globe className={`w-4 h-4 ${isPublished ? 'text-[#34D399]' : 'text-[#8E8E9A]'}`} />
-                <span className="text-xs sm:text-sm font-bold text-white">
+                <Globe className={`w-4 h-4 ${isPublished ? 'text-[#637358]' : 'text-[#8D8579]'}`} />
+                <span className="text-xs sm:text-sm font-display font-bold text-[#302C24]">
                   Publicación para Músicos
                 </span>
               </div>
-              <p className="text-xs text-[#B4B4BE] mt-0.5">
+              <p className="text-xs text-[#635C51] mt-0.5">
                 {isPublished 
                   ? 'Actualmente publicado: cualquier músico con el enlace puede ver los videos y acordes.'
                   : 'En borrador: solo tú y el administrador pueden ver estas canciones.'}
@@ -475,10 +475,10 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               <button
                 type="button"
                 onClick={() => setIsPublished(!isPublished)}
-                className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                className={`btn-kinetic px-3.5 py-2 rounded-xl text-xs font-display font-bold cursor-pointer ${
                   isPublished
-                    ? 'bg-[#34D399] hover:bg-[#10B981] text-[#0D0D10]'
-                    : 'bg-[#272730] hover:bg-[#32323D] text-white border border-white/15'
+                    ? 'bg-[#637358] hover:bg-[#4A5940] text-[#F8F4EA]'
+                    : 'bg-[#F5EBE0] hover:bg-[#DCBD9E]/55 text-[#302C24] border border-[#DCBD9E]'
                 }`}
               >
                 {isPublished ? '✓ Publicado' : 'Publicar Ahora'}
@@ -487,20 +487,20 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               <button
                 type="button"
                 onClick={handleCopyPublicLink}
-                className="px-3.5 py-2 bg-[#141419] hover:bg-[#272730] text-white border border-white/15 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                className="btn-kinetic px-3.5 py-2 bg-[#F8F4EA] hover:bg-[#F5EBE0] text-[#302C24] border border-[#E5DEC9] rounded-xl text-xs font-display font-bold flex items-center gap-1.5 cursor-pointer"
                 title="Copiar link oficial sin contraseña"
               >
-                {copiedLink ? <Check className="w-3.5 h-3.5 text-[#34D399]" /> : <Copy className="w-3.5 h-3.5 text-[#D8B28A]" />}
+                {copiedLink ? <Check className="w-3.5 h-3.5 text-[#4A5940]" /> : <Copy className="w-3.5 h-3.5 text-[#2E4056]" />}
                 <span>{copiedLink ? '¡Copiado!' : 'Copiar Link'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleShareWhatsApp}
-                className="px-3.5 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black flex items-center gap-1.5 transition-colors shadow-glow cursor-pointer"
+                className="btn-kinetic px-3.5 py-2 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-bold flex items-center gap-1.5 shadow-glow cursor-pointer"
                 title="Enviar por WhatsApp"
               >
-                <Share2 className="w-3.5 h-3.5" />
+                <Share2 className="w-3.5 h-3.5 text-[#DCBD9E]" />
                 <span className="hidden sm:inline">WhatsApp</span>
               </button>
             </div>
@@ -711,27 +711,27 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
           {/* MODO ADICIÓN RÁPIDA O EDICIÓN DE TONO */}
           {!editingSongId ? (
-            <div className="p-4 border border-white/12 bg-[#1D1D24] rounded-2xl space-y-3.5">
+            <div className="bento-card p-4 border-[#E5DEC9] bg-[#FCFBF8] rounded-2xl space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
                 <div>
-                  <h4 className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <Plus className="w-4 h-4 text-[#D8B28A]" />
+                  <h4 className="text-xs font-display font-bold text-[#302C24] uppercase tracking-wider flex items-center gap-1.5">
+                    <Plus className="w-4 h-4 text-[#2E4056]" />
                     <span>Agregar Canciones al Culto</span>
                   </h4>
-                  <p className="text-xs text-[#B4B4BE] mt-0.5">
+                  <p className="text-xs text-[#635C51] mt-0.5">
                     Selecciona del banco en 1 toque o agrega una canción nueva en 3 campos
                   </p>
                 </div>
 
                 {/* Tabs de modos: Banco vs Nueva rápida */}
-                <div className="grid grid-cols-2 gap-1 p-1 bg-[#111115] border border-white/10 rounded-xl w-full sm:w-auto">
+                <div className="grid grid-cols-2 gap-1 p-1 bg-[#F5EBE0] border border-[#DCBD9E]/60 rounded-xl w-full sm:w-auto">
                   <button
                     type="button"
                     onClick={() => setAddMode('bank')}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`py-1.5 px-3 rounded-lg text-xs font-display font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                       addMode === 'bank' 
-                        ? 'bg-[#D8B28A] text-[#0D0D10] font-black shadow-xs' 
-                        : 'text-[#B4B4BE] hover:text-white'
+                        ? 'bg-[#2E4056] text-[#F8F4EA] shadow-xs' 
+                        : 'text-[#635C51] hover:text-[#302C24]'
                     }`}
                   >
                     <Music className="w-3.5 h-3.5" />
@@ -741,10 +741,10 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
                   <button
                     type="button"
                     onClick={() => setAddMode('quick-new')}
-                    className={`py-1.5 px-3 rounded-lg text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`py-1.5 px-3 rounded-lg text-xs font-display font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
                       addMode === 'quick-new' 
-                        ? 'bg-[#D8B28A] text-[#0D0D10] font-black shadow-xs' 
-                        : 'text-[#B4B4BE] hover:text-white'
+                        ? 'bg-[#2E4056] text-[#F8F4EA] shadow-xs' 
+                        : 'text-[#635C51] hover:text-[#302C24]'
                     }`}
                   >
                     <Zap className="w-3.5 h-3.5" />
@@ -755,16 +755,16 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
 
               {/* MODO 1: BANCO DE CANCIONES */}
               {addMode === 'bank' && (
-                <div className="space-y-3 bg-[#141419] p-3.5 sm:p-4 rounded-2xl border border-white/10">
+                <div className="space-y-3 bg-[#F8F4EA] p-3.5 sm:p-4 rounded-2xl border border-[#E5DEC9]">
                   {/* Buscador de alto contraste */}
                   <div className="relative">
-                    <Search className="w-4 h-4 text-[#8E8E9A] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                    <Search className="w-4 h-4 text-[#8D8579] absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                     <input
                       type="text"
                       placeholder="Buscar por título o autor en el banco..."
                       value={bankSearchFilter}
                       onChange={(e) => setBankSearchFilter(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs border border-white/15 rounded-xl bg-[#0D0D10] text-white placeholder-[#8E8E9A] focus:outline-none focus:border-[#D8B28A]"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs border border-[#E5DEC9] rounded-xl bg-white text-[#302C24] placeholder-[#8D8579] focus:outline-none focus:border-[#2E4056]"
                     />
                   </div>
 
@@ -1258,13 +1258,13 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
         </div>
 
         {/* Footer Actions */}
-        <div className="p-3.5 sm:p-4 border-t border-white/10 bg-[#1D1D24] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
+        <div className="p-3.5 sm:p-4 border-t border-[#E5DEC9] bg-[#FCFBF8] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0">
           <button
             type="button"
             onClick={handleCopyPublicLink}
-            className="text-xs text-[#B4B4BE] hover:text-[#D8B28A] font-bold flex items-center gap-1.5 transition-colors truncate self-start sm:self-auto cursor-pointer"
+            className="text-xs text-[#635C51] hover:text-[#2E4056] font-bold flex items-center gap-1.5 transition-colors truncate self-start sm:self-auto cursor-pointer"
           >
-            <Globe className="w-3.5 h-3.5 text-[#D8B28A] flex-shrink-0" />
+            <Globe className="w-3.5 h-3.5 text-[#2E4056] flex-shrink-0" />
             <span className="truncate">Link: {publicRepertoireUrl.slice(0, 34)}...</span>
           </button>
 
@@ -1272,7 +1272,7 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
             <button
               type="button"
               onClick={onClose}
-              className="py-2.5 px-4 text-xs font-bold text-white bg-[#272730] hover:bg-[#32323D] border border-white/15 rounded-xl transition-colors text-center cursor-pointer"
+              className="btn-kinetic py-2.5 px-4 text-xs font-display font-bold text-[#302C24] bg-[#F8F4EA] hover:bg-[#F5EBE0] border border-[#E5DEC9] rounded-xl text-center cursor-pointer"
             >
               Cancelar
             </button>
@@ -1281,13 +1281,13 @@ export const ServiceSetlistModal: React.FC<Props> = ({ service, isOpen, onClose 
               type="button"
               onClick={handleSave}
               disabled={isSaving}
-              className="py-2.5 px-5 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] text-xs font-black rounded-xl transition-all shadow-glow flex items-center justify-center gap-1.5 disabled:opacity-50 text-center cursor-pointer"
+              className="btn-kinetic py-2.5 px-5 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] text-xs font-display font-extrabold rounded-xl shadow-glow flex items-center justify-center gap-1.5 disabled:opacity-50 text-center cursor-pointer"
             >
               {isSaving ? (
                 <span>Guardando...</span>
               ) : (
                 <>
-                  <Check className="w-4 h-4 stroke-[3]" />
+                  <Check className="w-4 h-4 stroke-[3] text-[#DCBD9E]" />
                   <span>Guardar</span>
                 </>
               )}

@@ -153,51 +153,51 @@ export const ServiceDetailModal: React.FC<Props> = ({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/75 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-3xl bg-[#16161B] border border-white/15 rounded-3xl shadow-modal overflow-hidden my-auto max-h-[92vh] flex flex-col text-white">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#213042]/60 backdrop-blur-md overflow-y-auto">
+      <div className="relative w-full max-w-3xl bg-[#FCFBF8] border border-[#E5DEC9] rounded-3xl shadow-modal overflow-hidden my-auto max-h-[92vh] flex flex-col text-[#302C24]">
         
-        {/* Header Superior Oscuro de Alto Contraste */}
-        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-white/10 bg-[#1D1D24] shrink-0">
+        {/* Header Superior Azul Iglesia con Alto Contraste */}
+        <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-[#213042] bg-gradient-to-r from-[#2E4056] to-[#26374B] text-[#F8F4EA] shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-                <span className="text-xs font-extrabold px-2.5 py-0.5 rounded-md bg-[#D8B28A]/20 text-[#E5C6A4] border border-[#D8B28A]/40">
+                <span className="text-xs font-display font-extrabold px-2.5 py-0.5 rounded-lg bg-[#DCBD9E] text-[#302C24]">
                   {service.title}
                 </span>
                 {isExpired ? (
-                  <span className="text-[11px] font-bold text-[#FDA4AF] bg-[#FB7185]/15 border border-[#FB7185]/35 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold text-[#F8F4EA] bg-rose-500/30 border border-rose-300/40 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
                     <Lock className="w-3 h-3" /> Inscripciones Expiradas
                   </span>
                 ) : service.isOpen ? (
-                  <span className="text-[11px] font-bold text-[#6EE7B7] bg-[#34D399]/15 border border-[#34D399]/35 px-2.5 py-0.5 rounded-md flex items-center gap-1.5">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#34D399] animate-pulse"></span> Fechas Abiertas
+                  <span className="text-[11px] font-bold text-[#EBF0E7] bg-[#8E9B84]/30 border border-[#8E9B84]/50 px-2.5 py-0.5 rounded-lg flex items-center gap-1.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#DCBD9E] animate-pulse"></span> Fechas Abiertas
                   </span>
                 ) : (
-                  <span className="text-[11px] font-bold text-[#B4B4BE] bg-white/5 border border-white/15 px-2.5 py-0.5 rounded-md flex items-center gap-1">
-                    <Lock className="w-3 h-3 text-[#8E8E9A]" /> Inscripciones cerradas
+                  <span className="text-[11px] font-bold text-[#E7EDF3] bg-[#F8F4EA]/10 border border-[#F8F4EA]/20 px-2.5 py-0.5 rounded-lg flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-[#DCBD9E]" /> Inscripciones cerradas
                   </span>
                 )}
               </div>
 
-              <h2 className="text-lg sm:text-2xl font-bold font-display text-white capitalize">
+              <h2 className="text-lg sm:text-2xl font-extrabold font-display text-[#F8F4EA] capitalize">
                 {dateFormatted}
               </h2>
 
-              <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-[#B4B4BE]">
+              <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-[#E7EDF3]">
                 <span className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-[#D8B28A]" />
-                  Culto: <strong className="text-white tabular-nums">{service.time}</strong>
+                  <Clock className="w-3.5 h-3.5 text-[#DCBD9E]" />
+                  Culto: <strong className="text-[#F8F4EA] tabular-nums">{service.time}</strong>
                 </span>
                 {service.rehearsalTime && (
                   <span>
-                    · Ensayo: <strong className="text-white tabular-nums">{service.rehearsalTime}</strong>
+                    · Ensayo: <strong className="text-[#F8F4EA] tabular-nums">{service.rehearsalTime}</strong>
                   </span>
                 )}
                 <span>
-                  · Cobertura: <strong className="text-white tabular-nums">{occupiedCount} de {totalSlots}</strong> posiciones
+                  · Cobertura: <strong className="text-[#F8F4EA] tabular-nums">{occupiedCount} de {totalSlots}</strong> posiciones
                 </span>
                 {service.registrationDeadline && (
-                  <span className="text-[#F3B36C] bg-[#E08E45]/15 border border-[#E08E45]/35 px-2 py-0.5 rounded font-medium">
+                  <span className="text-[#302C24] bg-[#DCBD9E] px-2 py-0.5 rounded-md font-bold">
                     Fecha límite: <strong>{service.registrationDeadline}</strong>
                   </span>
                 )}
@@ -206,51 +206,51 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-[#B4B4BE] hover:text-white hover:bg-white/10 transition-colors shrink-0"
+              className="btn-kinetic p-2 rounded-xl text-[#E7EDF3] hover:text-[#F8F4EA] hover:bg-[#F8F4EA]/15 shrink-0 cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {service.notes && (
-            <div className="mt-3 p-3 rounded-xl bg-[#141419] border border-white/10 text-xs text-[#E4E4E7] flex items-start gap-2">
-              <FileText className="w-4 h-4 text-[#D8B28A] flex-shrink-0 mt-0.5" />
-              <span><strong className="text-white">Notas / Repertorio:</strong> {service.notes}</span>
+            <div className="mt-3 p-3 rounded-xl bg-[#F8F4EA]/10 border border-[#F8F4EA]/20 text-xs text-[#F8F4EA] flex items-start gap-2">
+              <FileText className="w-4 h-4 text-[#DCBD9E] flex-shrink-0 mt-0.5" />
+              <span><strong className="text-[#DCBD9E]">Notas / Repertorio:</strong> {service.notes}</span>
             </div>
           )}
         </div>
 
         {/* Cuerpo Principal Desplazable (incluye Setlist, Bloqueo de Músicos y Puestos sin recortarse) */}
-        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar">
+        <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1 custom-scrollbar bg-[#F8F4EA]/55">
 
           {/* ACCESO RÁPIDO RECOMENDADO PARA EL USUARIO MÚSICO */}
           {musicianUser && isMusicianView && (
             <div>
               {isExpired && !myAssignedSlot ? (
-                <div className="p-4 bg-[#FB7185]/12 border border-[#FB7185]/35 rounded-2xl flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#FB7185]/20 text-[#FDA4AF] flex items-center justify-center font-bold flex-shrink-0">
+                <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold flex-shrink-0">
                     <Lock className="w-5 h-5" />
                   </div>
                   <div>
-                    <h4 className="text-xs font-bold text-white">
+                    <h4 className="text-xs font-bold text-[#302C24]">
                       Inscripciones expiradas para este servicio
                     </h4>
-                    <p className="text-xs text-[#FDA4AF] mt-0.5">
+                    <p className="text-xs text-rose-700 mt-0.5">
                       El plazo de postulación para esta fecha ha finalizado{service.registrationDeadline ? ` (límite: ${service.registrationDeadline})` : ''}. Ya no se admiten registros de puestos.
                     </p>
                   </div>
                 </div>
               ) : myAssignedSlot ? (
-                <div className="p-4 bg-[#34D399]/12 border border-[#34D399]/35 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="p-4 bg-[#EBF0E7] border border-[#8E9B84]/50 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#34D399] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#637358] text-[#F8F4EA] flex items-center justify-center font-bold flex-shrink-0">
                       <Check className="w-5 h-5 stroke-[2.5]" />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-white">
+                      <h4 className="text-xs font-bold text-[#302C24]">
                         Estás confirmado en este servicio
                       </h4>
-                      <p className="text-xs text-[#6EE7B7] mt-0.5">
+                      <p className="text-xs text-[#4A5940] mt-0.5">
                         Puesto asignado: <strong>{myAssignedSlot.label}</strong>
                       </p>
                     </div>
@@ -259,28 +259,28 @@ export const ServiceDetailModal: React.FC<Props> = ({
                   {!isExpired && (
                     <button
                       onClick={() => handleRelease(myAssignedSlot.key)}
-                      className="px-3 py-1.5 bg-[#1F1F26] hover:bg-[#FB7185]/20 text-[#FDA4AF] border border-[#FB7185]/35 rounded-xl text-xs font-bold transition-colors"
+                      className="btn-kinetic px-3 py-1.5 bg-white hover:bg-rose-50 text-rose-700 border border-rose-200 rounded-xl text-xs font-bold cursor-pointer"
                     >
                       Liberar mi puesto
                     </button>
                   )}
                 </div>
               ) : recommendedSlot && service.isOpen && !isExpired ? (
-                <div className="p-4 bg-[#D8B28A]/12 border border-[#D8B28A]/35 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="p-4 bg-[#F5EBE0] border border-[#DCBD9E] rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0">
+                    <div className="w-9 h-9 rounded-xl bg-[#2E4056] text-[#DCBD9E] flex items-center justify-center font-bold flex-shrink-0">
                       <Sparkles className="w-4 h-4" />
                     </div>
                     <div>
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <span className="text-[10px] uppercase font-black tracking-wider px-2 py-0.5 bg-[#D8B28A] text-[#0D0D10] rounded-md">
+                        <span className="text-[10px] font-display uppercase font-black tracking-wider px-2 py-0.5 bg-[#2E4056] text-[#F8F4EA] rounded-md">
                           Acceso Rápido
                         </span>
-                        <h4 className="text-xs font-bold text-white">
+                        <h4 className="text-xs font-bold text-[#302C24]">
                           {musicianUser.fullName}, tu instrumento es {musicianUser.primaryInstrument}
                         </h4>
                       </div>
-                      <p className="text-xs text-[#E5C6A4] mt-0.5">
+                      <p className="text-xs text-[#635C51] mt-0.5">
                         El puesto <strong>{recommendedSlot.label}</strong> está libre para este {dayName}.
                       </p>
                     </div>
@@ -288,9 +288,9 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
                   <button
                     onClick={() => handleClaim(recommendedSlot.key)}
-                    className="w-full sm:w-auto px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-glow transition-all active:scale-[0.98]"
+                    className="btn-kinetic w-full sm:w-auto px-4 py-2 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-extrabold flex items-center justify-center gap-2 shadow-glow cursor-pointer"
                   >
-                    <Check className="w-4 h-4 stroke-[3]" />
+                    <Check className="w-4 h-4 stroke-[3] text-[#DCBD9E]" />
                     <span>Aceptar puesto ({recommendedSlot.label})</span>
                   </button>
                 </div>
@@ -300,15 +300,15 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
           {/* Alerts */}
           {errorMsg && (
-            <div className="p-3 bg-[#FB7185]/15 border border-[#FB7185]/40 rounded-xl text-[#FDA4AF] text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-[#FB7185] flex-shrink-0" />
+            <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-rose-800 text-xs flex items-center gap-2 font-semibold">
+              <AlertCircle className="w-4 h-4 text-rose-600 flex-shrink-0" />
               <span>{errorMsg}</span>
             </div>
           )}
 
           {successMsg && (
-            <div className="p-3 bg-[#34D399]/15 border border-[#34D399]/40 rounded-xl text-[#6EE7B7] text-xs flex items-center gap-2">
-              <Check className="w-4 h-4 text-[#34D399] flex-shrink-0" />
+            <div className="p-3 bg-[#EBF0E7] border border-[#8E9B84]/50 rounded-xl text-[#4A5940] text-xs flex items-center gap-2 font-semibold">
+              <Check className="w-4 h-4 text-[#637358] flex-shrink-0" />
               <span>{successMsg}</span>
             </div>
           )}
@@ -329,25 +329,25 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
             if (canManageSetlist) {
               return (
-                <div className="p-4 bg-[#1E1E26] border border-[#D8B28A]/35 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-card">
+                <div className="bento-card p-4 bg-[#FCFBF8] border-[#DCBD9E] rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0 shadow-glow">
+                    <div className="w-10 h-10 rounded-xl bg-[#2E4056] text-[#DCBD9E] flex items-center justify-center font-bold flex-shrink-0 shadow-xs">
                       <Music className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs sm:text-sm font-bold text-white">
+                        <span className="text-xs sm:text-sm font-display font-bold text-[#302C24]">
                           Repertorio de Canciones (Setlist)
                         </span>
-                        <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded-md ${
+                        <span className={`text-[10px] font-display font-black uppercase px-2 py-0.5 rounded-md ${
                           service.isSongsPublished
-                            ? 'bg-[#34D399]/20 text-[#6EE7B7] border border-[#34D399]/40'
-                            : 'bg-[#E08E45]/20 text-[#F3B36C] border border-[#E08E45]/40'
+                            ? 'bg-[#EBF0E7] text-[#4A5940] border border-[#8E9B84]/45'
+                            : 'bg-[#F5EBE0] text-[#7D5A38] border border-[#DCBD9E]'
                         }`}>
                           {service.isSongsPublished ? '✓ Publicado' : 'Borrador'}
                         </span>
                       </div>
-                      <p className="text-xs text-[#B4B4BE] mt-0.5">
+                      <p className="text-xs text-[#635C51] mt-0.5">
                         {songs.length > 0
                           ? `${songs.length} alabanza(s) configurada(s) con videos y tonos.`
                           : 'Aún no has agregado canciones a este culto.'}
@@ -360,19 +360,19 @@ export const ServiceDetailModal: React.FC<Props> = ({
                       <button
                         type="button"
                         onClick={() => onOpenSetlist(service)}
-                        className="px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black transition-all shadow-glow flex items-center gap-1.5 cursor-pointer"
+                        className="btn-kinetic px-4 py-2 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-bold shadow-glow flex items-center gap-1.5 cursor-pointer"
                       >
-                        <Music className="w-3.5 h-3.5" />
+                        <Music className="w-3.5 h-3.5 text-[#DCBD9E]" />
                         <span>Gestionar Canciones</span>
                       </button>
                     )}
                     <a
                       href={publicUrl}
                       onClick={onClose}
-                      className="p-2 bg-[#141419] hover:bg-[#272730] text-white border border-white/15 rounded-xl transition-colors"
+                      className="btn-kinetic p-2 bg-[#F5EBE0] hover:bg-[#DCBD9E]/55 text-[#2E4056] border border-[#DCBD9E] rounded-xl"
                       title="Ver link público oficial"
                     >
-                      <ExternalLink className="w-4 h-4 text-[#D8B28A]" />
+                      <ExternalLink className="w-4 h-4" />
                     </a>
                   </div>
                 </div>
@@ -381,16 +381,16 @@ export const ServiceDetailModal: React.FC<Props> = ({
 
             if (isPublished) {
               return (
-                <div className="p-4 bg-[#1E1E26] border border-[#D8B28A]/35 rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 shadow-card">
+                <div className="bento-card p-4 bg-[#FCFBF8] border-[#DCBD9E] rounded-2xl flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#D8B28A] text-[#0D0D10] flex items-center justify-center font-bold flex-shrink-0 shadow-glow">
+                    <div className="w-10 h-10 rounded-xl bg-[#2E4056] text-[#DCBD9E] flex items-center justify-center font-bold flex-shrink-0 shadow-xs">
                       <Music className="w-5 h-5" />
                     </div>
                     <div>
-                      <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-1.5">
+                      <h4 className="text-xs sm:text-sm font-display font-bold text-[#302C24] flex items-center gap-1.5">
                         <span>Repertorio Oficial Publicado</span>
                       </h4>
-                      <p className="text-xs text-[#B4B4BE] mt-0.5">
+                      <p className="text-xs text-[#635C51] mt-0.5">
                         {songs.length} alabanza(s) listas para ensayar con videos de YouTube y tonos.
                       </p>
                     </div>
@@ -399,10 +399,10 @@ export const ServiceDetailModal: React.FC<Props> = ({
                   <a
                     href={publicUrl}
                     onClick={onClose}
-                    className="px-4 py-2 bg-[#D8B28A] hover:bg-[#E5C6A4] text-[#0D0D10] rounded-xl text-xs font-black transition-all shadow-glow flex items-center justify-center gap-1.5 self-end sm:self-auto"
+                    className="btn-kinetic px-4 py-2 bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] rounded-xl text-xs font-display font-bold shadow-glow flex items-center justify-center gap-1.5 self-end sm:self-auto"
                   >
                     <span>Ver Canciones & Tonos</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
+                    <ExternalLink className="w-3.5 h-3.5 text-[#DCBD9E]" />
                   </a>
                 </div>
               );
@@ -411,53 +411,53 @@ export const ServiceDetailModal: React.FC<Props> = ({
             return null;
           })()}
 
-          {/* Panel de Gestión de Bloqueo de Músicos por Culto (Exclusivo Administrador - Sin Recortes) */}
+          {/* Panel de Gestión de Bloqueo de Músicos por Culto (Exclusivo Administrador - Sin Recortes y Alto Contraste) */}
           {showAdminControls && (
-            <div className="bg-[#1C1C23] border border-white/12 rounded-2xl overflow-hidden shadow-card">
+            <div className="bg-[#FCFBF8] border border-[#E5DEC9] rounded-2xl overflow-hidden shadow-card">
               <div 
                 onClick={() => setShowBlockedUsersPanel(!showBlockedUsersPanel)}
-                className="p-4 bg-[#1F1F27] flex items-center justify-between gap-3 cursor-pointer hover:bg-[#262630] transition-colors"
+                className="p-4 bg-[#F5EBE0]/65 flex items-center justify-between gap-3 cursor-pointer hover:bg-[#F5EBE0] transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
                     (service.blockedMusicianIds || []).length > 0 
-                      ? 'bg-[#FB7185]/20 text-[#FDA4AF] border border-[#FB7185]/35' 
-                      : 'bg-[#D8B28A]/15 text-[#D8B28A] border border-[#D8B28A]/30'
+                      ? 'bg-rose-100 text-rose-700 border border-rose-200' 
+                      : 'bg-[#E7EDF3] text-[#2E4056] border border-[#2E4056]/20'
                   }`}>
                     <UserX className="w-5 h-5" />
                   </div>
                   <div className="min-w-0">
-                    <h4 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 flex-wrap">
+                    <h4 className="text-xs sm:text-sm font-display font-bold text-[#302C24] flex items-center gap-2 flex-wrap">
                       <span>Bloqueo de Músicos para este Culto</span>
                       {(service.blockedMusicianIds || []).length > 0 && (
-                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#FB7185]/20 text-[#FDA4AF] border border-[#FB7185]/40">
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200">
                           {(service.blockedMusicianIds || []).length} bloqueado(s)
                         </span>
                       )}
                     </h4>
-                    <p className="text-xs text-[#B4B4BE] mt-0.5 leading-snug">
+                    <p className="text-xs text-[#635C51] mt-0.5 leading-snug">
                       Los músicos bloqueados no verán este culto disponible ni tendrán acceso a sus canciones publicadas.
                     </p>
                   </div>
                 </div>
                 <button
                   type="button"
-                  className="px-3.5 py-2 rounded-xl bg-[#141419] hover:bg-[#D8B28A] text-[#D8B28A] hover:text-[#0D0D10] border border-[#D8B28A]/40 text-xs font-bold transition-all shrink-0 cursor-pointer"
+                  className="btn-kinetic px-3.5 py-2 rounded-xl bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] text-xs font-display font-bold shrink-0 cursor-pointer"
                 >
                   {showBlockedUsersPanel ? 'Ocultar' : 'Gestionar'}
                 </button>
               </div>
 
               {showBlockedUsersPanel && (
-                <div className="p-4 border-t border-white/10 bg-[#16161B] space-y-3">
+                <div className="p-4 border-t border-[#E5DEC9] bg-[#FCFBF8] space-y-3">
                   <div className="relative">
-                    <Search className="w-4 h-4 text-[#8E8E9A] absolute left-3 top-1/2 -translate-y-1/2" />
+                    <Search className="w-4 h-4 text-[#8D8579] absolute left-3 top-1/2 -translate-y-1/2" />
                     <input
                       type="text"
                       placeholder="Buscar músico por nombre o instrumento..."
                       value={blockedSearch}
                       onChange={(e) => setBlockedSearch(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#0D0D10] border border-white/15 rounded-xl focus:outline-none focus:border-[#D8B28A] text-white placeholder-[#8E8E9A]"
+                      className="w-full pl-9 pr-3 py-2.5 text-xs bg-[#F8F4EA] border border-[#E5DEC9] rounded-xl focus:bg-white focus:outline-none focus:border-[#2E4056] text-[#302C24] placeholder-[#8D8579]"
                     />
                   </div>
 
@@ -471,29 +471,29 @@ export const ServiceDetailModal: React.FC<Props> = ({
                             key={m.id}
                             className={`p-2.5 sm:p-3 rounded-xl border flex items-center justify-between gap-2 transition-all ${
                               isBlocked 
-                                ? 'bg-[#FB7185]/12 border-[#FB7185]/40' 
-                                : 'bg-[#1F1F26] border-white/10 hover:border-white/20'
+                                ? 'bg-rose-50 border-rose-200' 
+                                : 'bg-[#F8F4EA] border-[#E5DEC9] hover:border-[#2E4056]/30'
                             }`}
                           >
                             <div className="flex items-center gap-2.5 min-w-0">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold text-xs shrink-0 ${
-                                isBlocked ? 'bg-[#E11D48] text-white' : 'bg-[#D8B28A]/20 text-[#D8B28A]'
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-display font-bold text-xs shrink-0 ${
+                                isBlocked ? 'bg-rose-600 text-white' : 'bg-[#E7EDF3] text-[#2E4056]'
                               }`}>
                                 {m.fullName.charAt(0).toUpperCase()}
                               </div>
                               <div className="min-w-0">
-                                <p className="text-xs font-bold text-white truncate">{m.fullName}</p>
-                                <p className="text-[11px] text-[#B4B4BE] truncate">{m.primaryInstrument}</p>
+                                <p className="text-xs font-bold text-[#302C24] truncate">{m.fullName}</p>
+                                <p className="text-[11px] text-[#635C51] truncate">{m.primaryInstrument}</p>
                               </div>
                             </div>
 
                             <button
                               type="button"
                               onClick={() => toggleBlockMusicianInService(service.id, m.id)}
-                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                              className={`btn-kinetic px-3 py-1.5 rounded-xl text-xs font-display font-bold flex items-center gap-1.5 shrink-0 cursor-pointer ${
                                 isBlocked
-                                  ? 'bg-[#E11D48] text-white hover:bg-[#BE123C]'
-                                  : 'bg-[#141419] text-[#B4B4BE] hover:text-[#FDA4AF] hover:border-[#FB7185]/40 border border-white/15'
+                                  ? 'bg-rose-600 text-white hover:bg-rose-700'
+                                  : 'bg-white text-[#4A5940] hover:text-rose-700 hover:border-rose-300 border border-[#8E9B84]/45'
                               }`}
                             >
                               {isBlocked ? (
@@ -647,13 +647,13 @@ export const ServiceDetailModal: React.FC<Props> = ({
                               <button
                                 onClick={() => handleClaim(slot.key)}
                                 disabled={!service.isOpen || isExpired}
-                                className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-xl transition-all shadow-2xs ${
+                                className={`btn-kinetic inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-display font-bold rounded-xl shadow-2xs ${
                                   service.isOpen && !isExpired
-                                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white hover:scale-105 active:scale-95 shadow-sm shadow-emerald-600/20'
-                                    : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200'
+                                    ? 'bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] shadow-sm cursor-pointer'
+                                    : 'bg-[#F5EBE0] text-[#8D8579] cursor-not-allowed border border-[#E5DEC9]'
                                 }`}
                               >
-                                <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                                <Check className="w-3.5 h-3.5 stroke-[2.5] text-[#DCBD9E]" />
                                 <span>Anotarme</span>
                               </button>
                             )}
@@ -670,14 +670,14 @@ export const ServiceDetailModal: React.FC<Props> = ({
         </div>
 
         {/* Footer info */}
-        <div className="p-4 bg-[#1D1D24] border-t border-white/10 flex items-center justify-between gap-3 text-xs text-[#B4B4BE] shrink-0">
-          <div className="flex items-center gap-1.5 text-[#B4B4BE]">
-            <Info className="w-3.5 h-3.5 text-[#D8B28A] shrink-0" />
-            <span>Regla de Alabanza: Solo puedes poner tu check en <strong className="text-white">1 puesto</strong> por fecha de servicio.</span>
+        <div className="p-4 bg-[#FCFBF8] border-t border-[#E5DEC9] flex items-center justify-between gap-3 text-xs text-[#635C51] shrink-0">
+          <div className="flex items-center gap-1.5 text-[#635C51]">
+            <Info className="w-3.5 h-3.5 text-[#2E4056] shrink-0" />
+            <span>Regla de Alabanza: Solo puedes poner tu check en <strong className="text-[#302C24]">1 puesto</strong> por fecha de servicio.</span>
           </div>
           <button
             onClick={onClose}
-            className="px-4 py-1.5 rounded-xl bg-[#272730] hover:bg-[#D8B28A] text-white hover:text-[#0D0D10] border border-white/15 text-xs font-bold transition-colors shrink-0 cursor-pointer"
+            className="btn-kinetic px-4 py-1.5 rounded-xl bg-[#2E4056] hover:bg-[#213042] text-[#F8F4EA] text-xs font-display font-bold shrink-0 cursor-pointer"
           >
             Listo / Cerrar
           </button>

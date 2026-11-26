@@ -222,12 +222,12 @@ export const SongBankPlayer: React.FC = () => {
               </div>
             </div>
 
-            {/* Curva decorativa tipo ola en la parte inferior para fusionar con el fondo oscuro */}
+            {/* Curva decorativa tipo ola en la parte inferior para fusionar con el fondo crema */}
             <div className="absolute -bottom-1 left-0 right-0 overflow-hidden leading-none z-10 pointer-events-none">
               <svg
                 viewBox="0 0 1200 120"
                 preserveAspectRatio="none"
-                className="relative block w-full h-8 text-[#0D0D10] fill-current"
+                className="relative block w-full h-8 text-[#F8F4EA] fill-current"
               >
                 <path d="M0,0 C150,80 350,-30 500,40 C650,110 900,10 1200,45 L1200,120 L0,120 Z" />
               </svg>
@@ -392,23 +392,20 @@ export const SongBankPlayer: React.FC = () => {
     return (
       <div className="space-y-4">
         {/* Banner Editorial Musical */}
-        <div className="relative rounded-3xl overflow-hidden shadow-card p-5 text-white bg-[#14242D] min-h-[140px] flex flex-col justify-end">
-          <img
-            src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80"
-            alt="Worship"
-            className="absolute inset-0 w-full h-full object-cover opacity-30 mix-blend-luminosity"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#14242D] via-[#14242D]/80 to-transparent" />
+        <div className="relative rounded-3xl overflow-hidden shadow-modal p-5 sm:p-6 text-[#F8F4EA] bg-gradient-to-br from-[#2E4056] via-[#26374B] to-[#3B4F66] border border-[#213042] min-h-[140px] flex flex-col justify-end">
+          <div className="absolute -top-14 -right-10 w-48 h-48 rounded-full bg-[#DCBD9E]/20 blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-16 left-1/3 w-44 h-44 rounded-full bg-[#8E9B84]/25 blur-3xl pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-[#DCBD9E] via-[#8E9B84] to-[#DCBD9E] opacity-85" />
 
           <div className="relative z-10 flex items-start gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-[#D9E9EB]/20 backdrop-blur-md border border-white/20 flex items-center justify-center text-[#D9E9EB] shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-[#F8F4EA]/12 backdrop-blur-md border border-[#DCBD9E]/35 flex items-center justify-center text-[#DCBD9E] shrink-0">
               <Music className="w-6 h-6" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl sm:text-2xl font-bold text-white font-display leading-tight">
+              <h1 className="text-xl sm:text-2xl font-extrabold text-[#F8F4EA] font-display leading-tight">
                 Banco de Pistas de Audio
               </h1>
-              <p className="text-xs text-white/80 mt-1 leading-snug">
+              <p className="text-xs text-[#E7EDF3]/90 mt-1 leading-snug">
                 Escucha y practica las pistas del banco de canciones con transpositor de tono integrado.
               </p>
             </div>

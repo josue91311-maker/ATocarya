@@ -14,42 +14,42 @@ export interface MusicCardTheme {
 export const MUSIC_CARD_THEMES: Record<MusicThemeKey, MusicCardTheme> = {
   worship: {
     id: 'worship',
-    headerBg: '#C96B65', // Coral
-    headerText: '#FFFFFF',
-    accentColor: '#B95752',
-    lightBg: '#F7EAE5',
+    headerBg: '#2E4056', // Azul Iglesia
+    headerText: '#F8F4EA',
+    accentColor: '#213042',
+    lightBg: '#E7EDF3',
     svgPath: '/assets/music/worship-silhouette.svg',
   },
   guitar: {
     id: 'guitar',
-    headerBg: '#315F6D', // Petróleo
-    headerText: '#FFFFFF',
-    accentColor: '#234A57',
-    lightBg: '#D9E9EB',
+    headerBg: '#5C6B54', // Salvia profundo
+    headerText: '#F8F4EA',
+    accentColor: '#485441',
+    lightBg: '#EBF0E7',
     svgPath: '/assets/music/guitar-line.svg',
   },
   drums: {
     id: 'drums',
-    headerBg: '#BD8C29', // Mostaza elegante
-    headerText: '#FFFFFF',
-    accentColor: '#9D721A',
-    lightBg: '#FFF1CB',
+    headerBg: '#8A6A4B', // Arena cálida tostada
+    headerText: '#F8F4EA',
+    accentColor: '#6E5238',
+    lightBg: '#F5EBE0',
     svgPath: '/assets/music/drums-line.svg',
   },
   piano: {
     id: 'piano',
-    headerBg: '#46516F', // Pizarra
-    headerText: '#FFFFFF',
-    accentColor: '#363F59',
-    lightBg: '#E5E8F0',
+    headerBg: '#3D372E', // Café oscuro editorial
+    headerText: '#F8F4EA',
+    accentColor: '#302C24',
+    lightBg: '#F2ECE1',
     svgPath: '/assets/music/piano-line.svg',
   },
   musicWave: {
     id: 'musicWave',
-    headerBg: '#315F6D',
-    headerText: '#FFFFFF',
-    accentColor: '#264F5D',
-    lightBg: '#D9E9EB',
+    headerBg: '#2E4056',
+    headerText: '#F8F4EA',
+    accentColor: '#213042',
+    lightBg: '#E7EDF3',
     svgPath: '/assets/music/music-wave.svg',
   },
 };
